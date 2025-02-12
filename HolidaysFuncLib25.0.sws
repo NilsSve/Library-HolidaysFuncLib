@@ -1,0 +1,12 @@
+[Properties]
+Version=25.0
+[WorkspacePaths]
+ConfigFile=.\Programs\Config.ws
+[TestProjects]
+[Conditionals]
+Is$WebApp=False
+Is$Win64=True
+Is$GraphicsLibrary=False
+COMP$TIMESTAMP=True
+[Projects]
+[Libraries]

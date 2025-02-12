@@ -1,0 +1,12 @@
+[Properties]
+Version=24.0
+[WorkspacePaths]
+ConfigFile=.\Programs\Config.ws
+[TestProjects]
+[Conditionals]
+Is$WebApp=False
+Is$Win64=True
+Is$GraphicsLibrary=False
+[Libraries]
+[Projects]
+Project0=Dummy.src
