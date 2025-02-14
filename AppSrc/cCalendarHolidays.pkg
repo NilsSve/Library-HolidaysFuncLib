@@ -49,7 +49,7 @@ Use Windows.pkg
 Use Dll.pkg
 Use Dferror.pkg
 Use GlobalDateTimeFunctions.pkg
-Use cCalendarHolidays.inc
+Use cCalendarHolidays.h.pkg
 
 Register_Function psISO_Short Returns String
 

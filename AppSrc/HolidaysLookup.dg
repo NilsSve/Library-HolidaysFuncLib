@@ -15,7 +15,7 @@
 //    2025-11-22 Moved definitions at top of package to include file.
 //
 //****************************************************************************
-Use HolidaysLookup.inc
+Use HolidaysLookup.h.pkg
 
 // See bottom of package for General purpose access method!
 //   Function PopupHolidayLookup String sISO_Short Returns tHoliday[]
