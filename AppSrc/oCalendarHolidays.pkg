@@ -20,6 +20,8 @@ Use cCalendarHolidays.pkg
 Object oCalendarHolidays is a cCalendarHolidays
     Move Self to ghoCalendarHolidays
 
+    Use CountryPackages.pkg
+
     // *** Here we include special function packages ***
     #Include MothersDay.pkg   // Function "MothersDay"  returns the Mother's Day for the passed year and an ISO 2-character country code.
     #Include NationalDays.pkg // Function "NationalDay" returns the National Day for the passed year and an ISO 2-character country code.

@@ -12,18 +12,21 @@ Class cNationalHolidays is a cObject
         Move Self to ghoNationalHolidayObject
 
         { Visibility = Private }
+        
         Property String private_psISO_Short
         { Visibility = Public }
         Property String psOfficial_Short
+        
     End_Procedure
     
     { MethodType = Property }    
     Procedure Set psISO_Short String sISO_Short
+        String sOfficial_Short
+
         Set private_psISO_Short to sISO_Short
-        Move sISO_Short to Nations.ISO_Short
-        Find EQ Nations.ISO_Short
-        If (Found) Begin
-            Set psOfficial_Short to (Trim(Nations.Official_Short))
+        If (ghoCalendarHolidays <> 0) Begin
+            Get Official_ShortCode of ghoCalendarHolidays sISO_Short to sOfficial_Short     
+            Set psOfficial_Short to sOfficial_Short
         End
     End_Procedure  
     
@@ -37,5 +40,5 @@ Class cNationalHolidays is a cObject
             Send RegisterNationalHolidays of ghoCalendarHolidays Self
         End
     End_Procedure
-
+    
 End_Class

@@ -5,6 +5,11 @@
 // the calculation should take place - with a year from the list above.
 Define C_FirstGregorianYear for 1752 
 
+Struct tISO_ShortOfficial_Short
+    String sIso_Short
+    String sOffical_Short
+End_Struct
+
 Struct tLunar
     Integer iYear
     Integer iMonth
