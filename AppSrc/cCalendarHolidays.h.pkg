@@ -5,9 +5,11 @@
 // the calculation should take place - with a year from the list above.
 Define C_FirstGregorianYear for 1752 
 
-Struct tISO_ShortOfficial_Short
-    String sIso_Short
-    String sOffical_Short
+Struct tISO_Codes
+    String  sISO_Short       // 2-character code
+    String  sOffical_Short   // Short country name
+    String  sISO_Long        // 3-character code
+    Integer iISO_Code        // Numberic ISO code
 End_Struct
 
 Struct tLunar

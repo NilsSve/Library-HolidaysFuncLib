@@ -355,6 +355,12 @@ Object oBrittishHolidays is a cNationalHolidays
             Function_Return "4th Advent Sunday"
         End
 
+        Get AshWednesday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move 0 to iBankHoliday
+            Function_Return "Ash Wednesday"
+        End
+
         // Shrove Tuesday, Pancake Day - the day before Ash Wednesday
         //
         Get AshWednesday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate

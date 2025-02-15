@@ -205,6 +205,12 @@ Object oAmericanHolidays is a cNationalHolidays
             Function_Return "Thanksgiving Day"
         End
 
+        Get AshWednesday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move False to bOfficialHoliday
+            Function_Return "Ash Wednesday"
+        End
+
         Get PalmSunday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
             Move False to bOfficialHoliday

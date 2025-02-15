@@ -46,8 +46,10 @@ Use cCalendarHolidays.h.pkg
         country code for all functions calls, to have a unified calling interface.
         
         All 2-character sISO_Short codes can be seen near the bottom of this
-        package; "Procedure AddAllOfficialShort", or by getting the 'pAllISOCodes'
+        package; "Procedure CollectISOCodes", or by getting the 'pISO_Codes'
         struct array property.
+        All 2-character ISO_Short string are defined here:
+            https://www.iso.org/obp/ui/#search/code/
      
      2. Secondly there is the 'IsHoliday' function that returns the name of a 
         holiday/special day, given a certain date.
@@ -143,8 +145,8 @@ Class cCalendarHolidays is a cObject
         Forward Send Construct_Object
         
         { MethodType = Property Visibility = Public Category = Data}
-        { Description = "Struct array with all the worlds ISO_Short and Official_Short string values." }
-        Property tISO_ShortOfficial_Short[] pAllISOCodes
+        { Description = "Struct array with all the worlds ISO_Short-, Official_Short-, ISO_Long- string codes and iISO_Code- integer values." }
+        Property tISO_Codes[] pISO_Codes
         
         { MethodType = Property Visibility = Public Category = Data}
         { Description = "Struct array with all function names and other info associated with those functions." }
@@ -157,7 +159,7 @@ Class cCalendarHolidays is a cObject
         { MethodType = Property Visibility = Private }
         Property String[] psArrayAsYear
 
-        Send AddAllOfficialShort
+        Send CollectISOCodes
     End_Procedure
 
     Procedure End_Construct_Object
@@ -247,6 +249,24 @@ Class cCalendarHolidays is a cObject
             Get IsHoliday of hoNationalHolidays dInDate (&bOfficialHoliday) to sHolidayName
         End
         Function_Return sHolidayName
+    End_Function  
+    
+    Function ISO_ShortFromISO_Long String sISO_Long Returns String
+        tISO_Codes[] ISO_CodesArray
+        String sCode
+        Integer iSize iCount
+        
+        Move "" to sCode
+        Move (Uppercase(sISO_Long)) to sISO_Long 
+        Get pISO_Codes to ISO_CodesArray
+        Move (SizeOfArray(ISO_CodesArray)) to iSize
+        Decrement iSize
+        For iCount from 0 to iSize
+            If (ISO_CodesArray[iCount].sISO_Long = sISO_Long) Begin
+                Function_Return ISO_CodesArray[iCount].sISO_Short
+            End
+        Loop
+        Function_Return sCode
     End_Function
 
     Procedure HELPER_FUNCTIONS // For the Studio Code Explorer
@@ -1126,14 +1146,14 @@ Class cCalendarHolidays is a cObject
     // national ISO code, from a sISO_Short code.
     // The class is used by all packages in the CountryPackages.pkg file.
     Function Official_ShortCode String sISO_Short Returns String
-        tISO_ShortOfficial_Short[] AllISOCodes
-        tISO_ShortOfficial_Short ISOShort
+        tISO_Codes[] AllISOCodes
+        tISO_Codes ISOShort
         Integer iItem 
         String sOfficial_Short
         
         Move "" to sOfficial_Short
         Move (Uppercase(sISO_Short)) to ISOShort.sIso_Short
-        Get pAllISOCodes to AllISOCodes
+        Get pISO_Codes to AllISOCodes
         Move (SearchArray(ISOShort, AllISOCodes)) to iItem 
         If (iItem <> -1) Begin
             Move AllISOCodes[iItem].sOffical_Short to sOfficial_Short
@@ -1142,270 +1162,548 @@ Class cCalendarHolidays is a cObject
         Function_Return sOfficial_Short
     End_Function
     
-    Procedure AddAllOfficialShort
-        tISO_ShortOfficial_Short[] ISO_ShortOfficial_ShortArray
+//    Procedure OLD
+//        tISO_Codes[] ISO_CodesArray
+//        String[] asCodes
+//        String sCodes sCRLF sVal
+//        Integer iPos iSize iCount iItem
+//        
+//        Move (Character(13) + Character(10)) to sCRLF
+//        Move """
+//        AD-Andorra
+//        AE-United Arab Emirates
+//        AF-Afghanistan
+//        AG-Antigua and Barbuda
+//        AI-Anguilla
+//        AL-Albania
+//        AM-Armenia
+//        AO-Angola
+//        AR-Argentina
+//        AS-American Samoa
+//        AT-Austria
+//        AU-Australia
+//        AW-Aruba
+//        AX-Aaland Islands
+//        AZ-Azerbaijan
+//        BA-Bosnia and Herzegovina
+//        BB-Barbados
+//        BD-Bangladesh
+//        BE-Belgium
+//        BF-Burkina Faso
+//        BG-Bulgaria
+//        BH-Bahrain
+//        BI-Burundi
+//        BJ-Benin
+//        BL-Saint Barthélemy
+//        BM-Bermuda
+//        BN-Brunei Darussalam
+//        BO-Boliva, Plurinational State of
+//        BR-Brazil
+//        BS-Bahamas
+//        BT-Bhutan
+//        BW-Botswana
+//        BY-Belarus
+//        BZ-Belize
+//        CA-Canada
+//        CC-Cocos (Keeling) Islands
+//        CD-Congo, The Democratic Republic of
+//        CF-Central African Republic
+//        CG-Congo
+//        CH-Switzerland
+//        CI-Côte d'Ivoire
+//        CK-Cook Islands
+//        CL-Chile
+//        CM-Cameroon
+//        CN-China
+//        CO-Colombia
+//        CR-Costa Rica
+//        CU-Cuba
+//        CV-Cap Verde
+//        CW-Curacao
+//        CX-Christmas Island
+//        CY-Cyprus
+//        CZ-Czeck Republic
+//        DE-Germany
+//        DJ-Djibouti
+//        DK-Denmark
+//        DM-Dominica
+//        DO-Dominican Republic
+//        DZ-Algeria
+//        EC-Ecuador
+//        EE-Estonia
+//        EG-Egypt
+//        EH-Western Sahara
+//        ER-Eritrea
+//        ES-Spain
+//        ET-Ethiopia
+//        FI-Finland
+//        FJ-Fiji
+//        FK-Falklands Islands (Malvinas)
+//        FM-Micronesia, Federated States of
+//        FO-Faroe Islands
+//        FR-France
+//        GA-Gabon
+//        GB-United Kingdom
+//        GD-Grenada
+//        GE-Georgia
+//        GF-French Guyana
+//        GG-Guernsey
+//        GH-Ghana
+//        GI-Gibraltar
+//        GM-Gambia
+//        GN-Guinea
+//        GP-Guadeloupe
+//        GQ-Equatorial Guinea
+//        GR-Greece
+//        GS-South Georgia and the South Sandwich Isl
+//        GT-Guatemala
+//        GU-Guam
+//        GW-Guinea-Bissau
+//        GY-Guyana
+//        HK-Hong Kong
+//        HM-Heard Islands and McDonald Islands
+//        HN-Honduras
+//        HR-Croatia
+//        HT-Haiti
+//        HU-Hungary
+//        ID-Indonesia
+//        IE-Ireland
+//        IL-Israel
+//        IM-Isle Of Man
+//        IN-India
+//        IQ-Iraq
+//        IR-Iran, Islamic Republic of
+//        IS-Iceland
+//        IT-Italy
+//        JE-Jersey
+//        JM-Jamaica
+//        JO-Jordan
+//        JP-Japan
+//        KE-Kenya
+//        KG-Kyrgyzstan
+//        KH-Cambodia
+//        KI-Kiribati
+//        KM-Comoros
+//        KN-Saint Kitts and Nevis
+//        KP-Korea, Democratic Republic (North Korea)
+//        KR-Korea, Republic Of (South Korea)
+//        KW-Kuwait
+//        KY-Cayman Islands
+//        KZ-Kazakhstan
+//        LA-Lao People's Democratic Republic (Laos)
+//        LB-Lebanon
+//        LC-Saint Lucia
+//        LI-Liechtenstein
+//        LK-Sri Lanka
+//        LR-Liberia
+//        LS-Lesotho
+//        LT-Lithuania
+//        LU-Luxembourg
+//        LV-Latvia
+//        LY-Libyan Arab Jamahiriya
+//        MA-Morocco
+//        MC-Monaco
+//        MD-Moldova, Republic of
+//        ME-Montenegro
+//        MF-Saint Martin
+//        MG-Madagaskar
+//        MH-Marshall Islands
+//        MK-Macedonia, The Former Yugoslav Republic
+//        ML-Mali
+//        MM-Myanmar (Burma)
+//        MN-Mongolia
+//        MO-Macau
+//        MP-Northern Mariana Islands
+//        MQ-Martinique
+//        MR-Mauritania
+//        MS-Montserrat
+//        MT-Malta
+//        MU-Mauritius
+//        MV-Maldives
+//        MW-Malawi
+//        MX-Mexico
+//        MY-Malaysia
+//        MZ-Mozambique
+//        NA-Namibia
+//        NC-New Caledonia
+//        NE-Niger
+//        NF-Norfolk Islands
+//        NG-Nigeria
+//        NI-Nicaragua
+//        NL-Netherlands
+//        NO-Norway
+//        NP-Nepal
+//        NR-Nauru
+//        NU-Niue
+//        NZ-New Zealand
+//        OM-Oman
+//        PA-Panama
+//        PE-Peru
+//        PF-French Polynesia
+//        PG-Papua New Guinea
+//        PH-Philippines
+//        PK-Pakistan
+//        PL-Poland
+//        PM-Saint Pierre and Miquolon
+//        PN-Pitcairn
+//        PR-Puerto Rico
+//        PS-Palestinian Territory, Occupied
+//        PT-Portugal
+//        PW-Palau
+//        PY-Paraguay
+//        QA-Qatar
+//        RE-Réunion
+//        RO-Romania
+//        RS-Serbia
+//        RU-Russian Federation
+//        RW-Rwanda
+//        SA-Saudi Arabia
+//        SB-Solomon Islands
+//        SC-Seychelles
+//        SD-Sudan
+//        SE-Sweden
+//        SG-Singapore
+//        SH-Saint Helena
+//        SI-Slovenia
+//        SJ-Svalbard and Jan Mayen
+//        SK-Slovakia
+//        SL-Sierra Leone
+//        SM-San Marino
+//        SN-Senegal
+//        SO-Somalia
+//        SR-Suriname
+//        ST-Sao Tomé and Principe
+//        SV-El Salvador
+//        SY-Syrian Arablic Republic
+//        SZ-Swaziland
+//        TC-Turks and Caicos Islands
+//        TD-Chad
+//        TF-French Southerns Territories
+//        TG-Togo
+//        TH-Thailand
+//        TJ-Tajikistan
+//        TK-Tokelau
+//        TL-Timor-Leste
+//        TM-Turkmenistan
+//        TN-Tunisia
+//        TO-Tonga
+//        TR-Turkey
+//        TT-Trinidad and Tobago
+//        TV-Tuvalu
+//        TW-Taiwan, Province of China
+//        TZ-Tanzania
+//        UA-Ukraine
+//        UG-Uganda
+//        UM-United States Minor Outlying Islands
+//        US-United States of America
+//        UY-Uruguay
+//        UZ-Uzbekistan
+//        VA-Holy See (Vativan City State)
+//        VC-Saint Vincent and Grenadines
+//        VE-Venezuela, Bolivarian Republic of
+//        VG-Virgin Islands, Britiish
+//        VI-Virgin Islands, U.S.
+//        VN-Vietnam
+//        VU-Vanuatu
+//        WF-Wallis and Futuna
+//        WS-Samoa
+//        YE-Yemen
+//        YT-Mayotte
+//        ZA-South Africa
+//        ZM-Zambia
+//        ZW-Zimbabwe
+//        """ to sCodes  
+//        Move (StrSplitToArray(sCodes, sCRLF)) to asCodes
+//        
+//        Move 0 to iItem
+//        Move (SizeOfArray(asCodes)) to iSize
+//        Decrement iSize
+//        For iCount from 0 to iSize
+//            Move asCodes[iCount] to sVal
+//            Move (Pos("-", sVal)) to iPos
+//            Move (Left(sVal, iPos -1))              to ISO_CodesArray[iItem].sIso_Short
+//            Move (Mid(sVal, Length(sVal) ,iPos +1)) to ISO_CodesArray[iItem].sOffical_Short
+//            Increment iItem
+//        Loop
+//        Set pISO_Codes to ISO_CodesArray
+//    End_Procedure
+
+    Procedure CollectISOCodes
+        tISO_Codes[] ISO_CodesArray
         String[] asCodes
         String sCodes sCRLF sVal
         Integer iPos iSize iCount iItem
         
         Move (Character(13) + Character(10)) to sCRLF
         Move """
-        AD-Andorra
-        AE-United Arab Emirates
-        AF-Afghanistan
-        AG-Antigua and Barbuda
-        AI-Anguilla
-        AL-Albania
-        AM-Armenia
-        AO-Angola
-        AR-Argentina
-        AS-American Samoa
-        AT-Austria
-        AU-Australia
-        AW-Aruba
-        AX-Aaland Islands
-        AZ-Azerbaijan
-        BA-Bosnia and Herzegovina
-        BB-Barbados
-        BD-Bangladesh
-        BE-Belgium
-        BF-Burkina Faso
-        BG-Bulgaria
-        BH-Bahrain
-        BI-Burundi
-        BJ-Benin
-        BL-Saint Barthélemy
-        BM-Bermuda
-        BN-Brunei Darussalam
-        BO-Boliva, Plurinational State of
-        BR-Brazil
-        BS-Bahamas
-        BT-Bhutan
-        BW-Botswana
-        BY-Belarus
-        BZ-Belize
-        CA-Canada
-        CC-Cocos (Keeling) Islands
-        CD-Congo, The Democratic Republic of
-        CF-Central African Republic
-        CG-Congo
-        CH-Switzerland
-        CI-Côte d'Ivoire
-        CK-Cook Islands
-        CL-Chile
-        CM-Cameroon
-        CN-China
-        CO-Colombia
-        CR-Costa Rica
-        CU-Cuba
-        CV-Cap Verde
-        CW-Curacao
-        CX-Christmas Island
-        CY-Cyprus
-        CZ-Czeck Republic
-        DE-Germany
-        DJ-Djibouti
-        DK-Denmark
-        DM-Dominica
-        DO-Dominican Republic
-        DZ-Algeria
-        EC-Ecuador
-        EE-Estonia
-        EG-Egypt
-        EH-Western Sahara
-        ER-Eritrea
-        ES-Spain
-        ET-Ethiopia
-        FI-Finland
-        FJ-Fiji
-        FK-Falklands Islands (Malvinas)
-        FM-Micronesia, Federated States of
-        FO-Faroe Islands
-        FR-France
-        GA-Gabon
-        GB-United Kingdom
-        GD-Grenada
-        GE-Georgia
-        GF-French Guyana
-        GG-Guernsey
-        GH-Ghana
-        GI-Gibraltar
-        GM-Gambia
-        GN-Guinea
-        GP-Guadeloupe
-        GQ-Equatorial Guinea
-        GR-Greece
-        GS-South Georgia and the South Sandwich Isl
-        GT-Guatemala
-        GU-Guam
-        GW-Guinea-Bissau
-        GY-Guyana
-        HK-Hong Kong
-        HM-Heard Islands and McDonald Islands
-        HN-Honduras
-        HR-Croatia
-        HT-Haiti
-        HU-Hungary
-        ID-Indonesia
-        IE-Ireland
-        IL-Israel
-        IM-Isle Of Man
-        IN-India
-        IQ-Iraq
-        IR-Iran, Islamic Republic of
-        IS-Iceland
-        IT-Italy
-        JE-Jersey
-        JM-Jamaica
-        JO-Jordan
-        JP-Japan
-        KE-Kenya
-        KG-Kyrgyzstan
-        KH-Cambodia
-        KI-Kiribati
-        KM-Comoros
-        KN-Saint Kitts and Nevis
-        KP-Korea, Democratic Republic (North Korea)
-        KR-Korea, Republic Of (South Korea)
-        KW-Kuwait
-        KY-Cayman Islands
-        KZ-Kazakhstan
-        LA-Lao People's Democratic Republic (Laos)
-        LB-Lebanon
-        LC-Saint Lucia
-        LI-Liechtenstein
-        LK-Sri Lanka
-        LR-Liberia
-        LS-Lesotho
-        LT-Lithuania
-        LU-Luxembourg
-        LV-Latvia
-        LY-Libyan Arab Jamahiriya
-        MA-Morocco
-        MC-Monaco
-        MD-Moldova, Republic of
-        ME-Montenegro
-        MF-Saint Martin
-        MG-Madagaskar
-        MH-Marshall Islands
-        MK-Macedonia, The Former Yugoslav Republic
-        ML-Mali
-        MM-Myanmar (Burma)
-        MN-Mongolia
-        MO-Macau
-        MP-Northern Mariana Islands
-        MQ-Martinique
-        MR-Mauritania
-        MS-Montserrat
-        MT-Malta
-        MU-Mauritius
-        MV-Maldives
-        MW-Malawi
-        MX-Mexico
-        MY-Malaysia
-        MZ-Mozambique
-        NA-Namibia
-        NC-New Caledonia
-        NE-Niger
-        NF-Norfolk Islands
-        NG-Nigeria
-        NI-Nicaragua
-        NL-Netherlands
-        NO-Norway
-        NP-Nepal
-        NR-Nauru
-        NU-Niue
-        NZ-New Zealand
-        OM-Oman
-        PA-Panama
-        PE-Peru
-        PF-French Polynesia
-        PG-Papua New Guinea
-        PH-Philippines
-        PK-Pakistan
-        PL-Poland
-        PM-Saint Pierre and Miquolon
-        PN-Pitcairn
-        PR-Puerto Rico
-        PS-Palestinian Territory, Occupied
-        PT-Portugal
-        PW-Palau
-        PY-Paraguay
-        QA-Qatar
-        RE-Réunion
-        RO-Romania
-        RS-Serbia
-        RU-Russian Federation
-        RW-Rwanda
-        SA-Saudi Arabia
-        SB-Solomon Islands
-        SC-Seychelles
-        SD-Sudan
-        SE-Sweden
-        SG-Singapore
-        SH-Saint Helena
-        SI-Slovenia
-        SJ-Svalbard and Jan Mayen
-        SK-Slovakia
-        SL-Sierra Leone
-        SM-San Marino
-        SN-Senegal
-        SO-Somalia
-        SR-Suriname
-        ST-Sao Tomé and Principe
-        SV-El Salvador
-        SY-Syrian Arablic Republic
-        SZ-Swaziland
-        TC-Turks and Caicos Islands
-        TD-Chad
-        TF-French Southerns Territories
-        TG-Togo
-        TH-Thailand
-        TJ-Tajikistan
-        TK-Tokelau
-        TL-Timor-Leste
-        TM-Turkmenistan
-        TN-Tunisia
-        TO-Tonga
-        TR-Turkey
-        TT-Trinidad and Tobago
-        TV-Tuvalu
-        TW-Taiwan, Province of China
-        TZ-Tanzania
-        UA-Ukraine
-        UG-Uganda
-        UM-United States Minor Outlying Islands
-        US-United States of America
-        UY-Uruguay
-        UZ-Uzbekistan
-        VA-Holy See (Vativan City State)
-        VC-Saint Vincent and Grenadines
-        VE-Venezuela, Bolivarian Republic of
-        VG-Virgin Islands, Britiish
-        VI-Virgin Islands, U.S.
-        VN-Vietnam
-        VU-Vanuatu
-        WF-Wallis and Futuna
-        WS-Samoa
-        YE-Yemen
-        YT-Mayotte
-        ZA-South Africa
-        ZM-Zambia
-        ZW-Zimbabwe
-        """ to sCodes  
+        AD;Andorra;20;AND
+        AE;United Arab Emirates;784;ARE
+        AF;Afghanistan;4;AFG
+        AG;Antigua and Barbuda;28;ATG
+        AI;Anguilla;660;AIA
+        AL;Albania;8;ALB
+        AM;Armenia;51;ARM
+        AO;Angola;24;AGO
+        AR;Argentina;32;ARG
+        as;American Samoa;16;ASM
+        AT;Austria;40;AUT
+        AU;Australia;36;AUS
+        AW;Aruba;533;ABW
+        AX;Aaland Islands;248;ALA
+        AZ;Azerbaijan;31;AZE
+        BA;Bosnia and Herzegovina;70;BIH
+        BB;Barbados;52;BRB
+        BD;Bangladesh;50;BGD
+        BE;Belgium;56;BEL
+        BF;Burkina Faso;854;BFA
+        BG;Bulgaria;100;BGR
+        BH;Bahrain;48;BHR
+        BI;Burundi;108;BDI
+        BJ;Benin;204;BEN
+        BL;Saint Barthélemy;652;BLM
+        BM;Bermuda;60;BMU
+        BN;Brunei Darussalam;96;BRN
+        BO;Boliva, Plurinational State of;68;BOL
+        BR;Brazil;76;BRA
+        BS;Bahamas;44;BHS
+        BT;Bhutan;64;BTN
+        BW;Botswana;72;BWA
+        by;Belarus;112;BLR
+        BZ;Belize;84;BLZ
+        CA;Canada;124;CAN
+        CC;Cocos (Keeling) Islands;166;CCK
+        CD;Congo, The Democratic Republic of;180;COD
+        CF;Central African Republic;140;CAF
+        CG;Congo;178;COG
+        CH;Switzerland;756;CHE
+        CI;Côte d'Ivoire;384;CIV
+        CK;Cook Islands;184;COK
+        CL;Chile;152;CHL
+        CM;Cameroon;120;CMR
+        CN;China;156;CHN
+        CO;Colombia;170;COL
+        CR;Costa Rica;188;CRI
+        CU;Cuba;192;CUB
+        CV;Cap Verde;132;CPV
+        CW;Curacao;530;CUW
+        CX;Christmas Island;162;CXR
+        CY;Cyprus;196;CYP
+        CZ;Czeck Republic;203;CZE
+        DE;Germany;276;DEU
+        DJ;Djibouti;262;DJI
+        DK;Denmark;208;DNK
+        DM;Dominica;212;DMA
+        DO;Dominican Republic;214;DOM
+        DZ;Algeria;12;DZA
+        EC;Ecuador;218;ECU
+        EE;Estonia;233;EST
+        EG;Egypt;818;EGY
+        EH;Western Sahara;732;ESH
+        ER;Eritrea;232;ERI
+        ES;Spain;724;ESP
+        ET;Ethiopia;231;ETH
+        FI;Finland;246;FIN
+        FJ;Fiji;242;FJI
+        FK;Falklands Islands (Malvinas);238;FLK
+        FM;Micronesia, Federated States of;583;FSM
+        FO;Faroe Islands;234;FRO
+        FR;France;250;FRA
+        GA;Gabon;266;GAB
+        GB;United Kingdom;826;GBR
+        GD;Grenada;308;GRD
+        GE;Georgia;268;GEO
+        GF;French Guyana;254;GUF
+        GG;Guernsey;831;GGY
+        GH;Ghana;288;GHA
+        GI;Gibraltar;292;GIB
+        GM;Gambia;270;GMB
+        GN;Guinea;324;GIN
+        GP;Guadeloupe;312;GLP
+        GQ;Equatorial Guinea;226;GNQ
+        GR;Greece;300;GRC
+        GS;South Georgia and the South Sandwich Isl;239;SGS
+        GT;Guatemala;320;GTM
+        GU;Guam;316;GUM
+        GW;Guinea-Bissau;624;GNB
+        GY;Guyana;328;GUY
+        HK;Hong Kong;344;HKG
+        HM;Heard Islands and McDonald Islands;334;HMD
+        HN;Honduras;340;HND
+        HR;Croatia;191;HRV
+        HT;Haiti;332;HTI
+        HU;Hungary;348;HUN
+        ID;Indonesia;360;IDN
+        IE;Ireland;372;IRL
+        IL;Israel;376;ISR
+        IM;Isle Of Man;833;IMN
+        IN;India;356;IND
+        IQ;Iraq;368;IRQ
+        IR;Iran, Islamic Republic of;364;IRN
+        IS;Iceland;352;ISL
+        IT;Italy;380;ITA
+        JE;Jersey;832;JEY
+        JM;Jamaica;388;JAM
+        JO;Jordan;400;JOR
+        JP;Japan;392;JPN
+        KE;Kenya;404;KEN
+        KG;Kyrgyzstan;417;KGZ
+        KH;Cambodia;116;KHM
+        KI;Kiribati;296;KIR
+        KM;Comoros;174;COM
+        KN;Saint Kitts and Nevis;659;KNA
+        KP;Korea, Democratic Republic (North Korea);408;PRK
+        KR;Korea, Republic Of (South Korea);410;KOR
+        KW;Kuwait;414;KWT
+        KY;Cayman Islands;136;CYM
+        KZ;Kazakhstan;398;KAZ
+        LA;Lao People's Democratic Republic (Laos);418;LAO
+        LB;Lebanon;422;LBN
+        LC;Saint Lucia;662;LCA
+        LI;Liechtenstein;438;LIE
+        LK;Sri Lanka;144;LKA
+        LR;Liberia;430;LBR
+        LS;Lesotho;426;LSO
+        LT;Lithuania;440;LTU
+        LU;Luxembourg;442;LUX
+        LV;Latvia;428;LVA
+        LY;Libyan Arab Jamahiriya;434;LBY
+        MA;Morocco;504;MAR
+        MC;Monaco;492;MCO
+        MD;Moldova, Republic of;498;MDA
+        ME;Montenegro;499;MNE
+        MF;Saint Martin;663;MAF
+        MG;Madagaskar;450;MDG
+        MH;Marshall Islands;584;MHL
+        MK;Macedonia, The Former Yugoslav Republic;807;MKD
+        ML;Mali;466;MLI
+        MM;Myanmar (Burma);104;MMR
+        MN;Mongolia;496;MNG
+        MO;Macau;446;MAC
+        MP;Northern Mariana Islands;580;MNP
+        MQ;Martinique;474;MTQ
+        MR;Mauritania;478;MRT
+        MS;Montserrat;500;MSR
+        MT;Malta;470;MLT
+        MU;Mauritius;480;MUS
+        MV;Maldives;462;MDV
+        MW;Malawi;454;MWI
+        MX;Mexico;484;MEX
+        MY;Malaysia;458;MYS
+        MZ;Mozambique;508;MOZ
+        NA;Namibia;516;NAM
+        NC;New Caledonia;540;NCL
+        NE;Niger;562;NER
+        NF;Norfolk Islands;574;NFK
+        NG;Nigeria;566;NGA
+        NI;Nicaragua;558;NIC
+        NL;Netherlands;528;NLD
+        NO;Norway;578;NOR
+        NP;Nepal;524;NPL
+        NR;Nauru;520;NRU
+        NU;Niue;570;NIU
+        NZ;New Zealand;554;NZL
+        OM;Oman;512;OMN
+        PA;Panama;591;PAN
+        PE;Peru;604;PER
+        PF;French Polynesia;258;PYF
+        PG;Papua New Guinea;598;PNG
+        PH;Philippines;608;PHL
+        PK;Pakistan;586;PAK
+        PL;Poland;616;POL
+        PM;Saint Pierre and Miquolon;666;SPM
+        PN;Pitcairn;612;PCN
+        PR;Puerto Rico;630;PRI
+        PS;Palestinian Territory, Occupied;0;
+        PT;Portugal;620;PRT
+        PW;Palau;585;PLW
+        PY;Paraguay;600;PRY
+        QA;Qatar;634;QAT
+        RE;Réunion;638;REU
+        RO;Romania;642;ROM
+        RS;Serbia;688;SRB
+        RU;Russian Federation;643;RUS
+        RW;Rwanda;646;RWA
+        SA;Saudi Arabia;682;SAU
+        SB;Solomon Islands;90;SLB
+        SC;Seychelles;690;SYC
+        SD;Sudan;736;SDN
+        SE;Sweden;752;SWE
+        SG;Singapore;702;SGP
+        SH;Saint Helena;654;SHN
+        SI;Slovenia;705;SVN
+        SJ;Svalbard and Jan Mayen;744;SJM
+        SK;Slovakia;703;SVK
+        SL;Sierra Leone;694;SLE
+        SM;San Marino;674;SMR
+        SN;Senegal;686;SEN
+        SO;Somalia;706;SOM
+        SR;Suriname;740;SUR
+        ST;Sao Tomé and Principe;678;STP
+        SV;El Salvador;222;SLV
+        SY;Syrian Arablic Republic;760;SYR
+        SZ;Swaziland;748;SWZ
+        TC;Turks and Caicos Islands;796;TCA
+        TD;Chad;148;TCD
+        TF;French Southerns Territories;260;ATF
+        TG;Togo;768;TGO
+        TH;Thailand;764;THA
+        TJ;Tajikistan;762;TJK
+        TK;Tokelau;772;TKL
+        TL;Timor-Leste;626;TLS
+        TM;Turkmenistan;795;TKM
+        TN;Tunisia;788;TUN
+        to;Tonga;776;TON
+        TR;Turkey;792;TUR
+        TT;Trinidad and Tobago;780;TTO
+        TV;Tuvalu;798;TUV
+        TW;Taiwan, Province of China;158;TWN
+        TZ;Tanzania;834;TZA
+        UA;Ukraine;804;UKR
+        UG;Uganda;800;UGA
+        UM;United States Minor Outlying Islands;581;UMI
+        US;United States of America;840;USA
+        UY;Uruguay;858;URY
+        UZ;Uzbekistan;860;UZB
+        VA;Holy See (Vativan City State);336;VAT
+        VC;Saint Vincent and Grenadines;670;VCT
+        VE;Venezuela, Bolivarian Republic of;862;VEN
+        VG;Virgin Islands, Britiish;92;VGB
+        VI;Virgin Islands, U.S.;850;VIR
+        VN;Vietnam;704;VNM
+        VU;Vanuatu;548;VUT
+        WF;Wallis and Futuna;876;WLF
+        WS;Samoa;882;WSM
+        YE;Yemen;887;YEM
+        YT;Mayotte;175;MYT
+        ZA;South Africa;710;ZAF
+        ZM;Zambia;894;ZMB
+        ZW;Zimbabwe;716;ZWE
+        """ to sCodes        
+
         Move (StrSplitToArray(sCodes, sCRLF)) to asCodes
-        
+
         Move 0 to iItem
         Move (SizeOfArray(asCodes)) to iSize
         Decrement iSize
         For iCount from 0 to iSize
             Move asCodes[iCount] to sVal
-            Move (Pos("-", sVal)) to iPos
-            Move (Left(sVal, iPos -1))              to ISO_ShortOfficial_ShortArray[iItem].sIso_Short
-            Move (Mid(sVal, Length(sVal) ,iPos +1)) to ISO_ShortOfficial_ShortArray[iItem].sOffical_Short
+
+            Move (Pos(";", sVal)) to iPos
+            Move (Left(sVal, iPos -1)) to ISO_CodesArray[iItem].sIso_Short
+            Move (Mid(sVal, Length(sVal), iPos +1)) to sVal
+
+            Move (Pos(";", sVal)) to iPos
+            Move (Left(sVal, iPos -1)) to ISO_CodesArray[iItem].sOffical_Short
+            Move (Mid(sVal, Length(sVal), iPos +1)) to sVal
+
+            Move (Pos(";", sVal)) to iPos
+            Move (Left(sVal, iPos -1)) to ISO_CodesArray[iItem].iISO_Code
+            Move (Mid(sVal, Length(sVal), iPos +1)) to sVal
+
+            Move sVal to ISO_CodesArray[iItem].sISO_Long
             Increment iItem
         Loop
-        Set pAllISOCodes to ISO_ShortOfficial_ShortArray
-    End_Procedure
 
+        Set pISO_Codes to ISO_CodesArray
+    End_Procedure
 End_Class

@@ -228,6 +228,12 @@ Object oSwedishHolidays is a cNationalHolidays
             Function_Return "Halloween"
         End
 
+        Get AshWednesday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move False to bOfficialHoliday
+            Function_Return "Askonsdag"
+        End
+
         Get MaundyThursday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
             Move False to bOfficialHoliday

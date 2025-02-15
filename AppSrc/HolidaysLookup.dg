@@ -148,7 +148,7 @@ Object oHolidaysLookup is a cRDCModalPanel
             Integer[] ArrayOfSelected
             tHoliday[] SelectedHolidays
             Integer iDate_col iDescription_col  iHoliday_col
-            Integer i iSize iRow
+            Integer iCount iSize iRow
 
             // Get the datasource indexes of the various columns
             Get piColumnId of oDate_col        to iDate_col
@@ -161,11 +161,11 @@ Object oHolidaysLookup is a cRDCModalPanel
             Move (SizeOfArray(ArrayOfSelected)) to iSize
             Decrement iSize
 
-            For i From 0 to iSize
-                Move ArrayOfSelected[i] to iRow
-                Move TheData[iRow].sValue[iDate_col]        to SelectedHolidays[i].dDate
-                Move TheData[iRow].sValue[iDescription_col] to SelectedHolidays[i].sHolidayName
-                Move TheData[iRow].sValue[iHoliday_col]     to SelectedHolidays[i].bNationalHoliday
+            For iCount from 0 to iSize
+                Move ArrayOfSelected[iCount] to iRow
+                Move TheData[iRow].sValue[iDate_col]        to SelectedHolidays[iCount].dDate
+                Move TheData[iRow].sValue[iDescription_col] to SelectedHolidays[iCount].sHolidayName
+                Move TheData[iRow].sValue[iHoliday_col]     to SelectedHolidays[iCount].bNationalHoliday
             Loop
             Function_Return SelectedHolidays
         End_Function
