@@ -20,8 +20,8 @@ There are two types of functions/usages of this library.
         Not all of the functions needs the country code, but you can pass the
         country code for all functions calls, to have a unified calling interface.
         
-        All 2-character sISO_Short codes can be seen near the bottom of this
-        package; "Procedure AddAllOfficialShort", or by getting the 'pAllISOCodes'
+        All 2-character sISO_Short codes can be seen near the bottom of the cCalendarHolidays.pkg
+        file; "Procedure AddAllOfficialShort", or by getting the 'pAllISOCodes'
         struct array property.
      
      2. Secondly there is the 'IsHoliday' function that returns the name of a 
