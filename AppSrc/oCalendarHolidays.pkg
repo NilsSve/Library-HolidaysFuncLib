@@ -1120,7 +1120,7 @@ Object oCalendarHolidays is a cCalendarHolidays
     End_Function
     
     // ToDo: This should be changed to accept a iYear, and return the dDate.
-    { Published = True } 
+    { Published = False } 
     { Description = "Chinese New Year" }
     Function ChineseNewYear Date dDate Returns Date
         Date dReturn
