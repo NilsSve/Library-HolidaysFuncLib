@@ -240,6 +240,7 @@ Class cCalendarHolidays is a cObject
         Function_Return 0
     End_Function 
     
+    // Interfac function from this class to the national holiday classes (CountryPackages.pkg)
     Function IsHoliday Date dInDate String sISO_Short Boolean ByRef bOfficialHoliday Returns String
         Handle hoNationalHolidays
         String sHolidayName
