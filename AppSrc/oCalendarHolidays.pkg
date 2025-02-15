@@ -19,12 +19,13 @@ Use cCalendarHolidays.pkg
 
 Object oCalendarHolidays is a cCalendarHolidays
     Move Self to ghoCalendarHolidays
+    
+    // *** Collection of cNationalHolidays objects for selected countries ***
+    #Include CountryPackages.pkg
 
-    Use CountryPackages.pkg
-
-    // *** Here we include special function packages ***
-    #Include MothersDay.pkg   // Function "MothersDay"  returns the Mother's Day for the passed year and an ISO 2-character country code.
-    #Include NationalDays.pkg // Function "NationalDay" returns the National Day for the passed year and an ISO 2-character country code.
+    // *** Special function packages ***
+    #Include MothersDay.pkg   // Function "MothersDay"  returns the Mother's Day for the passed year and a 2-character ISO_Short code.
+    #Include NationalDays.pkg // Function "NationalDay" returns the National Day for the passed year and a 2-character ISO_Short code.
 
     { Published = True } 
     { Description = """

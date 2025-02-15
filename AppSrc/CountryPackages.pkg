@@ -8,6 +8,11 @@
 //   where "sISO_Short" is the psISO_Short defined in the packages
 //   below. E.g. "US", "GB", "NL", "NO", "ES", "SE".
 //
+// All ISO_Short 2-character codes can be seen in the "AddAllOfficialShort"
+// procedure of the cCalendarHolidays.pkg, or by the struct array property:
+//   "tISO_ShortOfficial_Short[] AllISOCodes"
+//   "Get pAllISOCodes of ghoCalendarHolidays to AllISOCodes"
+//
 // The *main message* in each cNationalHolidays object is;
 //    "Function IsHoliday Date dInDate Boolean ByRef bNationalHoliday Returns String"
 //    This single function handles all holidays and special dates for a country.

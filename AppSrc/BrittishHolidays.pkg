@@ -75,7 +75,7 @@ Object oBrittishHolidays is a cNationalHolidays
         // **************************************************
         // Special holidays for 2011
         //
-        If (DateGetYear(dInDate) = 2011) Begin
+        If (iYear = 2011) Begin
             // Royal Wedding - 29th April
             //
             If (DateGetDay(dInDate) = 29 and DateGetMonth(dInDate) = 4) Begin
@@ -231,6 +231,18 @@ Object oBrittishHolidays is a cNationalHolidays
 
         // *** Other notable dates ***
 
+        Get NewYearsEve of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move 0 to iBankHoliday
+            Function_Return "New Year's Eve"
+        End
+
+        Get NewYearsDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move 0 to iBankHoliday
+            Function_Return "New Year's Day"
+        End
+
         // Twelfth Night - 5th January (take your decorations down today!)
         //
         Get Epiphany of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
@@ -286,6 +298,12 @@ Object oBrittishHolidays is a cNationalHolidays
             Function_Return "Easter Day"
         End
 
+        Get FeastOfChristTheKing of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move 0 to iBankHoliday
+            Function_Return "Feast of Christ the King"
+        End
+
         // End of European (British) Summer Time - last Sunday in October (at 1am)
         //
         Get EUSummerTimeEnd of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
@@ -312,6 +330,31 @@ Object oBrittishHolidays is a cNationalHolidays
         // *** Movable holidays ***
         // Dates that depend on the date of Easter Day.
 
+        Get Advent1 of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move 0 to iBankHoliday
+            Function_Return "Advent Sunday"
+        End
+
+        Get Advent2 of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move 0 to iBankHoliday
+            Function_Return "2nd Advent Sunday"
+        End
+
+        Get Advent3 of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move 0 to iBankHoliday
+            Function_Return "3d Advent Sunday"
+        End
+
+        // This needs to be after ChristMasEve because it can fall on the same day, and we then wants to return Christmas Eve instead.
+        Get Advent4 of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move 0 to iBankHoliday
+            Function_Return "4th Advent Sunday"
+        End
+
         // Shrove Tuesday, Pancake Day - the day before Ash Wednesday
         //
         Get AshWednesday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
@@ -324,6 +367,48 @@ Object oBrittishHolidays is a cNationalHolidays
         If (dInDate = dHolidayDate) Begin
             Move 8 to iBankHoliday
             Function_Return "Good Friday (UK)"
+        End
+
+        Get AprilFoolsDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move 0 to iBankHoliday
+            Function_Return "April Fools' Day"
+        End
+
+        Get ThanksGiving of ghoCalendarHolidays iYear sISO_Short  to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move 0 to iBankHoliday
+            Function_Return "Thanksgiving Day"
+        End
+
+        Get PalmSunday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move 0 to iBankHoliday
+            Function_Return "Palm Sunday"
+        End
+
+        Get AscensionDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move 0 to iBankHoliday
+            Function_Return "Ascension Day"
+        End
+
+        Get WhitSunday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move 0 to iBankHoliday
+            Function_Return "Whit Sunday"
+        End
+
+        Get WhitMonday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move 0 to iBankHoliday
+            Function_Return "Whit Monday"
+        End
+
+        Get AllSaintsDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move 0 to iBankHoliday
+            Function_Return "All Saints Day"
         End
 
         // This day needs to be _after_ the WhitSunday.

@@ -18,7 +18,66 @@
                   object. (Nils Svedmyr)
 
 ****************************************************************************
-   
+*/
+Use Windows.pkg
+Use Dll.pkg
+Use Dferror.pkg
+Use GlobalDateTimeFunctions.pkg
+Use cCalendarHolidays.h.pkg
+
+/*   What is the function library for "Holidays and other special dates"?
+     
+     The library consists of holiday & special day functions for most parts of the world.
+     There are two types of functions/usages of this library.
+     
+     1. First there are a series of functions that returns the date for a given holiday
+        function, given a certain year.
+        
+        The library consists of a series of named holiday functions that all returns a date.
+        The functions takes two parameters;
+            a) An integer iYear
+            b) A 2-character string sISO_Short country code 
+        Returns: A date    
+        Example: "Get EasterDay of ghoCalendarHolidays 2025 "US" to dDate"
+        The country code is needed as some holidays falls on different dates in
+        different countries.
+        
+        Not all of the functions needs the country code, but you can pass the
+        country code for all functions calls, to have a unified calling interface.
+        
+        All 2-character sISO_Short codes can be seen near the bottom of this
+        package; "Procedure AddAllOfficialShort", or by getting the 'pAllISOCodes'
+        struct array property.
+     
+     2. Secondly there is the 'IsHoliday' function that returns the name of a 
+        holiday/special day, given a certain date.
+        It take on three parameters;
+            a) A date (could be return value from 1. above)
+            b) A 2-character string sISO_Short country code. Same as in 1. above.
+            c) A ByRef boolean parameter that will be true if the date is a holiday/bankday.
+               Remember that there are also special days like e.g. "Mother's Day" that
+               is not a holiday.
+        Returns: A holiday name as a string, and sets the ByRef param to True/False.
+        Example: "Get IsHoliday of ghoCalendarHolidays 03/16/2025 "US" (&bIsHoliday) to sHolidayName"
+        The 'IsHoliday' function of this class in its turn, calls an 'IsHoliday' function for the
+        passed ISO_Short value for the correct country packages found in CountryPackages.pkg file.
+        The CountryPackages.pkg is included in the oCalendarHolidays function library object.
+        
+        Note: If your country does not exist in CountryPackages.pkg you are encouraged to
+              create one by looking at the existing packages AND email the package
+              to support@rdctools.com.
+     
+     The global handle ghoCalendarHolidays can be used to access all functions.
+              
+     The cCalendarHolidays class consist of helper date functions for the holiday
+     function library: oCalendarHolidays.pkg (object). This object also contains
+     the code for all country packages found in CountryPackages.pkg 
+     
+     Note: The reason for the oCalendarHolidays.pkg is the usage of the "Procedure RegisterInterface"
+           class message. It is used to capture; the function name, calling parameters and the help text (comment).
+           And it is *only* allowed to use meta tags { Published } and { Description }, in
+           an Object (not Class).
+
    
    * Years when the Gregorian calendar was introduced:
      1582 - Spain, Italy, Polen, Portugal, France, Luxembourg
@@ -46,23 +105,9 @@
      1926 - Turkey
      1928 - Egypt 
 */
-Use Windows.pkg
-Use Dll.pkg
-Use Dferror.pkg
-Use GlobalDateTimeFunctions.pkg
-Use cCalendarHolidays.h.pkg
 
 Register_Function psISO_Short Returns String
 
-/* Note: All Holiday Date functions of the class is defined in an object that
-         is placed after the class definition (bottom of this package)
-         The reason is the usage of the "Procedure RegisterInterface"
-         message. It is used for capturing the function name, parameters and help text (comment).
-         And it is *only* allowed to use meta tags { Published } and { Description }, in
-         an Object (not Class).
-*/
-
-//Use An_Dates.pkg
 // *** These are best used as global functions: ***
     // First out are functions that used to be defined in the An_dates.pkg, but was moved
     // here for convenience.
@@ -92,29 +137,25 @@ Register_Function psISO_Short Returns String
         End
     End_Function
 
-//    Function DateGetDayName2 Global DateTime dtDate Returns String
-//        Integer iWeekday 
-//        String sDay
-//        Move (DateGetDayofWeek(dtDate)) to iWeekday
-//        Get GetDayName iWeekday to sDay
-//        Function_Return sDay
-//    End_Function
-//    
-//    Function DateGetMonthName2 Global Date dtDate Returns String 
-//        String sMonth
-//        Get GetMonthName (DateGetMonth(dtDate)) to sMonth
-//        Function_Return sMonth
-//    End_Function    
-//
-
 Class cCalendarHolidays is a cObject
 
     Procedure Construct_Object
         Forward Send Construct_Object
+        
+        { MethodType = Property Visibility = Public Category = Data}
+        { Description = "Struct array with all the worlds ISO_Short and Official_Short string values." }
         Property tISO_ShortOfficial_Short[] pAllISOCodes
-        Property String[] psArrayAsYear
-        Property Handle[] phoNationalHolidaysArray
+        
+        { MethodType = Property Visibility = Public Category = Data}
+        { Description = "Struct array with all function names and other info associated with those functions." }
         Property tHolidayFunc[] pHolidayFunctions
+
+        { MethodType = Property Visibility = Public Category = Data}
+        { Description = "Handle array with all registered cNationalHolidays objects. These packages/objects can be found in 'CountryPackages.pkg'" }
+        Property Handle[] phoNationalHolidaysArray
+        
+        { MethodType = Property Visibility = Private }
+        Property String[] psArrayAsYear
 
         Send AddAllOfficialShort
     End_Procedure
@@ -195,6 +236,15 @@ Class cCalendarHolidays is a cObject
             End
         Loop
         Function_Return 0
+    End_Function 
+    
+    Function IsHoliday Date dInDate String sISO_Short Boolean ByRef bOfficialHoliday Returns String
+        Handle hoNationalHolidays
+        String sHolidayName
+        
+        Get NationalHolidaysObject sISO_Short to hoNationalHolidays
+        Get IsHoliday of hoNationalHolidays dInDate (&bOfficialHoliday) to sHolidayName
+        Function_Return sHolidayName
     End_Function
 
     Procedure HELPER_FUNCTIONS // For the Studio Code Explorer
@@ -329,7 +379,6 @@ Class cCalendarHolidays is a cObject
         Move (AddressOf(sMonthName)) to lpsMonthName
         Move (GetLocaleInfo(LOCALE_USER_DEFAULT, iMonth, lpsMonthName, 20)) to iVoid
        
-    //    Move (ToOEM(CString(sMonthName))) to sMonthName
         If (bCapsFirstLetter = True) Begin
             Move (Uppercase(Left(sMonthName, 1)) + Mid(sMonthName, Length(sMonthName), 2)) to sMonthName
         End
@@ -339,9 +388,9 @@ Class cCalendarHolidays is a cObject
 
     // Note: It is assumed here that Monday is the first day of the week.
     Function DayNameFromInteger Integer iDayNo Boolean bLongName Boolean bCapsFirstLetter Returns String
-       String sDayName
-       Pointer lpsDayName
-       Integer iVoid iDay
+        String sDayName
+        Pointer lpsDayName
+        Integer iVoid iDay
     
         Case Begin
             Case (iDayNo = 1) 
@@ -402,16 +451,15 @@ Class cCalendarHolidays is a cObject
                 Case Break
         Case End
     
-       Move (ZeroString(20)) to sDayName
-       Move (AddressOf(sDayName)) to lpsDayName
-       Move (GetLocaleInfo(LOCALE_USER_DEFAULT, iDay, lpsDayName, 20)) to iVoid
+        Move (ZeroString(20)) to sDayName
+        Move (AddressOf(sDayName)) to lpsDayName
+        Move (GetLocaleInfo(LOCALE_USER_DEFAULT, iDay, lpsDayName, 20)) to iVoid
     
-    //    Move (ToAnsi(CString(sDayName))) to sDayName
         If (bCapsFirstLetter = True) Begin
             Move (Uppercase(Left(sDayName, 1)) + Mid(sDayName, Length(sDayName), 2)) to sDayName
         End
     
-       Function_Return sDayName
+        Function_Return sDayName
     End_Function
 
     // Note: 2025-01-22 NS. Changed to use DAW's DateSet global function.
@@ -489,7 +537,6 @@ Class cCalendarHolidays is a cObject
 
     // Given the number of a day in the week, return its short name.
     // Day 1 is Sunday.
-    //
     Function GetDayName Integer iWeekDay Returns String
         String sDayName
         Get DayNameFromInteger iWeekDay False True to sDayName
@@ -503,7 +550,6 @@ Class cCalendarHolidays is a cObject
     End_Function
     
     // Given a data (or DateTime) return the short name of the day of the week.
-    //
     Function DateGetDayNameLong DateTime dtDate Returns String
         Integer iWeekday 
         String sDay
@@ -514,7 +560,6 @@ Class cCalendarHolidays is a cObject
     End_Function
     
     // Given a data (or DateTime) return the short name of the day of the week.
-    //
     Function DateGetDayName DateTime dtDate Returns String
         Integer iWeekday 
         String sDay
@@ -524,7 +569,6 @@ Class cCalendarHolidays is a cObject
     End_Function
     
     // Given the number of a month, return its name.
-    //
     Function GetMonthName Integer iMthNo Returns String
         String sMonthName
         Get MonthNameFromInteger iMthNo False True to sMonthName
@@ -532,7 +576,6 @@ Class cCalendarHolidays is a cObject
     End_Function
     
     // Given a date (or DateTime) return the name of the month.
-    //
     Function DateGetMonthName Date dtDate Returns String 
         String sMonth
         Get GetMonthName (DateGetMonth(dtDate)) to sMonth
@@ -546,7 +589,6 @@ Class cCalendarHolidays is a cObject
     End_Function
     
     // Given a date (or DateTime) return the name of the month.
-    //
     Function DateGetMonthNameLong Date dtDate Returns String
         String sMonth
         Get GetMonthNameLong (DateGetMonth(dtDate)) to sMonth
@@ -554,7 +596,6 @@ Class cCalendarHolidays is a cObject
     End_Function
     
     // Given a  date (or DateTime) return the number of days in the month.
-    //
     Function DateGetDaysInMonth DateTime dtDate Returns Integer
         Integer iMth iYr iDays
         Move (DateGetMonth(dtDate)) to iMth
@@ -597,14 +638,14 @@ Class cCalendarHolidays is a cObject
     // and week 1 of any year is that with the year's first Thursday in it) containing
     // the date passed.
     //
+    // Algorithm (from Wikipedia: http://en.wikipedia.org/wiki/Talk:ISO_week_date#Algorithms)
+    // Determine the date's Day of Week, D
+    // Use that to move to the nearest Thursday (-3..+3 days)
+    // The result the year of that Date, Y
     Function DateGetISOYear DateTime dtDate Returns Integer
         Integer  iDayNo
         Date     dDate dNearestThu
     
-        // Algorithm (from Wikipedia: http://en.wikipedia.org/wiki/Talk:ISO_week_date#Algorithms)
-        // Determine the date's Day of Week, D
-        // Use that to move to the nearest Thursday (-3..+3 days)
-        // The result the year of that Date, Y
         Move dtDate to dDate
         Get DateGetISODayOfWeek dDate to iDayNo
         Move (dDate - iDayNo + 4) to dNearestThu  // go to previous Thursday
@@ -612,7 +653,6 @@ Class cCalendarHolidays is a cObject
     End_Function
     
     // Return a date in the ISO format Year-Week-Day (e.g. "2009-W53-7")
-    //
     Function DateGetISOWeekDate DateTime dtDate Returns String
         Integer iWeek
         String sYear sDays
@@ -623,7 +663,6 @@ Class cCalendarHolidays is a cObject
     End_Function
     
     // Given a date (or DateTime) return the date (DateTime) of the last day in the month.
-    //
     Function DateGetLastDayOfMonth DateTime dtDate Returns DateTime
         DateTime dtLastDate 
         Integer iDays
@@ -633,7 +672,6 @@ Class cCalendarHolidays is a cObject
     End_Function
     
     // Given a date (or DateTime) return the date (DateTime) of the first day of the year
-    //
     Function DateGetFirstDayOfYear DateTime dtDate Returns DateTime
         Move (DateSetDay(dtDate,1))   to dtDate
         Move (DateSetMonth(dtDate,1)) to dtDate
@@ -641,7 +679,6 @@ Class cCalendarHolidays is a cObject
     End_Function
     
     // Given a date (or DateTime) return the date (DateTime) of the Last day of the year
-    //
     Function DateGetLastDayOfYear DateTime dtDate Returns DateTime
         Move (DateSetMonth(dtDate,12)) to dtDate
         Move (DateSetDay(dtDate,31))   to dtDate
@@ -825,7 +862,6 @@ Class cCalendarHolidays is a cObject
        
         Function_Return sRet
     End_Function
-
 
     // Amended to use built-in date functions
     Function YearFromDate Date dDate Returns Integer
