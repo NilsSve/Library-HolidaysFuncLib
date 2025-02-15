@@ -243,7 +243,9 @@ Class cCalendarHolidays is a cObject
         String sHolidayName
         
         Get NationalHolidaysObject sISO_Short to hoNationalHolidays
-        Get IsHoliday of hoNationalHolidays dInDate (&bOfficialHoliday) to sHolidayName
+        If (hoNationalHolidays <> 0) Begin
+            Get IsHoliday of hoNationalHolidays dInDate (&bOfficialHoliday) to sHolidayName
+        End
         Function_Return sHolidayName
     End_Function
 
