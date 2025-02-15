@@ -1,7 +1,7 @@
 ﻿// This is the class to use when creating National Holidays packages,
 // such as BrittishHolidays.pkg, SwedishHolidays.pkg, NorwegianHolidays.pkg etc.
 // Note: Each country holiday package based on this class should be added 
-//       to the "CountryPackages.pkg."
+//       to the "CountryPackages.pkg." That package is Included by the oCalendarHolidays.pkg file.
 // The class registers itself with the ghoCalendarHolidays object.
 
 Use cCalendarHolidays.pkg
