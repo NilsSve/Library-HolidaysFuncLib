@@ -27,7 +27,7 @@ Use cCalendarHolidays.h.pkg
 
 /*   What is the function library for "Holidays and other special dates"?
      
-     The library consists of holiday & special day functions for most parts of the world.
+     The library consists of holiday & special day functions for most parts of the Western world.
      There are two types of functions/usages of this library.
      
      1. First there are a series of functions that returns the date for a given holiday
