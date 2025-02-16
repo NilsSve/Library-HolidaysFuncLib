@@ -985,7 +985,9 @@ Class cCalendarHolidays is a cObject
         Loop
         Function_Return iDays
     End_Function
-
+    
+    // ToDo: These functions are not used at the moment. More work is needed
+    //       in the oCalendarHolidays object to use these functions.
     Function ChineseLunar Date dDate Returns tLunar
         Integer iOffset iLoop iTemp iLeapMonth
         tLunar Lunar
