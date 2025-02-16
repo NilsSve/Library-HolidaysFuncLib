@@ -986,6 +986,245 @@ Class cCalendarHolidays is a cObject
         Function_Return iDays
     End_Function
 
+    Function ChineseLunar Date dDate Returns tLunar
+        Integer iOffset iLoop iTemp iLeapMonth
+        tLunar Lunar
+        Date dSetDate
+        
+        Get DateSetDate 1900 1 31 to dSetDate
+        Move (dDate - dSetDate - 1) to iOffset
+
+        For iLoop from 1900 to 2050
+            If (iOffset>0) Begin
+                Get HexYearDays iLoop to iTemp
+                Subtract iTemp from iOffset
+            End
+            Else Begin
+                Move iLoop to Lunar.iYear
+                Move 2050 to iLoop
+            End
+        Loop
+        If (iOffset<0) Begin
+            Add iTemp to iOffset
+            Subtract 1 from Lunar.iYear
+        End
+        Get HexLeapMonth Lunar.iYear to iLeapMonth
+        Move False to Lunar.bLeap
+
+        For iLoop from 1 to 13
+            If (iOffset>0) Begin
+                If (iLeapMonth>0 and iLoop=(iLeapMonth+1) and Lunar.bLeap=False) Begin
+                    Subtract 1 from iLoop
+                    Move True to Lunar.bLeap
+                    Get HexLeapDays Lunar.iYear to iTemp
+                End
+                Else Begin
+                    Get HexMonthDays Lunar.iYear iLoop to iTemp
+                End
+                If (Lunar.bLeap=True and iLoop=(iLeapMonth+1)) Begin
+                    Move False to Lunar.bLeap
+                End
+                Subtract iTemp from iOffset
+            End
+            Else Begin
+                Move iLoop to Lunar.iMonth
+                Move 13 to iLoop
+            End
+        Loop
+        If (iOffset=0 and iLeapMonth>0 and iLoop=(iLeapMonth+1)) Begin
+            If (Lunar.bLeap) Begin
+                Move False to Lunar.bLeap
+            End
+            Else Begin
+                Move True to Lunar.bLeap
+                Subtract 1 from Lunar.iMonth
+            End
+        End
+        If (iOffset<0) Begin
+            Add iTemp to iOffset
+            Subtract 1 from Lunar.iMonth
+        End
+        Move (iOffset+1) to Lunar.iDay
+        Function_Return Lunar
+    End_Function
+
+    Function IslamicCalendar Date dDate Returns tLunar
+        Integer iYear iMonth iDay iAlpha iBeta iJD iDD iJJ iZZ iCyc
+        Number  nShift nYear
+        tLunar Lunar
+
+        Move (DateGetYear(dDate))  to iYear
+        Move (DateGetMonth(dDate)) to iMonth
+        Move (DateGetDay(dDate))   to iDay
+
+        If (iMonth<3) Begin
+            Subtract 1 from iYear
+            Add 12 to iMonth
+        End
+        Move (Integer(iYear/100.0)) to iAlpha
+        Move (2-iAlpha+Integer(iAlpha/4.0)) to iBeta
+        If (iYear<1583) Begin
+            Move 0 to iBeta
+        End
+        If (iYear=1582) Begin
+            If (iMonth>10) Begin
+                Move -10 to iBeta
+            End
+            If (iMonth=10) Begin
+                Move 0 to iBeta
+                If (iDay>4) Begin
+                    Move -10 to iBeta
+                End
+            End
+        End
+        Move (Integer(365.25*(iYear+4716))+Integer(30.6001*(iMonth+1))+iDay+iBeta-1524) to iJD
+        Move 0 to iBeta
+        If (iJD>2299160) Begin
+            Move (Integer((iJD-1867216.25)/36524.25)) to iAlpha
+            Move (1+iAlpha-Integer(iAlpha/4.0)) to iBeta
+        End
+        Move (iJD+iBeta+1524) to iBeta
+        Move (Integer(365.25*Integer((iBeta-122.1)/365.25))) to iDD
+        Move (iBeta-iDD-Integer(30.6001*Integer((iBeta-iDD)/30.6001))) to iDay
+        Move (10631.0/30.0) to nYear
+        Move (8.01/60.0) to nShift // results in years 2, 5, 7, 10, 13, 15, 18, 21, 24, 26 & 29 as leap years
+        Move (iJD-1948084) to iZZ
+        Move (iZZ/10631.0) to iCyc
+        Move (iZZ-(10631*iCyc)) to iZZ
+        Move (Integer((iZZ-nShift)/nYear)) to iJJ
+        Move (30*iCyc+iJJ) to Lunar.iYear
+        Move (iZZ-Integer(iJJ*nYear+nShift)) to iZZ
+        Move (Integer((iZZ+28.5001)/29.5)) to Lunar.iMonth
+        If (Lunar.iMonth=13) Begin
+            Move 12 to Lunar.iMonth
+        End
+        Move (iZZ-Integer(29.5001*Lunar.iMonth-29)) to Lunar.iDay
+        Function_Return Lunar
+    End_Function
+    
+    Function ChineseNewYear Date dDate Returns Date
+        Date dReturn
+        tLunar Lunar
+
+        If (DateGetYear(dDate) <2050) Begin
+            Get ChineseLunar dDate to Lunar
+        End
+        If (Lunar.bLeap=False and Lunar.iMonth=1 and (Lunar.iDay=1 or Lunar.iDay=2)) Begin
+            Move dDate to dReturn
+        End
+        Function_Return dReturn
+    End_Function
+
+    Function VesakDay Date dDate Returns Date
+        Date dReturn
+        tLunar Lunar
+
+        If (DateGetYear(dDate)<2050) Begin
+            Get ChineseLunar dDate to Lunar
+        End
+        If (Lunar.bLeap=False and Lunar.iMonth=4 and Lunar.iDay=15) Begin
+            Move dDate to dReturn
+        End
+        Function_Return dReturn
+    End_Function
+
+    Function ProphetMuhammadBirthday Date dDate Returns Date
+        Date dReturn
+        tLunar Lunar
+
+        Get IslamicCalendar dDate to Lunar
+        If (Lunar.iMonth=3 and Lunar.iDay=12) Begin
+            Move dDate to dReturn
+        End
+        Function_Return dReturn
+    End_Function
+
+    Function HariRayaPuasa Date dDate String sISO_Short Returns Date
+        Date dReturn
+        tLunar Lunar
+
+        Get IslamicCalendar dDate to Lunar
+        If (Lunar.iMonth=10) Begin
+            If (sISO_Short="MY") Begin
+                If (Lunar.iDay=1 or Lunar.iDay=2) Begin
+                    Move dDate to dReturn
+                End
+            End
+            Else If (sISO_Short = "SG") Begin
+                If (Lunar.iDay=1) Begin
+                    Move dDate to dReturn
+                End
+            End
+        End
+        Function_Return dReturn
+    End_Function
+
+    Function HariRayaHaji Date dDate Returns Date
+        Date dReturn
+        tLunar Lunar
+
+        Get IslamicCalendar dDate to Lunar
+        If (Lunar.iMonth=12 and Lunar.iDay=10) Begin
+            Move dDate to dReturn
+        End
+        Function_Return dReturn
+    End_Function
+
+    Function HariRayaHaji2ndDay Date dDate Returns Date
+        Date dReturn
+        tLunar Lunar
+
+        Get IslamicCalendar dDate to Lunar
+        If (Lunar.iMonth=12 and Lunar.iDay=11) Begin
+            Move dDate to dReturn
+        End
+        Function_Return dReturn
+    End_Function
+
+    Function AwalMuharram Date dDate Returns Date
+        Date dReturn
+        tLunar Lunar
+
+        Get IslamicCalendar dDate to Lunar
+        If (Lunar.iMonth=1 and Lunar.iDay=1) Begin
+            Move dDate to dReturn
+        End
+        Function_Return dReturn
+    End_Function
+
+    Function IsrakMikraj Date dDate Returns Date
+        Date dReturn
+        tLunar Lunar
+
+        Get IslamicCalendar dDate to Lunar
+        If (Lunar.iMonth=7 and Lunar.iDay=28) Begin
+            Move dDate to dReturn
+        End
+        Function_Return dReturn
+    End_Function
+
+    Function AwalRamadan Date dDate Returns Date
+        Date dReturn
+        tLunar Lunar
+
+        Get IslamicCalendar dDate to Lunar
+        If (Lunar.iMonth=9 and Lunar.iDay=2) Begin
+            Move dDate to dReturn
+        End
+        Function_Return dReturn
+    End_Function
+
+    Function NuzulAlQuran Date dDate Returns Date
+        Date dReturn
+        tLunar Lunar
+
+        Get IslamicCalendar dDate to Lunar
+        If (Lunar.iMonth=9 and Lunar.iDay=18) Begin
+            Move dDate to dReturn
+        End
+        Function_Return dReturn
+    End_Function
+
     Procedure DoFillHexValues
         String[] sArrayAsYear
         Move '$04bd8' to sArrayAsYear[0]   // Year 1900 ??  dec=19416
