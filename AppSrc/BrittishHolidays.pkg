@@ -417,6 +417,32 @@ Object oBrittishHolidays is a cNationalHolidays
             Function_Return "All Saints Day"
         End
 
+        Get NationalDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move 1 to iBankHoliday
+            Function_Return "National Day"
+        End
+
+        If ((DateGetMonth(dInDate) = 2) and (DateGetDay(dInDate) = 1)) Begin // 1 of March.
+            Move 0 to iBankHoliday
+            Function_Return "St David's Day (Wales)"
+        End
+
+        If ((DateGetMonth(dInDate) = 2) and (DateGetDay(dInDate) = 17)) Begin // 17 of March.
+            Move 0 to iBankHoliday
+            Function_Return "St Patrick's Day (Northern Ireland)"
+        End
+
+        If ((DateGetMonth(dInDate) = 4) and (DateGetDay(dInDate) = 23)) Begin // 23 of April.
+            Move 0 to iBankHoliday
+            Function_Return "St George's Day (England)"
+        End
+
+        If ((DateGetMonth(dInDate) = 11) and (DateGetDay(dInDate) = 30)) Begin // 30 of November.
+            Move 0 to iBankHoliday
+            Function_Return "St Andrew's Day (Skottland)"
+        End
+
         // This day needs to be _after_ the WhitSunday.
         // So when WhitSunday falls on the last Sunday in May,
         // only the WhitSunday will get generated. Else the

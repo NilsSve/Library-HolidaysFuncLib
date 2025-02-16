@@ -252,7 +252,7 @@ Class cCalendarHolidays is a cObject
         Function_Return sHolidayName
     End_Function  
     
-    Function ISO_ShortFromISO_Long String sISO_Long Returns String
+    Function ISO_LongToISO_Short String sISO_Long Returns String
         tISO_Codes[] ISO_CodesArray
         String sCode
         Integer iSize iCount
