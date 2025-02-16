@@ -1151,7 +1151,7 @@ Object oCalendarHolidays is a cCalendarHolidays
     End_Function
 
     { Published = False } 
-    { Description = "" }
+    { Description = "Prophet Muhammad's Birthday" }
     Function ProphetMuhammadBirthday Date dDate Returns Date
         Date dReturn
         tLunar Lunar
