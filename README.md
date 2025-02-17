@@ -41,7 +41,13 @@ There are two types of functions/usages of this library.
         Note: If your country does not exist in CountryPackages.pkg you are encouraged to
               create one by looking at the existing packages AND email the package
               to support@rdctools.com.
-     
+              
+     3. Thirdly there is a 'reciprocal' function to number 1. above. The 'Holiday Function Library' 
+        is named: 'IsDateAHoliday'.
+        It takes a Date- and an ISO_Short- parameter and returns a boolean True/False if the date is found.
+        Or in other words if a matching function was found in the library.
+        The function also uses three ByRef parameters: Boolean bIsHoliday, String sHolidayName and String sFunctionName.     
+
      The global handle ghoCalendarHolidays can be used to access all functions.
               
      The cCalendarHolidays class consist of helper date functions for the holiday
