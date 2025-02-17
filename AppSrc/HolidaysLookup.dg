@@ -120,7 +120,7 @@ Object oHolidaysLookup is a cRDCModalPanel
             Get DateSetDate of ghoCalendarHolidays iYear 1 1 to dYearDate
 
             For i From 1 to iDays
-                Get IsHoliday of ghoNationalHolidayObject dYearDate (&bHoliday) to sHolidayName
+                Get HolidayName of ghoNationalHolidayObject dYearDate (&bHoliday) to sHolidayName
                 If (sHolidayName <> "") Begin
                     Get DateGetDayName of ghoCalendarHolidays dYearDate to sWeekDay
                     Get DateGetISOWeek of ghoCalendarHolidays dYearDate to iWeekNo

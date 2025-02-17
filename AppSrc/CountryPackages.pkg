@@ -14,7 +14,7 @@
 //   "Get pISO_Codes of ghoCalendarHolidays to AllISOCodes"
 //
 // The *main message* in each cNationalHolidays object is;
-//    "Function IsHoliday Date dInDate Boolean ByRef bNationalHoliday Returns String"
+//    "Function HolidayName Date dInDate Boolean ByRef bNationalHoliday Returns String"
 //    This single function handles all holidays and special dates for a country.
 //   
 // Note: If you don't need all language packages, you can comment them out.

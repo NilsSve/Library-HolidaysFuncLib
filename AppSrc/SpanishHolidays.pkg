@@ -9,7 +9,7 @@
 // Note        : To create a similar package for another country, copy the function below and
 //               simply change the name and wordings and possibly also what should constitute the holidays
 //               for your country. All the underlying holiday functions can be found in oCalendarHolidays.pkg
-//               The IsHoliday function is used by the Holidays.vw sample view; the oCreateDates_bp business process.
+//               The HolidayName function is used by the Holidays.vw sample view; the oCreateDates_bp business process.
 //
 //             : This is the _start_ of a Spanish holiday function package. You can add your own days to it.
 //
@@ -27,7 +27,7 @@ Object oSpanishHolidays is a cNationalHolidays
 
     // Function that returns the name of Spanish 'holidays' from a date variable.
     //
-    // Function IsHoliday takes two parameters;
+    // Function HolidayName takes two parameters;
     // A 4-year digit date variable and a boolean as a ByRef variable.
     //
     // Returns: A string with the 'holidayname' as text AND it changes the boolean ByRef
@@ -46,7 +46,7 @@ Object oSpanishHolidays is a cNationalHolidays
     //
     // Note that although all functions below defines two parameters, not all
     // of those functions use the second parameter.
-    Function IsHoliday Date dInDate Boolean ByRef bNationalHoliday Returns String
+    Function HolidayName Date dInDate Boolean ByRef bNationalHoliday Returns String
         Integer iYear
         Date dHolidayDate
         String sHolidayName sISO_Short

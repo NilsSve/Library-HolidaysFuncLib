@@ -51,7 +51,7 @@ Use cCalendarHolidays.h.pkg
         All 2-character ISO_Short string are defined here:
             https://www.iso.org/obp/ui/#search/code/
      
-     2. Secondly there is the 'IsHoliday' function that returns the name of a 
+     2. Secondly there is the 'HolidayName' function that returns the name of a 
         holiday/special day, given a certain date.
         It take on three parameters;
             a) A date (could be return value from 1. above)
@@ -60,8 +60,8 @@ Use cCalendarHolidays.h.pkg
                Remember that there are also special days like e.g. "Mother's Day" that
                is not a holiday.
         Returns: A holiday name as a string, and sets the ByRef param to True/False.
-        Example: "Get IsHoliday of ghoCalendarHolidays 03/16/2025 "US" (&bIsHoliday) to sHolidayName"
-        The 'IsHoliday' function of this class in its turn, calls an 'IsHoliday' function for the
+        Example: "Get HolidayName of ghoCalendarHolidays 03/16/2025 "US" (&bIsHoliday) to sHolidayName"
+        The 'HolidayName' function of this class in its turn, calls an 'HolidayName' function for the
         passed ISO_Short value for the correct country packages found in CountryPackages.pkg file.
         The CountryPackages.pkg is included in the oCalendarHolidays function library object.
         
@@ -176,13 +176,13 @@ Class cCalendarHolidays is a cObject
     
     { Visibility  = Public }
     { Description = "Interface function from this class to cNationalHolidays class objects (CountryPackages.pkg)" }
-    Function IsHoliday Date dInDate String sISO_Short Boolean ByRef bOfficialHoliday Returns String
+    Function HolidayName Date dInDate String sISO_Short Boolean ByRef bOfficialHoliday Returns String
         Handle hoNationalHolidays
         String sHolidayName
         
         Get NationalHolidaysObject sISO_Short to hoNationalHolidays
         If (hoNationalHolidays <> 0) Begin
-            Get IsHoliday of hoNationalHolidays dInDate (&bOfficialHoliday) to sHolidayName
+            Get HolidayName of hoNationalHolidays dInDate (&bOfficialHoliday) to sHolidayName
         End
         Function_Return sHolidayName
     End_Function  
@@ -227,7 +227,7 @@ Class cCalendarHolidays is a cObject
         Loop
         
         If (Err = False and bFound = True and sISO_Short <> "") Begin
-            Get IsHoliday dInDate sISO_Short (&bIsHoliday) to sHolidayName
+            Get HolidayName dInDate sISO_Short (&bIsHoliday) to sHolidayName
         End
 
         Move (Err = False and LastErr <> DFERR_ENTER_VALID_DATE and String(dDate) <> "") to bFound
