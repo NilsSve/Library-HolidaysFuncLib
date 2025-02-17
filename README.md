@@ -24,7 +24,7 @@ There are two types of functions/usages of this library.
         file; "Procedure AddAllOfficialShort", or by getting the 'pAllISOCodes'
         struct array property.
      
-     2. Secondly there is the 'IsHoliday' function that returns the name of a 
+     2. Secondly there is the 'HolidayName' function that returns the name of a 
         holiday/special day, given a certain date.
         It take on three parameters;
             a) A date (could be return value from 1. above)
@@ -33,7 +33,7 @@ There are two types of functions/usages of this library.
                Remember that there are also special days like e.g. "Mother's Day" that
                is not a holiday.
         Returns: A holiday name as a string, and sets the ByRef param to True/False.
-        Example: "Get IsHoliday of ghoCalendarHolidays 03/16/2025 "US" (&bIsHoliday) to sHolidayName"
+        Example: "Get HolidayName of ghoCalendarHolidays 03/16/2025 "US" (&bIsHoliday) to sHolidayName"
         The 'IsHoliday' function of this class in its turn, calls an 'IsHoliday' function for the
         passed ISO_Short value for the correct country packages found in CountryPackages.pkg file.
         The CountryPackages.pkg is included in the oCalendarHolidays function library object.
