@@ -67,17 +67,23 @@ Use cCalendarHolidays.h.pkg
         
         Note: If your country does not exist in CountryPackages.pkg you are encouraged to
               create one by looking at the existing packages AND email the package
-              to support@rdctools.com.
+              to support@rdctools.com. 
+              
+      3. Thirdly there is a 'reciprocal' function to number 1. above. The 'Holiday Function Library' 
+         is named: 'IsDateAHoliday'.
+         It takes a Date- and an ISO_Short- parameter and returns a boolean True/False if the date is found.
+         Or in other words if a matching function was found in the library.
+         The function also uses three ByRef parameters: Boolean bIsHoliday, String sHolidayName and String sFunctionName.
      
      The global handle ghoCalendarHolidays can be used to access all functions.
               
-     The cCalendarHolidays class consist of helper date functions for the holiday
-     function library: oCalendarHolidays.pkg (object). This object also contains
-     the code for all country packages found in CountryPackages.pkg 
+     The cCalendarHolidays class consist of helper functions for the holiday
+     function library: oCalendarHolidays.pkg (object), but can be used for whatever purposes.
+     The oCalendarHolidays object also contains code for all country packages found in CountryPackages.pkg.
      
      Note: The reason for the oCalendarHolidays.pkg is the usage of the "Procedure RegisterInterface"
-           class message. It is used to capture; the function name, calling parameters and the help text (comment).
-           And it is *only* allowed to use meta tags { Published } and { Description }, in
+           class message (private). It is used to capture; the function name, calling parameters and the help text (comment).
+           It is *only* allowed in DataFlex to use meta tags { Published } and { Description }, in
            an Object (not Class).
 
    
@@ -110,10 +116,8 @@ Use cCalendarHolidays.h.pkg
 
 Register_Function psISO_Short Returns String
 
-// *** These are best used as global functions: ***
-    // First out are functions that used to be defined in the An_dates.pkg, but was moved
-    // here for convenience.
-    // *** Start An_Dates.pkg functions ***
+// *** These two functions are best used as globals: ***
+    // Helper functions used by the class.
     Function LeftFill2 Global String sString Integer iWidth String sFillChar Returns String
         Function_Return (Insert(Repeat(sFillChar,0 max (iWidth-Length(Trim(sString)))),Trim(sString),0))
     End_Function
@@ -167,80 +171,11 @@ Class cCalendarHolidays is a cObject
         Forward Send End_Construct_Object
     End_Procedure
 
-    // Register functions to class pHolidayFunctions struct array property.
-    Procedure RegisterInterface Handle hMsg String sMsgName String sParams String sComment
-        Handle hNewTest       
-        String sReturnType
-        tHolidayFunc   HolidayFunction
-        tHolidayFunc[] HolidayFuncArray
-        tHolidayFuncVar[] HolidayFuncVarArray
-        
-        If (Left(sMsgName, 4) = "msg_") Begin
-            Move (Replace("msg_", sMsgName, "")) to sMsgName
-        End
-        If (Left(sMsgName, 4) = "get_") Begin
-            Move (Replace("get_", sMsgName, "")) to sMsgName
-        End
-        
-        If (sParams <> "") Begin
-            Get ExtractParams sParams (&sReturnType) to HolidayFuncVarArray
-            Move HolidayFuncVarArray to HolidayFunction.HolidayFuncVarArray 
-            Move sReturnType         to HolidayFunction.sReturnType
-        End
-        Get pHolidayFunctions to HolidayFuncArray
-        Move sMsgName         to HolidayFunction.sName
-        Move sComment         to HolidayFunction.sHelp
-        Move HolidayFunction  to HolidayFuncArray[-1] 
-        Move (SortArray(HolidayFuncArray)) to HolidayFuncArray
-        Set pHolidayFunctions to HolidayFuncArray
+    Procedure PUBLIC_MESSAGES
     End_Procedure
     
-    // Helper function for Procedure RegisterInterface.
-    Function ExtractParams String sParams String ByRef sReturnType Returns tHolidayFuncVar[]
-        tHolidayFuncVar[] HolidayFuncVarArray
-        String[] asParams
-        Integer iCount iSize iParam
-        Move 0 to iParam
-        Move (StrSplitToArray(sParams, " ")) to asParams
-        Move (SizeOfArray(asParams)) to iSize
-        Decrement iSize
-        For iCount from 0 to iSize
-            If (Lowercase(asParams[iCount]) = "returns") Begin
-                Increment iCount
-                Move asParams[iCount] to sReturnType
-                Move iSize to iCount // Get out of here.
-            End
-            Else Begin
-                Move asParams[iCount] to HolidayFuncVarArray[iParam].sType
-                Increment iCount
-                Move asParams[iCount] to HolidayFuncVarArray[iParam].sVarName 
-                Increment iParam
-            End
-        Loop    
-        Function_Return HolidayFuncVarArray
-    End_Function
-
-    Procedure RegisterNationalHolidays Handle hoNationalHolidays
-        Handle[] hoNationalHolidaysArray
-        Get phoNationalHolidaysArray to hoNationalHolidaysArray
-        Move hoNationalHolidays to hoNationalHolidaysArray[SizeOfArray(hoNationalHolidaysArray)]
-        Set phoNationalHolidaysArray to hoNationalHolidaysArray
-    End_Procedure
-
-    // Returns the national holiday object handle for the passed sISO_Short code
-    Function NationalHolidaysObject String sISO_Short Returns Handle
-        Integer iCount
-        Handle[] hoNationalHolidaysArray
-        Get phoNationalHolidaysArray to hoNationalHolidaysArray
-        For iCount From 0 to (SizeOfArray(hoNationalHolidaysArray) - 1)
-            If (psISO_Short(hoNationalHolidaysArray[iCount]) = sISO_Short) Begin
-                Function_Return hoNationalHolidaysArray[iCount]
-            End
-        Loop
-        Function_Return 0
-    End_Function 
-    
-    // Interfac function from this class to the national holiday classes (CountryPackages.pkg)
+    { Visibility  = Public }
+    { Description = "Interface function from this class to cNationalHolidays class objects (CountryPackages.pkg)" }
     Function IsHoliday Date dInDate String sISO_Short Boolean ByRef bOfficialHoliday Returns String
         Handle hoNationalHolidays
         String sHolidayName
@@ -252,6 +187,59 @@ Class cCalendarHolidays is a cObject
         Function_Return sHolidayName
     End_Function  
     
+    { Visibility   = Public }
+    { Description  = "This is the reciprocal function, compared to making a call to"}
+    { Description  += "any of the 'Holiday Function Library' functions,"}
+    { Description += "where you pass a year and get a date variable as the return value."}
+    { Description += "For this function: Pass a known date and an ISO_Short 2-character country code."}
+    { Description += "Returns a boolean True/False if the date is found in the function library."}
+    { Description += "If 'True' is returned, it also returns;"}
+    { Description += " - A boolean 'bIsHoliday' as ByRef and a" }
+    { Description += " - A ByRef String with the Holiday Name,"}
+    { Description += " - A ByRef String with the Function Name,"}
+    { Description += "for the passed sISO_Short country code."}
+    Function IsDateAHoliday Date dInDate String sISO_Short Boolean ByRef bIsHoliday String ByRef sHolidayName String ByRef sFunctionName Returns Boolean
+        Boolean bFound bErr bWasTrappd
+        tHolidayFunc[] HolidayFunctions
+        Integer iSize iCount iFuncID iYear iLastErr 
+        Date dDate
+
+        Move False to bFound
+        Move Err to bErr
+        Move LastErr to iLastErr
+        Move False to Err
+        Get IsTrapped of (TrappedErrors(Error_Object_Id)) DFERR_ENTER_VALID_DATE to bWasTrappd
+        Send Ignore_Error to Error_Object_Id DFERR_ENTER_VALID_DATE
+
+        Move (DateGetYear(dInDate)) to iYear
+        Get pHolidayFunctions to HolidayFunctions
+        Move (SizeOfArray(HolidayFunctions)) to iSize
+        Decrement iSize 
+        
+        For iCount from 0 to iSize
+            Move (Eval("get_" - HolidayFunctions[iCount].sName)) to iFuncID
+            Get iFuncID iYear sISO_Short to dDate
+            Move (dInDate = dDate) to bFound
+            If (Err = True or bFound = True) Begin
+                Move HolidayFunctions[iCount].sName to sFunctionName
+                Move iSize to iCount // We're out of here
+            End
+        Loop
+        
+        If (Err = False and bFound = True and sISO_Short <> "") Begin
+            Get IsHoliday dInDate sISO_Short (&bIsHoliday) to sHolidayName
+        End
+
+        Move (Err = False and LastErr <> DFERR_ENTER_VALID_DATE and String(dDate) <> "") to bFound
+        Move bErr to Err
+        Move iLastErr to LastErr
+        
+        Function_Return bFound
+    End_Function
+
+    { Visibility = Public }
+    { Description  = "To get the ISO_Short national ISO code, from a sISO_Long code."}
+    { Description += "An ISO_Short code is 2-characters, while an ISO_Long is 3-characters."}
     Function ISO_LongToISO_Short String sISO_Long Returns String
         tISO_Codes[] ISO_CodesArray
         String sCode
@@ -270,22 +258,26 @@ Class cCalendarHolidays is a cObject
         Function_Return sCode
     End_Function
 
-    Procedure HELPER_FUNCTIONS // For the Studio Code Explorer
-    End_Procedure
-
-    Function WindowsLocaleValue Integer iLocaleId Returns String
-        WString sValue wsResult
-        Pointer lpValue
-        Integer iRetval
+    { Visibility = Public }
+    { Description = "To get the Offical_Short national ISO code, from a sISO_Short code."}
+    Function ISO_ShortToOfficial_Short String sISO_Short Returns String
+        tISO_Codes[] AllISOCodes
+        tISO_Codes ISOShort
+        Integer iItem 
+        String sOfficial_Short
+        
+        Move "" to sOfficial_Short
+        Move (Uppercase(sISO_Short)) to ISOShort.sIso_Short
+        Get pISO_Codes to AllISOCodes
+        Move (SearchArray(ISOShort, AllISOCodes)) to iItem 
+        If (iItem <> -1) Begin
+            Move AllISOCodes[iItem].sOffical_Short to sOfficial_Short
+        End
+        
+        Function_Return sOfficial_Short
+    End_Function 
     
-        Move (AddressOf(sValue)) to lpValue
-        Move (WinAPI_GetLocaleInfoEx(AddressOf(sValue), iLocaleId, 0, 0)) to iRetval
-        Move (ZeroString (iRetval)) to wsResult
-        Move (WinAPI_GetLocaleInfoEx(AddressOf(sValue), iLocaleId, AddressOf(wsResult), iRetval)) to iRetval
-    
-        Function_Return (Cstring(wsResult))
-    End_Function
-
+    { Visibility = Public }
     Function MonthNameFromInteger Integer iMthNo Boolean bLongName Boolean bCapsFirstLetter Returns String
         String sMonthName
         Pointer lpsMonthName
@@ -409,7 +401,8 @@ Class cCalendarHolidays is a cObject
         Function_Return sMonthName
     End_Function
 
-    // Note: It is assumed here that Monday is the first day of the week.
+    { Visibility = Public }
+    { Description = "It is assumed here that Monday is the first day of the week." }
     Function DayNameFromInteger Integer iDayNo Boolean bLongName Boolean bCapsFirstLetter Returns String
         String sDayName
         Pointer lpsDayName
@@ -485,24 +478,27 @@ Class cCalendarHolidays is a cObject
         Function_Return sDayName
     End_Function
 
-    // Note: 2025-01-22 NS. Changed to use DAW's DateSet global function.
-    // Construct a date from integers iYear iMonth and iDay
+    { Visibility = Public }
+    { Description  = "Construct a date from integers iYear iMonth and iDay" }
+    { Description += "2025-01-22 NS. Changed to use DAW's DateSet global function." }
     Function DateSetDate Integer iYear Integer iMonth Integer iDay Returns Date
         Date dDate
         Move (DateSet(iYear, iMonth, iDay)) to dDate
         Function_Return dDate
     End_Function
     
+    { Visibility = Public }
     Function IsLeapYear Integer iYear Returns Boolean
         Function_Return ((not(Mod(iYear, 4))) and (Mod(iYear, 100)) and (Mod(iYear, 400)))
     End_Function
 
-    // Check if a date represented as a string is valid.
-    // Returns true if date is valid; false otherwise.
-    // Note: It preserves the state of the Err and LastErr global variables.
-    //       For some odd reason this gives a false positive;
-    //         'Move (IsDateValid(sValue)) to bOK'
-    //       even if the sValue = "" or sValue = "xfsdf" (!)
+    { Visibility = Public }
+    { Description  = "Check if a date represented as a string is valid." }
+    { Description += " Returns true if date is valid; false otherwise." }
+    { Description += "Note: It preserves the state of the Err and LastErr global variables." }
+    { Description += "      For some odd reason this gives a false positive;" }
+    { Description += "      'Move (IsDateValid(sValue)) to bOK'" }
+    { Description += "       even if the sValue = "" or sValue = "xfsdf" (!)" }
     Function IsValidDateString String sDate Returns Boolean
         Date dDate
         DateTime dtDate
@@ -512,12 +508,12 @@ Class cCalendarHolidays is a cObject
         Move Err to bErr
         Move LastErr to iLastErr
         Move False to Err
-        Get isTrapped of (trappedErrors(Error_Object_Id)) 16 to bWasTrappd
-        Send Ignore_Error to Error_Object_Id 16
+        Get IsTrapped of (TrappedErrors(Error_Object_Id)) DFERR_ENTER_VALID_DATE to bWasTrappd
+        Send Ignore_Error to Error_Object_Id DFERR_ENTER_VALID_DATE
         Move (Date(sDate)) to dDate
         Move sDate to dtDate
         If (bWasTrappd) Begin
-            Send Trap_Error to Error_Object_Id 16
+            Send Trap_Error to Error_Object_Id DFERR_ENTER_VALID_DATE
         End 
         If (Err = False) Begin  
             Move (DateGetYear(dtDate))  to iYear
@@ -530,16 +526,17 @@ Class cCalendarHolidays is a cObject
                 Move (iDay > iMonthDays) to Err
             End
         End
-        Move (Err = False and LastErr <> 16 and String(dDate) <> "") to bOK
+        Move (Err = False and LastErr <> DFERR_ENTER_VALID_DATE and String(dDate) <> "") to bOK
         Move bErr to Err
         Move iLastErr to LastErr
         
         Function_Return bOK
     End_Function
     
-    // IsInteger returns True if the value held by the sValue parameter is an integer (the function does not handle thousand seps).
-    // Note that even if this function returns True it may still not be possible to 'Move' the value to an integer variable. This will
-    // be the case if the value falls outside of the integer value range (-2147483648 to 2147483647)
+    { Visibility = Public }
+    { Description  = "IsInteger returns True if the value held by the sValue parameter is an integer (the function does not handle thousand seps)." }
+    { Description += "Note that even if this function returns True it may still not be possible to 'Move' the value to an integer variable. This will" }
+    { Description += "be the case if the value falls outside of the integer value range (-2147483648 to 2147483647)" }
     Function IsInteger String sValue Returns Boolean
         Integer iPos iLen 
         If (Trim(sValue) = "") Begin
@@ -558,21 +555,24 @@ Class cCalendarHolidays is a cObject
         Function_Return True
     End_Function
 
-    // Given the number of a day in the week, return its short name.
-    // Day 1 is Sunday.
+    { Visibility = Public }
+    { Description  = "Given the number of a day in the week, return its short name." }
+    { Description += "Day 1 is Sunday." }
     Function GetDayName Integer iWeekDay Returns String
         String sDayName
         Get DayNameFromInteger iWeekDay False True to sDayName
         Function_Return sDayName
     End_Function
     
+    { Visibility = Public }
     Function GetDayNameLong Integer iWeekDay Returns String
         String sDayName
         Get DayNameFromInteger iWeekDay True True to sDayName
         Function_Return sDayName
     End_Function
     
-    // Given a data (or DateTime) return the short name of the day of the week.
+    { Visibility = Public }
+    { Description = "Given a data (or DateTime) return the short name of the day of the week." }
     Function DateGetDayNameLong DateTime dtDate Returns String
         Integer iWeekday 
         String sDay
@@ -582,7 +582,8 @@ Class cCalendarHolidays is a cObject
         Function_Return sDay
     End_Function
     
-    // Given a data (or DateTime) return the short name of the day of the week.
+    { Visibility = Public }
+    { Description = "Given a data (or DateTime) return the short name of the day of the week." }
     Function DateGetDayName DateTime dtDate Returns String
         Integer iWeekday 
         String sDay
@@ -591,34 +592,39 @@ Class cCalendarHolidays is a cObject
         Function_Return sDay
     End_Function
     
-    // Given the number of a month, return its name.
+    { Visibility = Public }
+    { Description = "Given the number of a month, return its name." }
     Function GetMonthName Integer iMthNo Returns String
         String sMonthName
         Get MonthNameFromInteger iMthNo False True to sMonthName
         Function_Return sMonthName
     End_Function
     
-    // Given a date (or DateTime) return the name of the month.
+    { Visibility = Public }
+    { Description = "Given a date (or DateTime) return the name of the month." }
     Function DateGetMonthName Date dtDate Returns String 
         String sMonth
         Get GetMonthName (DateGetMonth(dtDate)) to sMonth
         Function_Return sMonth
     End_Function
     
+    { Visibility = Public }
     Function GetMonthNameLong Integer iMthNo Returns String
         String sMonthName
         Get MonthNameFromInteger iMthNo True True to sMonthName
         Function_Return sMonthName
     End_Function
     
-    // Given a date (or DateTime) return the name of the month.
+    { Visibility = Public }
+    { Description = "Given a date (or DateTime) return the name of the month." }
     Function DateGetMonthNameLong Date dtDate Returns String
         String sMonth
         Get GetMonthNameLong (DateGetMonth(dtDate)) to sMonth
         Function_Return sMonth
     End_Function
     
-    // Given a  date (or DateTime) return the number of days in the month.
+    { Visibility = Public }
+    { Description = "Given a date (or DateTime) return the number of days in the month." }
     Function DateGetDaysInMonth DateTime dtDate Returns Integer
         Integer iMth iYr iDays
         Move (DateGetMonth(dtDate)) to iMth
@@ -635,36 +641,36 @@ Class cCalendarHolidays is a cObject
         Function_Return iDays
     End_Function
     
-    // Return the number of the day of the week according to the ISO definition -
-    // Moday is day 1.
-    // The built-in function DateGetDayOfWeek returns Sunday as 1.
-    // "The great advantage of having International Standards is that they make
-    // it easy for the American people to differ from everybody else."
-    //
+    { Visibility = Public }
+    { Description  = "Return the number of the day of the week according to the ISO definition -" }
+    { Description += "Moday is day 1." }
+    { Description += "The built-in function DateGetDayOfWeek returns Sunday as 1." }
+    { Description += "'The great advantage of having International Standards is that they make" }
+    { Description += "it easy for the American people to differ from everybody else.'" }
     Function DateGetISODayOfWeek DateTime dtDate Returns Integer
         Integer iDayNo
         Move (DateGetDayOfWeek(dtDate)) to iDayNo
         Function_Return (If(iDayNo = 1,7,iDayNo - 1))
     End_Function
     
-    // Changed 2025-01-22 NS. Now uses the DAW DateGetWeekOfYearISO function instead.
-    //
-    // Return the week number (ISO 8601 definition - weeks start on a Monday
-    // and week 1 of any year is that with the year's first Thursday in it).
+    { Visibility = Public }
+    { Description  = "Return the week number (ISO 8601 definition - weeks start on a Monday" }
+    { Description += "and week 1 of any year is that with the year's first Thursday in it)." }
+    { Description += "Changed 2025-01-22 NS. Now uses the DAW DateGetWeekOfYearISO function instead." }
     Function DateGetISOWeek DateTime dtDate Returns Integer
         Integer iWeek
         Move (DateGetWeekOfYearISO(dtDate)) to iWeek
         Function_Return iWeek
     End_Function
     
-    // Return the Year of the Week (ISO 8601 definition - weeks start on a Monday
-    // and week 1 of any year is that with the year's first Thursday in it) containing
-    // the date passed.
-    //
-    // Algorithm (from Wikipedia: http://en.wikipedia.org/wiki/Talk:ISO_week_date#Algorithms)
-    // Determine the date's Day of Week, D
-    // Use that to move to the nearest Thursday (-3..+3 days)
-    // The result the year of that Date, Y
+    { Visibility = Public }
+    { Description  = "Return the Year of the Week (ISO 8601 definition - weeks start on a Monday" }
+    { Description += "and week 1 of any year is that with the year's first Thursday in it) containing" }
+    { Description += "the date passed." }
+    { Description += "Algorithm (from Wikipedia: http://en.wikipedia.org/wiki/Talk:ISO_week_date#Algorithms)" }
+    { Description += "Determine the date's Day of Week, D" }
+    { Description += "Use that to move to the nearest Thursday (-3..+3 days)" }
+    { Description += "The result the year of that Date, Y" }
     Function DateGetISOYear DateTime dtDate Returns Integer
         Integer  iDayNo
         Date     dDate dNearestThu
@@ -675,7 +681,8 @@ Class cCalendarHolidays is a cObject
         Function_Return (DateGetYear(dNearestThu))
     End_Function
     
-    // Return a date in the ISO format Year-Week-Day (e.g. "2009-W53-7")
+    { Visibility = Public }
+    { Description = "Return a date in the ISO format Year-Week-Day (e.g. '2009-W53-7')" }
     Function DateGetISOWeekDate DateTime dtDate Returns String
         Integer iWeek
         String sYear sDays
@@ -685,7 +692,8 @@ Class cCalendarHolidays is a cObject
         Function_Return (sYear - "-W" - LeftFill2(iWeek,2,0) - "-" - sDays)
     End_Function
     
-    // Given a date (or DateTime) return the date (DateTime) of the last day in the month.
+    { Visibility = Public }
+    { Description = "Given a date (or DateTime) return the date (DateTime) of the last day in the month." }
     Function DateGetLastDayOfMonth DateTime dtDate Returns DateTime
         DateTime dtLastDate 
         Integer iDays
@@ -694,30 +702,32 @@ Class cCalendarHolidays is a cObject
         Function_Return dtLastDate
     End_Function
     
-    // Given a date (or DateTime) return the date (DateTime) of the first day of the year
+    { Visibility = Public }
+    { Description = "Given a date (or DateTime) return the date (DateTime) of the first day of the year" }
     Function DateGetFirstDayOfYear DateTime dtDate Returns DateTime
         Move (DateSetDay(dtDate,1))   to dtDate
         Move (DateSetMonth(dtDate,1)) to dtDate
         Function_Return dtDate
     End_Function
     
-    // Given a date (or DateTime) return the date (DateTime) of the Last day of the year
+    { Visibility = Public }
+    { Description = "Given a date (or DateTime) return the date (DateTime) of the Last day of the year" }
     Function DateGetLastDayOfYear DateTime dtDate Returns DateTime
         Move (DateSetMonth(dtDate,12)) to dtDate
         Move (DateSetDay(dtDate,31))   to dtDate
         Function_Return dtDate
     End_Function
     
-    // Given a date (or DateTime) advance or retard it by a given number of months.
-    // If the original date happens to be the last day of the month, and you want the
-    // returned date to be the last day of the new month (e.g.  - if advancing by one
-    // month - you would want 28th February to become 31st March rather than 28th March
-    // or 30th April to become 31st May) pass the optional boolean parameter as a true
-    // value (the 31st May will always become 30th June etc.).
-    //
+    { Visibility = Public }
+    { Description  = "Given a date (or DateTime) advance or retard it by a given number of months." }
+    { Description += "If the original date happens to be the last day of the month, and you want the" }
+    { Description += "returned date to be the last day of the new month (e.g.  - if advancing by one" }
+    { Description += "month - you would want 28th February to become 31st March rather than 28th March" }
+    { Description += "or 30th April to become 31st May) pass the optional boolean parameter as a true" }
+    { Description += "value (the 31st May will always become 30th June etc.)." }
+    { Description += "If bLastDay is present and True the last day of the new month will be returned." }
+    { Description += "Use this if you want the 28th February to become eg 31st March or 30th April to become 31st May." }
     Function DateChangeMonth DateTime dtDate Integer iMths Boolean bLastDay Returns DateTime
-        // If bLastDay is present and True the last day of the new month will be returned.
-        // Use this if you want the 28th February to become eg 31st March or 30th April to become 31st May.
         Integer iDay iMth iYr iYrs iLastDay iDays
         Boolean bIsLast
         Move (DateGetDay(dtDate))   to iDay
@@ -751,9 +761,9 @@ Class cCalendarHolidays is a cObject
         Function_Return (DateSetDay(dtDate,iDay))
     End_Function
     
-    // Given a date (or DateTime) advance or retard it by a given number of years.
-    // The last day of the month is treated as for DateChangeMonth.
-    //
+    { Visibility = Public }
+    { Description  = "Given a date (or DateTime) advance or retard it by a given number of years." }
+    { Description += "The last day of the month is treated as for DateChangeMonth." }
     Function DateChangeYear DateTime dtDate Integer iYrs Boolean bLastDay Returns DateTime
         // If bLastDay is present and True the last day of the new month will be returned.
         // Use this if you want the 28th February 2007 to become eg 29th Feburary 2008.
@@ -772,28 +782,28 @@ Class cCalendarHolidays is a cObject
         Function_Return (DateSetDay(dtDate,iDay))
     End_Function
     
-    // Function DateFormat. Written by Samuel Pizarro
-    //
-    // dDate        - A date variable
-    // sFormatToken - Formatation tokens:
-    //                d     - Day of month as digits with no leading zero for single-digit days. 
-    //                dd    - Day of month as digits with leading zero for single-digit days. 
-    //                ddd   - Day of week as a three-letter abbreviation. The Function uses the LOCALE_SABBREVDAYNAME value associated with the specified locale. 
-    //                dddd  - Day of week as its full name. The Function uses the LOCALE_SDAYNAME value associated with the specified locale. 
-    //                M     - (Note the capsed 'M'.) Month as digits with no leading zero for single-digit months. 
-    //                MM    - Month as digits with leading zero for single-digit months. 
-    //                MMM   - Month as a three-letter abbreviation. The Function uses the LOCALE_SABBREVMONTHNAME value associated with the specified locale. 
-    //                MMMM  - Month as its full name. The Function uses the LOCALE_SMONTHNAME value associated with the specified locale. 
-    //                y     - Year as last two digits, but with no leading zero for years less than 10. 
-    //                yy    - Year as last two digits, but with leading zero for years less than 10. 
-    //                yyyy  - Year represented by full four or five digits, depending on the calendar used. Thai Buddhist and Korean calendars both have five digit years. The "yyyy" pattern will Show five digits for these two calendars, and four digits for all other supported calendars.  
-    //                yyyyy - Identical to "yyyy".  
-    //                gg    - Period/era String. The Function uses the CAL_SERASTRING value associated with the specified locale. This element is ignored If the Date to be formatted does not have an associated era or period String. 
-    // Exemples:
-    //     Move (sDateFormat(4/3/2002,"dddd ,d 'de' MMMM 'de' yyyy")) to sRet
-    //       sRet = "Quarta-Feira, 3 de abril de 2002"
-    //     Move (sDateFormat(30/09/2006,"dd/MM/yy")) to sRet
-    //       sRet = "30/09/06" 
+    { Visibility = Public }
+    { Description  = "Formats a dDate to a string according to the passed format token string" }
+    { Description += "The last day of the month is treated as for DateChangeMonth." }
+    { Description += "Format tokens:" }
+    { Description += "d     - Day of month as digits with no leading zero for single-digit days. " }
+    { Description += "dd    - Day of month as digits with leading zero for single-digit days." }
+    { Description += "ddd   - Day of week as a three-letter abbreviation. The Function uses the LOCALE_SABBREVDAYNAME value associated with the specified locale." }
+    { Description += "dddd  - Day of week as its full name. The Function uses the LOCALE_SDAYNAME value associated with the specified locale." }
+    { Description += "M     - (Note the capsed 'M'.) Month as digits with no leading zero for single-digit months." }
+    { Description += "MM    - Month as digits with leading zero for single-digit months." }
+    { Description += "MMM   - Month as a three-letter abbreviation. The Function uses the LOCALE_SABBREVMONTHNAME value associated with the specified locale." }
+    { Description += "MMMM  - Month as its full name. The Function uses the LOCALE_SMONTHNAME value associated with the specified locale." }
+    { Description += "y     - Year as last two digits, but with no leading zero for years less than 10." }
+    { Description += "yy    - Year as last two digits, but with leading zero for years less than 10." }
+    { Description += "yyyy  - Year represented by full four or five digits, depending on the calendar used. Thai Buddhist and Korean calendars both have five digit years. The "yyyy" pattern will Show five digits for these two calendars, and four digits for all other supported calendars." }
+    { Description += "yyyyy - Identical to "yyyy"." }
+    { Description += "gg    - Period/era String. The Function uses the CAL_SERASTRING value associated with the specified locale. This element is ignored If the Date to be formatted does not have an associated era or period String." }
+    { Description += "Exemples:" }
+    { Description += "  Move (sDateFormat(4/3/2002,"dddd ,d 'de' MMMM 'de' yyyy")) to sRet" }
+    { Description += "  sRet = 'Quarta-Feira, 3 de abril de 2002'" }
+    { Description += "  Move (sDateFormat(30/09/2006,'dd/MM/yy')) to sRet" }
+    { Description += "  sRet = '30/09/06'" }
     Function DateFormat Date dDate String sFormatToken Returns String
         String sDateRet 
         WString wsFormat wsFormattedDate 
@@ -828,20 +838,21 @@ Class cCalendarHolidays is a cObject
         Function_Return sDateRet
     End_Function
 
-    // Function TimeFormat
-    //
-    // Parameters: 
-    //   sFormatToken - Use these tokens:
-    //   h  - Hours with no leading zero for single-digit hours; 12-hour clock. 
-    //   hh - Hours with leading zero for single-digit hours; 12-hour clock. 
-    //   H  - Hours with no leading zero for single-digit hours; 24-hour clock. 
-    //   HH - Hours with leading zero for single-digit hours; 24-hour clock. 
-    //   m  - Minutes with no leading zero for single-digit minutes. 
-    //   mm - Minutes with leading zero for single-digit minutes. 
-    //   s  - Seconds with no leading zero for single-digit seconds. 
-    //   ss - Seconds with leading zero for single-digit seconds. 
-    //   t  - One character Time marker String, such as A or P. 
-    //   tt - Multicharacter Time marker String, such as AM or PM. 
+    { Visibility = Public }
+    { Description  = "Formats a Time variable according to the passed token string" }
+    { Description += "Parameters:" }
+    { Description += "A Time variable" }
+    { Description += "Format tokens:" }
+    { Description += "h  - Hours with no leading zero for single-digit hours; 12-hour clock." }
+    { Description += "hh - Hours with leading zero for single-digit hours; 12-hour clock." }
+    { Description += "H  - Hours with no leading zero for single-digit hours; 24-hour clock." }
+    { Description += "HH - Hours with leading zero for single-digit hours; 24-hour clock." }
+    { Description += "m  - Minutes with no leading zero for single-digit minutes." }
+    { Description += "mm - Minutes with leading zero for single-digit minutes." }
+    { Description += "s  - Seconds with no leading zero for single-digit seconds." }
+    { Description += "ss - Seconds with leading zero for single-digit seconds." }
+    { Description += "t  - One character Time marker String, such as A or P." }
+    { Description += "tt - Multicharacter Time marker String, such as AM or PM." }
     Function TimeFormat Time tTime String sFormatToken Returns String
         String sTimeRet sTmFormat
         tSystemTimeType tSt
@@ -873,7 +884,8 @@ Class cCalendarHolidays is a cObject
         Function_Return sTimeRet
     End_Function
 
-    //  Returns the current time formatted according to the sFormatToken
+    { Visibility = Public }
+    { Description = "Returns the current time formatted according to the sFormatToken" }
     Function CurrentTimeFormat String sFormatToken Returns String
         Time tVar
         String sTmFormat sRet
@@ -886,17 +898,115 @@ Class cCalendarHolidays is a cObject
         Function_Return sRet
     End_Function
 
-    // Amended to use built-in date functions
+    { Visibility = Public }
+    { Description = "Amended to use built-in date functions" }
     Function YearFromDate Date dDate Returns Integer
         Function_Return (DateGetYear(dDate))
     End_Function
     
-    // Function is being used both by the MothersDay.pkg and NationalDays.pkg.
-    // Helper function for the NationalDay function (internal - no error handling)
-    // Great Britain (U.K.) has a moving National Day - and falls on the second Saturday in June.
-    // Function UKNationalDay
-    //   Params:  4-digit integer Year
-    //   Returns: 4-character string in the format: MMDD
+    Procedure PRIVATE_MESSAGES // For the Studio Code Explorer
+    End_Procedure
+
+    { Visibility = Private }
+    { Description  = "Collects data from all functions of the oCalendarHoldays object." }
+    { Description += "Saves the data in the pHolidayFunctions struct array property." }
+    Procedure RegisterInterface Handle hMsg String sMsgName String sParams String sComment
+        Handle hNewTest       
+        String sReturnType
+        tHolidayFunc   HolidayFunction
+        tHolidayFunc[] HolidayFuncArray
+        tHolidayFuncVar[] HolidayFuncVarArray
+        
+        If (Left(sMsgName, 4) = "msg_") Begin
+            Move (Replace("msg_", sMsgName, "")) to sMsgName
+        End
+        If (Left(sMsgName, 4) = "get_") Begin
+            Move (Replace("get_", sMsgName, "")) to sMsgName
+        End
+        
+        If (sParams <> "") Begin
+            Get ExtractParams sParams (&sReturnType) to HolidayFuncVarArray
+            Move HolidayFuncVarArray to HolidayFunction.HolidayFuncVarArray 
+            Move sReturnType         to HolidayFunction.sReturnType
+        End
+        Get pHolidayFunctions to HolidayFuncArray
+        Move sMsgName         to HolidayFunction.sName
+        Move sComment         to HolidayFunction.sHelp
+        Move HolidayFunction  to HolidayFuncArray[-1] 
+        Move (SortArray(HolidayFuncArray)) to HolidayFuncArray
+        Set pHolidayFunctions to HolidayFuncArray
+    End_Procedure
+    
+    { Visibility = Private }
+    { Description = "Helper function for the Procedure RegisterInterface." }
+    Function ExtractParams String sParams String ByRef sReturnType Returns tHolidayFuncVar[]
+        tHolidayFuncVar[] HolidayFuncVarArray
+        String[] asParams
+        Integer iCount iSize iParam
+        Move 0 to iParam
+        Move (StrSplitToArray(sParams, " ")) to asParams
+        Move (SizeOfArray(asParams)) to iSize
+        Decrement iSize
+        For iCount from 0 to iSize
+            If (Lowercase(asParams[iCount]) = "returns") Begin
+                Increment iCount
+                Move asParams[iCount] to sReturnType
+                Move iSize to iCount // Get out of here.
+            End
+            Else Begin
+                Move asParams[iCount] to HolidayFuncVarArray[iParam].sType
+                Increment iCount
+                Move asParams[iCount] to HolidayFuncVarArray[iParam].sVarName 
+                Increment iParam
+            End
+        Loop    
+        Function_Return HolidayFuncVarArray
+    End_Function
+    
+    { Visibility = Private }
+    { Description = "Returns the national holiday object handle for the passed sISO_Short code" } 
+    Function NationalHolidaysObject String sISO_Short Returns Handle
+        Integer iCount
+        Handle[] hoNationalHolidaysArray
+        Get phoNationalHolidaysArray to hoNationalHolidaysArray
+        For iCount from 0 to (SizeOfArray(hoNationalHolidaysArray) - 1)
+            If (psISO_Short(hoNationalHolidaysArray[iCount]) = sISO_Short) Begin
+                Function_Return hoNationalHolidaysArray[iCount]
+            End
+        Loop
+        Function_Return 0
+    End_Function 
+    
+    { Visibility = Private }
+    { Description = "Message used by the cNationalHolidays class to register itself in this class." } 
+    Procedure RegisterNationalHolidays Handle hoNationalHolidays
+        Handle[] hoNationalHolidaysArray
+        Get phoNationalHolidaysArray to hoNationalHolidaysArray
+        Move hoNationalHolidays to hoNationalHolidaysArray[SizeOfArray(hoNationalHolidaysArray)]
+        Set phoNationalHolidaysArray to hoNationalHolidaysArray
+    End_Procedure
+    
+    { Visibility = Private }
+    Function WindowsLocaleValue Integer iLocaleId Returns String
+        WString sValue wsResult
+        Pointer lpValue
+        Integer iRetval
+    
+        Move (AddressOf(sValue)) to lpValue
+        Move (WinAPI_GetLocaleInfoEx(AddressOf(sValue), iLocaleId, 0, 0)) to iRetval
+        Move (ZeroString (iRetval)) to wsResult
+        Move (WinAPI_GetLocaleInfoEx(AddressOf(sValue), iLocaleId, AddressOf(wsResult), iRetval)) to iRetval
+    
+        Function_Return (Cstring(wsResult))
+    End_Function
+
+    { Visibility = Private }
+    { Description  = "This function is being used both by the MothersDay.pkg and NationalDays.pkg." }
+    { Description += "Helper function for the NationalDay function (internal - no error handling)" }
+    { Description += "Great Britain (U.K.) has a moving National Day - and falls on the second Saturday in June." }
+    { Description += "Function UKNationalDay" }
+    { Description += "Params:  4-digit integer Year" }
+    { Description += "Returns: 4-character string in the format: MMDD" }
     Function UKNationalDay Integer iYear Returns String
         Date   dDate
         String sMonth sDay
@@ -928,6 +1038,7 @@ Class cCalendarHolidays is a cObject
         Function_Return (String(sMonth) + String(sDay))
     End_Function
 
+    { Visibility = Private }
     Function HexToBinary Number nNum Returns String
         String sString
 
@@ -938,12 +1049,14 @@ Class cCalendarHolidays is a cObject
         Function_Return (Right('0000'+sString,4))
     End_Function
 
+    { Visibility = Private }
     Function HexLeapMonth Integer iYear Returns Integer
         String[] sArrayAsYear
         Get psArrayAsYear to sArrayAsYear
         Function_Return ('$'+Right(sArrayAsYear[iYear-1900],1))
     End_Function
 
+    { Visibility = Private }
     Function HexLeapDays Integer iYear Returns Integer
         Integer iLeapMonth iDay
         String[] sArrayAsYear
@@ -956,6 +1069,7 @@ Class cCalendarHolidays is a cObject
         Function_Return iDay
     End_Function
 
+    { Visibility = Private }
     Function HexMonthDays Integer iYear Integer iMonth Returns Integer
         Integer iLoop
         String  sTemp sString
@@ -969,6 +1083,7 @@ Class cCalendarHolidays is a cObject
         Function_Return (If(Mid(sString,1,iMonth)=1,30,29))
     End_Function
 
+    { Visibility = Private }
     Function HexYearDays Integer iYear Returns Integer
         Integer iDays iLoop iString
         String  sString
@@ -986,8 +1101,8 @@ Class cCalendarHolidays is a cObject
         Function_Return iDays
     End_Function
     
-    // ToDo: These functions are not used at the moment. More work is needed
-    //       in the oCalendarHolidays object to use these functions.
+    { Visibility = Private }
+    { Description = "Not used. More work needed" }
     Function ChineseLunar Date dDate Returns tLunar
         Integer iOffset iLoop iTemp iLeapMonth
         tLunar Lunar
@@ -1050,6 +1165,8 @@ Class cCalendarHolidays is a cObject
         Function_Return Lunar
     End_Function
 
+    { Visibility = Private }
+    { Description = "Not used. More work needed" }
     Function IslamicCalendar Date dDate Returns tLunar
         Integer iYear iMonth iDay iAlpha iBeta iJD iDD iJJ iZZ iCyc
         Number  nShift nYear
@@ -1104,6 +1221,8 @@ Class cCalendarHolidays is a cObject
         Function_Return Lunar
     End_Function
     
+    { Visibility = Private }
+    { Description = "Not used. More work needed" }
     Function ChineseNewYear Date dDate Returns Date
         Date dReturn
         tLunar Lunar
@@ -1117,6 +1236,8 @@ Class cCalendarHolidays is a cObject
         Function_Return dReturn
     End_Function
 
+    { Visibility = Private }
+    { Description = "Not used. More work needed" }
     Function VesakDay Date dDate Returns Date
         Date dReturn
         tLunar Lunar
@@ -1130,6 +1251,8 @@ Class cCalendarHolidays is a cObject
         Function_Return dReturn
     End_Function
 
+    { Visibility = Private }
+    { Description = "Not used. More work needed" }
     Function ProphetMuhammadBirthday Date dDate Returns Date
         Date dReturn
         tLunar Lunar
@@ -1141,6 +1264,8 @@ Class cCalendarHolidays is a cObject
         Function_Return dReturn
     End_Function
 
+    { Visibility = Private }
+    { Description = "Not used. More work needed" }
     Function HariRayaPuasa Date dDate String sISO_Short Returns Date
         Date dReturn
         tLunar Lunar
@@ -1161,6 +1286,8 @@ Class cCalendarHolidays is a cObject
         Function_Return dReturn
     End_Function
 
+    { Visibility = Private }
+    { Description = "Not used. More work needed" }
     Function HariRayaHaji Date dDate Returns Date
         Date dReturn
         tLunar Lunar
@@ -1172,6 +1299,8 @@ Class cCalendarHolidays is a cObject
         Function_Return dReturn
     End_Function
 
+    { Visibility = Private }
+    { Description = "Not used. More work needed" }
     Function HariRayaHaji2ndDay Date dDate Returns Date
         Date dReturn
         tLunar Lunar
@@ -1183,6 +1312,8 @@ Class cCalendarHolidays is a cObject
         Function_Return dReturn
     End_Function
 
+    { Visibility = Private }
+    { Description = "Not used. More work needed" }
     Function AwalMuharram Date dDate Returns Date
         Date dReturn
         tLunar Lunar
@@ -1194,6 +1325,8 @@ Class cCalendarHolidays is a cObject
         Function_Return dReturn
     End_Function
 
+    { Visibility = Private }
+    { Description = "Not used. More work needed" }
     Function IsrakMikraj Date dDate Returns Date
         Date dReturn
         tLunar Lunar
@@ -1205,6 +1338,8 @@ Class cCalendarHolidays is a cObject
         Function_Return dReturn
     End_Function
 
+    { Visibility = Private }
+    { Description = "Not used. More work needed" }
     Function AwalRamadan Date dDate Returns Date
         Date dReturn
         tLunar Lunar
@@ -1216,6 +1351,8 @@ Class cCalendarHolidays is a cObject
         Function_Return dReturn
     End_Function
 
+    { Visibility = Private }
+    { Description = "Not used. More work needed" }
     Function NuzulAlQuran Date dDate Returns Date
         Date dReturn
         tLunar Lunar
@@ -1227,6 +1364,8 @@ Class cCalendarHolidays is a cObject
         Function_Return dReturn
     End_Function
 
+    { Visibility = Private }
+    { Description = "Internal for calculating the Chinese New Year etc." }
     Procedure DoFillHexValues
         String[] sArrayAsYear
         Move '$04bd8' to sArrayAsYear[0]   // Year 1900 ??  dec=19416
@@ -1384,292 +1523,8 @@ Class cCalendarHolidays is a cObject
         Set psArrayAsYear to sArrayAsYear
     End_Procedure
 
-    // Used by the cNationalHolidays class to get the Offical_Short
-    // national ISO code, from a sISO_Short code.
-    // The class is used by all packages in the CountryPackages.pkg file.
-    Function Official_ShortCode String sISO_Short Returns String
-        tISO_Codes[] AllISOCodes
-        tISO_Codes ISOShort
-        Integer iItem 
-        String sOfficial_Short
-        
-        Move "" to sOfficial_Short
-        Move (Uppercase(sISO_Short)) to ISOShort.sIso_Short
-        Get pISO_Codes to AllISOCodes
-        Move (SearchArray(ISOShort, AllISOCodes)) to iItem 
-        If (iItem <> -1) Begin
-            Move AllISOCodes[iItem].sOffical_Short to sOfficial_Short
-        End
-        
-        Function_Return sOfficial_Short
-    End_Function
-    
-//    Procedure OLD
-//        tISO_Codes[] ISO_CodesArray
-//        String[] asCodes
-//        String sCodes sCRLF sVal
-//        Integer iPos iSize iCount iItem
-//        
-//        Move (Character(13) + Character(10)) to sCRLF
-//        Move """
-//        AD-Andorra
-//        AE-United Arab Emirates
-//        AF-Afghanistan
-//        AG-Antigua and Barbuda
-//        AI-Anguilla
-//        AL-Albania
-//        AM-Armenia
-//        AO-Angola
-//        AR-Argentina
-//        AS-American Samoa
-//        AT-Austria
-//        AU-Australia
-//        AW-Aruba
-//        AX-Aaland Islands
-//        AZ-Azerbaijan
-//        BA-Bosnia and Herzegovina
-//        BB-Barbados
-//        BD-Bangladesh
-//        BE-Belgium
-//        BF-Burkina Faso
-//        BG-Bulgaria
-//        BH-Bahrain
-//        BI-Burundi
-//        BJ-Benin
-//        BL-Saint Barthélemy
-//        BM-Bermuda
-//        BN-Brunei Darussalam
-//        BO-Boliva, Plurinational State of
-//        BR-Brazil
-//        BS-Bahamas
-//        BT-Bhutan
-//        BW-Botswana
-//        BY-Belarus
-//        BZ-Belize
-//        CA-Canada
-//        CC-Cocos (Keeling) Islands
-//        CD-Congo, The Democratic Republic of
-//        CF-Central African Republic
-//        CG-Congo
-//        CH-Switzerland
-//        CI-Côte d'Ivoire
-//        CK-Cook Islands
-//        CL-Chile
-//        CM-Cameroon
-//        CN-China
-//        CO-Colombia
-//        CR-Costa Rica
-//        CU-Cuba
-//        CV-Cap Verde
-//        CW-Curacao
-//        CX-Christmas Island
-//        CY-Cyprus
-//        CZ-Czeck Republic
-//        DE-Germany
-//        DJ-Djibouti
-//        DK-Denmark
-//        DM-Dominica
-//        DO-Dominican Republic
-//        DZ-Algeria
-//        EC-Ecuador
-//        EE-Estonia
-//        EG-Egypt
-//        EH-Western Sahara
-//        ER-Eritrea
-//        ES-Spain
-//        ET-Ethiopia
-//        FI-Finland
-//        FJ-Fiji
-//        FK-Falklands Islands (Malvinas)
-//        FM-Micronesia, Federated States of
-//        FO-Faroe Islands
-//        FR-France
-//        GA-Gabon
-//        GB-United Kingdom
-//        GD-Grenada
-//        GE-Georgia
-//        GF-French Guyana
-//        GG-Guernsey
-//        GH-Ghana
-//        GI-Gibraltar
-//        GM-Gambia
-//        GN-Guinea
-//        GP-Guadeloupe
-//        GQ-Equatorial Guinea
-//        GR-Greece
-//        GS-South Georgia and the South Sandwich Isl
-//        GT-Guatemala
-//        GU-Guam
-//        GW-Guinea-Bissau
-//        GY-Guyana
-//        HK-Hong Kong
-//        HM-Heard Islands and McDonald Islands
-//        HN-Honduras
-//        HR-Croatia
-//        HT-Haiti
-//        HU-Hungary
-//        ID-Indonesia
-//        IE-Ireland
-//        IL-Israel
-//        IM-Isle Of Man
-//        IN-India
-//        IQ-Iraq
-//        IR-Iran, Islamic Republic of
-//        IS-Iceland
-//        IT-Italy
-//        JE-Jersey
-//        JM-Jamaica
-//        JO-Jordan
-//        JP-Japan
-//        KE-Kenya
-//        KG-Kyrgyzstan
-//        KH-Cambodia
-//        KI-Kiribati
-//        KM-Comoros
-//        KN-Saint Kitts and Nevis
-//        KP-Korea, Democratic Republic (North Korea)
-//        KR-Korea, Republic Of (South Korea)
-//        KW-Kuwait
-//        KY-Cayman Islands
-//        KZ-Kazakhstan
-//        LA-Lao People's Democratic Republic (Laos)
-//        LB-Lebanon
-//        LC-Saint Lucia
-//        LI-Liechtenstein
-//        LK-Sri Lanka
-//        LR-Liberia
-//        LS-Lesotho
-//        LT-Lithuania
-//        LU-Luxembourg
-//        LV-Latvia
-//        LY-Libyan Arab Jamahiriya
-//        MA-Morocco
-//        MC-Monaco
-//        MD-Moldova, Republic of
-//        ME-Montenegro
-//        MF-Saint Martin
-//        MG-Madagaskar
-//        MH-Marshall Islands
-//        MK-Macedonia, The Former Yugoslav Republic
-//        ML-Mali
-//        MM-Myanmar (Burma)
-//        MN-Mongolia
-//        MO-Macau
-//        MP-Northern Mariana Islands
-//        MQ-Martinique
-//        MR-Mauritania
-//        MS-Montserrat
-//        MT-Malta
-//        MU-Mauritius
-//        MV-Maldives
-//        MW-Malawi
-//        MX-Mexico
-//        MY-Malaysia
-//        MZ-Mozambique
-//        NA-Namibia
-//        NC-New Caledonia
-//        NE-Niger
-//        NF-Norfolk Islands
-//        NG-Nigeria
-//        NI-Nicaragua
-//        NL-Netherlands
-//        NO-Norway
-//        NP-Nepal
-//        NR-Nauru
-//        NU-Niue
-//        NZ-New Zealand
-//        OM-Oman
-//        PA-Panama
-//        PE-Peru
-//        PF-French Polynesia
-//        PG-Papua New Guinea
-//        PH-Philippines
-//        PK-Pakistan
-//        PL-Poland
-//        PM-Saint Pierre and Miquolon
-//        PN-Pitcairn
-//        PR-Puerto Rico
-//        PS-Palestinian Territory, Occupied
-//        PT-Portugal
-//        PW-Palau
-//        PY-Paraguay
-//        QA-Qatar
-//        RE-Réunion
-//        RO-Romania
-//        RS-Serbia
-//        RU-Russian Federation
-//        RW-Rwanda
-//        SA-Saudi Arabia
-//        SB-Solomon Islands
-//        SC-Seychelles
-//        SD-Sudan
-//        SE-Sweden
-//        SG-Singapore
-//        SH-Saint Helena
-//        SI-Slovenia
-//        SJ-Svalbard and Jan Mayen
-//        SK-Slovakia
-//        SL-Sierra Leone
-//        SM-San Marino
-//        SN-Senegal
-//        SO-Somalia
-//        SR-Suriname
-//        ST-Sao Tomé and Principe
-//        SV-El Salvador
-//        SY-Syrian Arablic Republic
-//        SZ-Swaziland
-//        TC-Turks and Caicos Islands
-//        TD-Chad
-//        TF-French Southerns Territories
-//        TG-Togo
-//        TH-Thailand
-//        TJ-Tajikistan
-//        TK-Tokelau
-//        TL-Timor-Leste
-//        TM-Turkmenistan
-//        TN-Tunisia
-//        TO-Tonga
-//        TR-Turkey
-//        TT-Trinidad and Tobago
-//        TV-Tuvalu
-//        TW-Taiwan, Province of China
-//        TZ-Tanzania
-//        UA-Ukraine
-//        UG-Uganda
-//        UM-United States Minor Outlying Islands
-//        US-United States of America
-//        UY-Uruguay
-//        UZ-Uzbekistan
-//        VA-Holy See (Vativan City State)
-//        VC-Saint Vincent and Grenadines
-//        VE-Venezuela, Bolivarian Republic of
-//        VG-Virgin Islands, Britiish
-//        VI-Virgin Islands, U.S.
-//        VN-Vietnam
-//        VU-Vanuatu
-//        WF-Wallis and Futuna
-//        WS-Samoa
-//        YE-Yemen
-//        YT-Mayotte
-//        ZA-South Africa
-//        ZM-Zambia
-//        ZW-Zimbabwe
-//        """ to sCodes  
-//        Move (StrSplitToArray(sCodes, sCRLF)) to asCodes
-//        
-//        Move 0 to iItem
-//        Move (SizeOfArray(asCodes)) to iSize
-//        Decrement iSize
-//        For iCount from 0 to iSize
-//            Move asCodes[iCount] to sVal
-//            Move (Pos("-", sVal)) to iPos
-//            Move (Left(sVal, iPos -1))              to ISO_CodesArray[iItem].sIso_Short
-//            Move (Mid(sVal, Length(sVal) ,iPos +1)) to ISO_CodesArray[iItem].sOffical_Short
-//            Increment iItem
-//        Loop
-//        Set pISO_Codes to ISO_CodesArray
-//    End_Procedure
-
+    { Visibility = Private }
+    { Description = "Sets the pISO_Codes struct array property" }
     Procedure CollectISOCodes
         tISO_Codes[] ISO_CodesArray
         String[] asCodes
@@ -1948,4 +1803,5 @@ Class cCalendarHolidays is a cObject
 
         Set pISO_Codes to ISO_CodesArray
     End_Procedure
+
 End_Class

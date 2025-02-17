@@ -25,7 +25,7 @@ Class cNationalHolidays is a cObject
 
         Set private_psISO_Short to sISO_Short
         If (ghoCalendarHolidays <> 0) Begin
-            Get Official_ShortCode of ghoCalendarHolidays sISO_Short to sOfficial_Short     
+            Get ISO_ShortToOfficial_Short of ghoCalendarHolidays sISO_Short to sOfficial_Short     
             Set psOfficial_Short to sOfficial_Short
         End
     End_Procedure  
