@@ -148,19 +148,22 @@ Class cCalendarHolidays is a cObject
     Procedure Construct_Object
         Forward Send Construct_Object
         
-        { MethodType = Property Visibility = Public Category = Data}
+        { Visibility = Public }
+        { MethodType = Property }
         { Description = "Struct array with all the worlds ISO_Short-, Official_Short-, ISO_Long- string codes and iISO_Code- integer values." }
         Property tISO_Codes[] pISO_Codes
         
-        { MethodType = Property Visibility = Public Category = Data}
+        { Visibility = Public }
+        { MethodType = Property }
         { Description = "Struct array with all function names and other info associated with those functions." }
         Property tHolidayFunc[] pHolidayFunctions
 
-        { MethodType = Property Visibility = Public Category = Data}
+        { Visibility = Public }
+        { MethodType = Property }
         { Description = "Handle array with all registered cNationalHolidays objects. These packages/objects can be found in 'CountryPackages.pkg'" }
         Property Handle[] phoNationalHolidaysArray
         
-        { MethodType = Property Visibility = Private }
+        { Visibility = Private }
         Property String[] psArrayAsYear
 
         Send CollectISOCodes
