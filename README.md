@@ -2,7 +2,7 @@
 
 **Function Library for Holidays and Special Dates**
 
-This library provides holiday and special day functions for various regions in the Western world. There are two primary types of functions available in this library:
+This library provides holiday and special day functions for various regions in the Western world. There are three primary types of functions available in this library:
 
 1. **Holiday Date Functions**: These functions return the date of a specific holiday for a given year. Each function requires two parameters:
    - **iYear**: An integer representing the year.
