@@ -74,7 +74,8 @@ Use cCalendarHolidays.h.pkg
          It takes a Date- and an ISO_Short- parameter and returns a boolean True/False if the date is found.
          Or in other words if a matching function was found in the library.
          The function also uses three ByRef parameters: Boolean bIsHoliday, String sHolidayName and String sFunctionName.
-     
+
+     The WindowsLocaleISO_Short function can be used to get the Windows locale ISO_Short 2-character code.
      The global handle ghoCalendarHolidays can be used to access all functions.
               
      The cCalendarHolidays class consist of helper functions for the holiday
@@ -241,6 +242,25 @@ Class cCalendarHolidays is a cObject
     End_Function
 
     { Visibility = Public }
+    { Description = "To get the Offical_Short national ISO code, from a sISO_Short code."}
+    Function ISO_ShortToOfficial_Short String sISO_Short Returns String
+        tISO_Codes[] AllISOCodes
+        tISO_Codes ISOShort
+        Integer iItem 
+        String sOfficial_Short
+        
+        Move "" to sOfficial_Short
+        Move (Uppercase(sISO_Short)) to ISOShort.sIso_Short
+        Get pISO_Codes to AllISOCodes
+        Move (SearchArray(ISOShort, AllISOCodes)) to iItem 
+        If (iItem <> -1) Begin
+            Move AllISOCodes[iItem].sOffical_Short to sOfficial_Short
+        End
+        
+        Function_Return sOfficial_Short
+    End_Function 
+    
+    { Visibility = Public }
     { Description  = "To get the ISO_Short national ISO code, from a sISO_Long code."}
     { Description += "An ISO_Short code is 2-characters, while an ISO_Long is 3-characters."}
     Function ISO_LongToISO_Short String sISO_Long Returns String
@@ -262,23 +282,13 @@ Class cCalendarHolidays is a cObject
     End_Function
 
     { Visibility = Public }
-    { Description = "To get the Offical_Short national ISO code, from a sISO_Short code."}
-    Function ISO_ShortToOfficial_Short String sISO_Short Returns String
-        tISO_Codes[] AllISOCodes
-        tISO_Codes ISOShort
-        Integer iItem 
-        String sOfficial_Short
-        
-        Move "" to sOfficial_Short
-        Move (Uppercase(sISO_Short)) to ISOShort.sIso_Short
-        Get pISO_Codes to AllISOCodes
-        Move (SearchArray(ISOShort, AllISOCodes)) to iItem 
-        If (iItem <> -1) Begin
-            Move AllISOCodes[iItem].sOffical_Short to sOfficial_Short
-        End
-        
-        Function_Return sOfficial_Short
-    End_Function 
+    { Description  = "To get the ISO_Short code (2-character) for the current machine, with a Windows API call."}
+    Function WindowsLocaleISO_Short Returns String
+        String sISO_Long sISO_Short
+        Get WindowsLocaleValue LOCALE_SABBREVCTRYNAME to sISO_Long
+        Get ISO_LongToISO_Short sISO_Long to sISO_Short
+        Function_Return sISO_Short
+    End_Function
     
     { Visibility = Public }
     Function MonthNameFromInteger Integer iMthNo Boolean bLongName Boolean bCapsFirstLetter Returns String
