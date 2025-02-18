@@ -15,7 +15,7 @@ This library provides holiday and special day functions for various regions in t
    Get EasterDay of ghoCalendarHolidays 2025 "US" to dDate
    ```
 
-   The country code is necessary because some holidays are observed on different dates in various countries. While not all functions need the country code, it can be provided for consistency across all function calls. A list of all 2-character ISO Short codes can be found in the `cCalendarHolidays.pkg` file under the procedure "AddAllOfficialShort," or by accessing the `pAllISOCodes` struct array property.
+   The country code is necessary because some holidays are observed on different dates in various countries. While not all functions need the country code, it can be provided for consistency across all function calls. A list of all 2-character ISO Short codes can be found in the `cCalendarHolidays.pkg` file under the procedure "AddAllOfficialShort," or by accessing the `pAllISOCodes` struct array property.  The `WindowsLocaleISO_Short` function can be utilized to determine the Windows locale ISO Short 2-character code for the current machine.
 
 2. **Holiday Name Function**: This function returns the name of a holiday or special day given a specific date. It requires three parameters:
    - A date (this can be the return value from the holiday date functions).
@@ -36,7 +36,7 @@ This library provides holiday and special day functions for various regions in t
    - String `sHolidayName`
    - String `sFunctionName`
 
-   The `WindowsLocaleISO_Short` function can be utilized to determine the Windows locale ISO Short 2-character code for the current machine. The global handle `ghoCalendarHolidays` provides access to all functions, while the `cCalendarHolidays` class contains helper date functions related to the holiday function library, encapsulated in the `oCalendarHolidays.pkg` object. This object also holds the code for all country packages found in `CountryPackages.pkg`.
+  The global handle `ghoCalendarHolidays` provides access to all functions, while the `cCalendarHolidays` class contains helper date functions related to the holiday function library, encapsulated in the `oCalendarHolidays.pkg` object. This object also holds the code for all country packages found in `CountryPackages.pkg`.
 
 For demonstration of how to use this library, please refer to the `HolidayFuncLibDemo` repository.
 
