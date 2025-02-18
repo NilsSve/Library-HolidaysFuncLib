@@ -48,7 +48,8 @@ There are two types of functions/usages of this library.
         Or in other words if a matching function was found in the library.
         The function also uses three ByRef parameters: Boolean bIsHoliday, String sHolidayName and String sFunctionName.     
 
-     The WindowsLocaleISO_Short function can be used to get the Windows locale ISO_Short 2-character code.
+     The WindowsLocaleISO_Short function can be used to get the Windows locale ISO_Short 2-character code,
+     for the current machine.
      The global handle ghoCalendarHolidays can be used to access all functions.
               
      The cCalendarHolidays class consist of helper date functions for the holiday
