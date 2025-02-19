@@ -348,7 +348,8 @@ Object oBrittishHolidays is a cNationalHolidays
             Function_Return "3d Advent Sunday"
         End
 
-        // This needs to be after ChristMasEve because it can fall on the same day, and we then wants to return Christmas Eve instead.
+        // This needs to be after ChristMasEve because it can fall on the same day,
+        // and we then wants to return Christmas Eve instead.
         Get Advent4 of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
             Move 0 to iBankHoliday
