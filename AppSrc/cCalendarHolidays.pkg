@@ -194,13 +194,13 @@ Class cCalendarHolidays is a cObject
     
     { Visibility   = Public }
     { Description  = "This is the reciprocal function, compared to making a call to"}
-    { Description  += "any of the 'Holiday Function Library' functions,"}
-    { Description += "where you pass a year and get a date variable as the return value."}
+    { Description  += "anything from the 'Holiday Function Library', where you"}
+    { Description += "pass a year and get a date variable as the return value."}
     { Description += "For this function: Pass a known date and an ISO_Short 2-character country code."}
     { Description += "Returns a boolean True/False if the date is found in the function library."}
     { Description += "If 'True' is returned, it also returns;"}
     { Description += " - A boolean 'bIsHoliday' as ByRef and a" }
-    { Description += " - A ByRef String with the Holiday Name,"}
+    { Description += " - A ByRef String with the Holiday Name, and a"}
     { Description += " - A ByRef String with the Function Name,"}
     { Description += "for the passed sISO_Short country code."}
     Function IsDateAHoliday Date dInDate String sISO_Short Boolean ByRef bIsHoliday String ByRef sHolidayName String ByRef sFunctionName Returns Boolean
@@ -571,7 +571,7 @@ Class cCalendarHolidays is a cObject
 
     { Visibility = Public }
     { Description  = "Given the number of a day in the week, return its short name." }
-    { Description += "Day 1 is Sunday." }
+    { Description += "Day 1 is Monday." }
     Function GetDayName Integer iWeekDay Returns String
         String sDayName
         Get DayNameFromInteger iWeekDay False True to sDayName
