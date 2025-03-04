@@ -939,7 +939,7 @@ Class cCalendarHolidays is a cObject
         End
         
         If (sParams <> "") Begin
-            Get ExtractParams sParams (&sReturnType) to HolidayFuncVarArray
+            Get ParseParams sParams (&sReturnType) to HolidayFuncVarArray
             Move HolidayFuncVarArray to HolidayFunction.HolidayFuncVarArray 
             Move sReturnType         to HolidayFunction.sReturnType
         End
@@ -953,7 +953,7 @@ Class cCalendarHolidays is a cObject
     
     { Visibility = Private }
     { Description = "Helper function for the Procedure RegisterInterface." }
-    Function ExtractParams String sParams String ByRef sReturnType Returns tHolidayFuncVar[]
+    Function ParseParams String sParams String ByRef sReturnType Returns tHolidayFuncVar[]
         tHolidayFuncVar[] HolidayFuncVarArray
         String[] asParams
         Integer iCount iSize iParam
