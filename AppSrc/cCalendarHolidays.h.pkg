@@ -6,10 +6,11 @@
 Define C_FirstGregorianYear for 1752 
 
 Struct tISO_Codes
-    String  sISO_Short       // 2-character code
-    String  sOffical_Short   // Short country name
-    String  sISO_Long        // 3-character code
-    Integer iISO_Code        // Numberic ISO code
+    String  sISO_Short          // 2-character code
+    String  sOffical_Short      // Short country name
+    String  sISO_Long           // 3-character code
+    Integer iISO_Code           // Numberic ISO code 
+    Boolean bNorthernHemisphere // Countries that belongs to the northern hemisphere, aka north of the equator.
 End_Struct
 
 Struct tLunar

@@ -1547,248 +1547,248 @@ Class cCalendarHolidays is a cObject
         
         Move (Character(13) + Character(10)) to sCRLF
         Move """
-        AD;Andorra;20;AND
-        AE;United Arab Emirates;784;ARE
-        AF;Afghanistan;4;AFG
-        AG;Antigua and Barbuda;28;ATG
-        AI;Anguilla;660;AIA
-        AL;Albania;8;ALB
-        AM;Armenia;51;ARM
-        AO;Angola;24;AGO
-        AR;Argentina;32;ARG
-        as;American Samoa;16;ASM
-        AT;Austria;40;AUT
-        AU;Australia;36;AUS
-        AW;Aruba;533;ABW
-        AX;Aaland Islands;248;ALA
-        AZ;Azerbaijan;31;AZE
-        BA;Bosnia and Herzegovina;70;BIH
-        BB;Barbados;52;BRB
-        BD;Bangladesh;50;BGD
-        BE;Belgium;56;BEL
-        BF;Burkina Faso;854;BFA
-        BG;Bulgaria;100;BGR
-        BH;Bahrain;48;BHR
-        BI;Burundi;108;BDI
-        BJ;Benin;204;BEN
-        BL;Saint Barthélemy;652;BLM
-        BM;Bermuda;60;BMU
-        BN;Brunei Darussalam;96;BRN
-        BO;Boliva, Plurinational State of;68;BOL
-        BR;Brazil;76;BRA
-        BS;Bahamas;44;BHS
-        BT;Bhutan;64;BTN
-        BW;Botswana;72;BWA
-        by;Belarus;112;BLR
-        BZ;Belize;84;BLZ
-        CA;Canada;124;CAN
-        CC;Cocos (Keeling) Islands;166;CCK
-        CD;Congo, The Democratic Republic of;180;COD
-        CF;Central African Republic;140;CAF
-        CG;Congo;178;COG
-        CH;Switzerland;756;CHE
-        CI;Côte d'Ivoire;384;CIV
-        CK;Cook Islands;184;COK
-        CL;Chile;152;CHL
-        CM;Cameroon;120;CMR
-        CN;China;156;CHN
-        CO;Colombia;170;COL
-        CR;Costa Rica;188;CRI
-        CU;Cuba;192;CUB
-        CV;Cap Verde;132;CPV
-        CW;Curacao;530;CUW
-        CX;Christmas Island;162;CXR
-        CY;Cyprus;196;CYP
-        CZ;Czeck Republic;203;CZE
-        DE;Germany;276;DEU
-        DJ;Djibouti;262;DJI
-        DK;Denmark;208;DNK
-        DM;Dominica;212;DMA
-        DO;Dominican Republic;214;DOM
-        DZ;Algeria;12;DZA
-        EC;Ecuador;218;ECU
-        EE;Estonia;233;EST
-        EG;Egypt;818;EGY
-        EH;Western Sahara;732;ESH
-        ER;Eritrea;232;ERI
-        ES;Spain;724;ESP
-        ET;Ethiopia;231;ETH
-        FI;Finland;246;FIN
-        FJ;Fiji;242;FJI
-        FK;Falklands Islands (Malvinas);238;FLK
-        FM;Micronesia, Federated States of;583;FSM
-        FO;Faroe Islands;234;FRO
-        FR;France;250;FRA
-        GA;Gabon;266;GAB
-        GB;United Kingdom;826;GBR
-        GD;Grenada;308;GRD
-        GE;Georgia;268;GEO
-        GF;French Guyana;254;GUF
-        GG;Guernsey;831;GGY
-        GH;Ghana;288;GHA
-        GI;Gibraltar;292;GIB
-        GM;Gambia;270;GMB
-        GN;Guinea;324;GIN
-        GP;Guadeloupe;312;GLP
-        GQ;Equatorial Guinea;226;GNQ
-        GR;Greece;300;GRC
-        GS;South Georgia and the South Sandwich Isl;239;SGS
-        GT;Guatemala;320;GTM
-        GU;Guam;316;GUM
-        GW;Guinea-Bissau;624;GNB
-        GY;Guyana;328;GUY
-        HK;Hong Kong;344;HKG
-        HM;Heard Islands and McDonald Islands;334;HMD
-        HN;Honduras;340;HND
-        HR;Croatia;191;HRV
-        HT;Haiti;332;HTI
-        HU;Hungary;348;HUN
-        ID;Indonesia;360;IDN
-        IE;Ireland;372;IRL
-        IL;Israel;376;ISR
-        IM;Isle Of Man;833;IMN
-        IN;India;356;IND
-        IQ;Iraq;368;IRQ
-        IR;Iran, Islamic Republic of;364;IRN
-        IS;Iceland;352;ISL
-        IT;Italy;380;ITA
-        JE;Jersey;832;JEY
-        JM;Jamaica;388;JAM
-        JO;Jordan;400;JOR
-        JP;Japan;392;JPN
-        KE;Kenya;404;KEN
-        KG;Kyrgyzstan;417;KGZ
-        KH;Cambodia;116;KHM
-        KI;Kiribati;296;KIR
-        KM;Comoros;174;COM
-        KN;Saint Kitts and Nevis;659;KNA
-        KP;Korea, Democratic Republic (North Korea);408;PRK
-        KR;Korea, Republic Of (South Korea);410;KOR
-        KW;Kuwait;414;KWT
-        KY;Cayman Islands;136;CYM
-        KZ;Kazakhstan;398;KAZ
-        LA;Lao People's Democratic Republic (Laos);418;LAO
-        LB;Lebanon;422;LBN
-        LC;Saint Lucia;662;LCA
-        LI;Liechtenstein;438;LIE
-        LK;Sri Lanka;144;LKA
-        LR;Liberia;430;LBR
-        LS;Lesotho;426;LSO
-        LT;Lithuania;440;LTU
-        LU;Luxembourg;442;LUX
-        LV;Latvia;428;LVA
-        LY;Libyan Arab Jamahiriya;434;LBY
-        MA;Morocco;504;MAR
-        MC;Monaco;492;MCO
-        MD;Moldova, Republic of;498;MDA
-        ME;Montenegro;499;MNE
-        MF;Saint Martin;663;MAF
-        MG;Madagaskar;450;MDG
-        MH;Marshall Islands;584;MHL
-        MK;Macedonia, The Former Yugoslav Republic;807;MKD
-        ML;Mali;466;MLI
-        MM;Myanmar (Burma);104;MMR
-        MN;Mongolia;496;MNG
-        MO;Macau;446;MAC
-        MP;Northern Mariana Islands;580;MNP
-        MQ;Martinique;474;MTQ
-        MR;Mauritania;478;MRT
-        MS;Montserrat;500;MSR
-        MT;Malta;470;MLT
-        MU;Mauritius;480;MUS
-        MV;Maldives;462;MDV
-        MW;Malawi;454;MWI
-        MX;Mexico;484;MEX
-        MY;Malaysia;458;MYS
-        MZ;Mozambique;508;MOZ
-        NA;Namibia;516;NAM
-        NC;New Caledonia;540;NCL
-        NE;Niger;562;NER
-        NF;Norfolk Islands;574;NFK
-        NG;Nigeria;566;NGA
-        NI;Nicaragua;558;NIC
-        NL;Netherlands;528;NLD
-        NO;Norway;578;NOR
-        NP;Nepal;524;NPL
-        NR;Nauru;520;NRU
-        NU;Niue;570;NIU
-        NZ;New Zealand;554;NZL
-        OM;Oman;512;OMN
-        PA;Panama;591;PAN
-        PE;Peru;604;PER
-        PF;French Polynesia;258;PYF
-        PG;Papua New Guinea;598;PNG
-        PH;Philippines;608;PHL
-        PK;Pakistan;586;PAK
-        PL;Poland;616;POL
-        PM;Saint Pierre and Miquolon;666;SPM
-        PN;Pitcairn;612;PCN
-        PR;Puerto Rico;630;PRI
-        PS;Palestinian Territory, Occupied;0;
-        PT;Portugal;620;PRT
-        PW;Palau;585;PLW
-        PY;Paraguay;600;PRY
-        QA;Qatar;634;QAT
-        RE;Réunion;638;REU
-        RO;Romania;642;ROM
-        RS;Serbia;688;SRB
-        RU;Russian Federation;643;RUS
-        RW;Rwanda;646;RWA
-        SA;Saudi Arabia;682;SAU
-        SB;Solomon Islands;90;SLB
-        SC;Seychelles;690;SYC
-        SD;Sudan;736;SDN
-        SE;Sweden;752;SWE
-        SG;Singapore;702;SGP
-        SH;Saint Helena;654;SHN
-        SI;Slovenia;705;SVN
-        SJ;Svalbard and Jan Mayen;744;SJM
-        SK;Slovakia;703;SVK
-        SL;Sierra Leone;694;SLE
-        SM;San Marino;674;SMR
-        SN;Senegal;686;SEN
-        SO;Somalia;706;SOM
-        SR;Suriname;740;SUR
-        ST;Sao Tomé and Principe;678;STP
-        SV;El Salvador;222;SLV
-        SY;Syrian Arablic Republic;760;SYR
-        SZ;Swaziland;748;SWZ
-        TC;Turks and Caicos Islands;796;TCA
-        TD;Chad;148;TCD
-        TF;French Southerns Territories;260;ATF
-        TG;Togo;768;TGO
-        TH;Thailand;764;THA
-        TJ;Tajikistan;762;TJK
-        TK;Tokelau;772;TKL
-        TL;Timor-Leste;626;TLS
-        TM;Turkmenistan;795;TKM
-        TN;Tunisia;788;TUN
-        to;Tonga;776;TON
-        TR;Turkey;792;TUR
-        TT;Trinidad and Tobago;780;TTO
-        TV;Tuvalu;798;TUV
-        TW;Taiwan, Province of China;158;TWN
-        TZ;Tanzania;834;TZA
-        UA;Ukraine;804;UKR
-        UG;Uganda;800;UGA
-        UM;United States Minor Outlying Islands;581;UMI
-        US;United States of America;840;USA
-        UY;Uruguay;858;URY
-        UZ;Uzbekistan;860;UZB
-        VA;Holy See (Vativan City State);336;VAT
-        VC;Saint Vincent and Grenadines;670;VCT
-        VE;Venezuela, Bolivarian Republic of;862;VEN
-        VG;Virgin Islands, Britiish;92;VGB
-        VI;Virgin Islands, U.S.;850;VIR
-        VN;Vietnam;704;VNM
-        VU;Vanuatu;548;VUT
-        WF;Wallis and Futuna;876;WLF
-        WS;Samoa;882;WSM
-        YE;Yemen;887;YEM
-        YT;Mayotte;175;MYT
-        ZA;South Africa;710;ZAF
-        ZM;Zambia;894;ZMB
-        ZW;Zimbabwe;716;ZWE
+        AD;Andorra;20;AND;1
+        AE;United Arab Emirates;784;ARE;1
+        AF;Afghanistan;4;AFG;1
+        AG;Antigua and Barbuda;28;ATG;1
+        AI;Anguilla;660;AIA;1
+        AL;Albania;8;ALB;1
+        AM;Armenia;51;ARM;1
+        AO;Angola;24;AGO;0
+        AR;Argentina;32;ARG;0
+        as;American Samoa;16;ASM;0
+        AT;Austria;40;AUT;1
+        AU;Australia;36;AUS;1
+        AW;Aruba;533;ABW;1
+        AX;Aaland Islands;248;ALA;1
+        AZ;Azerbaijan;31;AZE;1
+        BA;Bosnia and Herzegovina;70;BIH;1
+        BB;Barbados;52;BRB;1
+        BD;Bangladesh;50;BGD;1
+        BE;Belgium;56;BEL;1
+        BF;Burkina Faso;854;BFA;1
+        BG;Bulgaria;100;BGR;1
+        BH;Bahrain;48;BHR;1
+        BI;Burundi;108;BDI;1
+        BJ;Benin;204;BEN;1
+        BL;Saint Barthélemy;652;BLM;1
+        BM;Bermuda;60;BMU;1
+        BN;Brunei Darussalam;96;BRN;0
+        BO;Boliva, Plurinational State of;68;BOL;0
+        BR;Brazil;76;BRA;0
+        BS;Bahamas;44;BHS;1
+        BT;Bhutan;64;BTN;1
+        BW;Botswana;72;BWA;0
+        by;Belarus;112;BLR;1
+        BZ;Belize;84;BLZ;1
+        CA;Canada;124;CAN;1
+        CC;Cocos (Keeling) Islands;166;CCK;0
+        CD;Congo, The Democratic Republic of;180;COD;0
+        CF;Central African Republic;140;CAF;1
+        CG;Congo;178;COG;0
+        CH;Switzerland;756;CHE;1
+        CI;Côte d'Ivoire;384;CIV;1
+        CK;Cook Islands;184;COK;0
+        CL;Chile;152;CHL;0
+        CM;Cameroon;120;CMR;1
+        CN;China;156;CHN;1
+        CO;Colombia;170;COL;1
+        CR;Costa Rica;188;CRI;1
+        CU;Cuba;192;CUB;1
+        CV;Cap Verde;132;CPV;1
+        CW;Curacao;530;CUW;1
+        CX;Christmas Island;162;CXR;0
+        CY;Cyprus;196;CYP;1
+        CZ;Czeck Republic;203;CZE;1
+        DE;Germany;276;DEU;1
+        DJ;Djibouti;262;DJI;1
+        DK;Denmark;208;DNK;1
+        DM;Dominica;212;DMA;1
+        DO;Dominican Republic;214;DOM;1
+        DZ;Algeria;12;DZA;1
+        EC;Ecuador;218;ECU;1
+        EE;Estonia;233;EST;1
+        EG;Egypt;818;EGY;1
+        EH;Western Sahara;732;ESH;1
+        ER;Eritrea;232;ERI;1
+        ES;Spain;724;ESP;1
+        ET;Ethiopia;231;ETH;1
+        FI;Finland;246;FIN;1
+        FJ;Fiji;242;FJI;0
+        FK;Falklands Islands (Malvinas);238;FLK;0
+        FM;Micronesia, Federated States of;583;FSM;1
+        FO;Faroe Islands;234;FRO;1
+        FR;France;250;FRA;1
+        GA;Gabon;266;GAB;0
+        GB;United Kingdom;826;GBR;1
+        GD;Grenada;308;GRD;1
+        GE;Georgia;268;GEO;1
+        GF;French Guyana;254;GUF;1
+        GG;Guernsey;831;GGY;1
+        GH;Ghana;288;GHA;1
+        GI;Gibraltar;292;GIB;1
+        GM;Gambia;270;GMB;1
+        GN;Guinea;324;GIN;1
+        GP;Guadeloupe;312;GLP;1
+        GQ;Equatorial Guinea;226;GNQ;0
+        GR;Greece;300;GRC;1
+        GS;South Georgia and the South Sandwich Isl;239;SGS;0
+        GT;Guatemala;320;GTM;1
+        GU;Guam;316;GUM;0
+        GW;Guinea-Bissau;624;GNB;1
+        GY;Guyana;328;GUY;1
+        HK;Hong Kong;344;HKG;1
+        HM;Heard Islands and McDonald Islands;334;HMD;0
+        HN;Honduras;340;HND;1
+        HR;Croatia;191;HRV;1
+        HT;Haiti;332;HTI;1
+        HU;Hungary;348;HUN;1
+        ID;Indonesia;360;IDN;1
+        IE;Ireland;372;IRL;1
+        IL;Israel;376;ISR;1
+        IM;Isle Of Man;833;IMN;1
+        IN;India;356;IND;1
+        IQ;Iraq;368;IRQ;1
+        IR;Iran, Islamic Republic of;364;IRN;1
+        IS;Iceland;352;ISL;1
+        IT;Italy;380;ITA;1
+        JE;Jersey;832;JEY;1
+        JM;Jamaica;388;JAM;1
+        JO;Jordan;400;JOR;1
+        JP;Japan;392;JPN;1
+        KE;Kenya;404;KEN;0
+        KG;Kyrgyzstan;417;KGZ;1
+        KH;Cambodia;116;KHM;1
+        KI;Kiribati;296;KIR;1
+        KM;Comoros;174;COM;0
+        KN;Saint Kitts and Nevis;659;KNA;1
+        KP;Korea, Democratic Republic (North Korea);408;PRK;1
+        KR;Korea, Republic Of (South Korea);410;KOR;1
+        KW;Kuwait;414;KWT;1
+        KY;Cayman Islands;136;CYM;1
+        KZ;Kazakhstan;398;KAZ;1
+        LA;Lao People's Democratic Republic (Laos);418;LAO;1
+        LB;Lebanon;422;LBN;1
+        LC;Saint Lucia;662;LCA;1
+        LI;Liechtenstein;438;LIE;1
+        LK;Sri Lanka;144;LKA;1
+        LR;Liberia;430;LBR;1
+        LS;Lesotho;426;LSO;0
+        LT;Lithuania;440;LTU;1
+        LU;Luxembourg;442;LUX;1
+        LV;Latvia;428;LVA;1
+        LY;Libyan Arab Jamahiriya;434;LBY;1
+        MA;Morocco;504;MAR;1
+        MC;Monaco;492;MCO;1
+        MD;Moldova, Republic of;498;MDA;1
+        ME;Montenegro;499;MNE;1
+        MF;Saint Martin;663;MAF;1
+        MG;Madagaskar;450;MDG;0
+        MH;Marshall Islands;584;MHL;1
+        MK;Macedonia, The Former Yugoslav Republic;807;MKD;1
+        ML;Mali;466;MLI;1
+        MM;Myanmar (Burma);104;MMR;1
+        MN;Mongolia;496;MNG;1
+        MO;Macau;446;MAC;1
+        MP;Northern Mariana Islands;580;MNP;1
+        MQ;Martinique;474;MTQ;1
+        MR;Mauritania;478;MRT;1
+        MS;Montserrat;500;MSR;1
+        MT;Malta;470;MLT;1
+        MU;Mauritius;480;MUS;0
+        MV;Maldives;462;MDV;0
+        MW;Malawi;454;MWI;0
+        MX;Mexico;484;MEX;1
+        MY;Malaysia;458;MYS;1
+        MZ;Mozambique;508;MOZ;0
+        NA;Namibia;516;NAM;0
+        NC;New Caledonia;540;NCL;0
+        NE;Niger;562;NER;1
+        NF;Norfolk Islands;574;NFK;1
+        NG;Nigeria;566;NG;1
+        NI;Nicaragua;558;NIC;1
+        NL;Netherlands;528;NLD;1
+        NO;Norway;578;NOR;1
+        NP;Nepal;524;NPL;1
+        NR;Nauru;520;NRU;1
+        NU;Niue;570;NIU;0
+        NZ;New Zealand;554;NZL;0
+        OM;Oman;512;OMN;1
+        PA;Panama;591;PAN;1
+        PE;Peru;604;PER;0
+        PF;French Polynesia;258;PYF;0
+        PG;Papua New Guinea;598;PNG;1
+        PH;Philippines;608;PHL;1
+        PK;Pakistan;586;PAK;1
+        PL;Poland;616;POL;1
+        PM;Saint Pierre and Miquolon;666;SPM;1
+        PN;Pitcairn;612;PCN;0
+        PR;Puerto Rico;630;PRI;1
+        PS;Palestinian Territory, Occupied;0
+        PT;Portugal;620;PRT;1
+        PW;Palau;585;PLW;1
+        PY;Paraguay;600;PRY;0
+        QA;Qatar;634;QAT;1
+        RE;Réunion;638;REU;0
+        RO;Romania;642;ROM;1
+        RS;Serbia;688;SRB;1
+        RU;Russian Federation;643;RUS;1
+        RW;Rwanda;646;RWA;0
+        SA;Saudi Arabia;682;SAU;1
+        SB;Solomon Islands;90;SLB;0
+        SC;Seychelles;690;SYC;0
+        SD;Sudan;736;SDN;1
+        SE;Sweden;752;SWE;1
+        SG;Singapore;702;SGP;1
+        SH;Saint Helena;654;SHN;0
+        SI;Slovenia;705;SVN;1
+        SJ;Svalbard and Jan Mayen;744;SJM;1
+        SK;Slovakia;703;SVK;1
+        SL;Sierra Leone;694;SLE;1
+        SM;San Marino;674;SMR;1
+        SN;Senegal;686;SEN;1
+        SO;Somalia;706;SOM;1
+        SR;Suriname;740;SUR;1
+        ST;Sao Tomé and Principe;678;STP;1
+        SV;El Salvador;222;SLV;1
+        SY;Syrian Arablic Republic;760;SYR;1
+        SZ;Swaziland;748;SWZ;0
+        TC;Turks and Caicos Islands;796;TCA;1
+        TD;Chad;148;TCD;1
+        TF;French Southerns Territories;260;ATF;0
+        TG;Togo;768;TGO;1
+        TH;Thailand;764;THA;1
+        TJ;Tajikistan;762;TJK;1
+        TK;Tokelau;772;TKL;0
+        TL;Timor-Leste;626;TLS;1
+        TM;Turkmenistan;795;TKM;1
+        TN;Tunisia;788;TUN;1
+        to;Tonga;776;TON;0
+        TR;Turkey;792;TUR;1
+        TT;Trinidad and Tobago;780;TTO;1
+        TV;Tuvalu;798;TUV;0
+        TW;Taiwan, Province of China;158;TWN;1
+        TZ;Tanzania;834;TZA;0
+        UA;Ukraine;804;UKR;1
+        UG;Uganda;800;UGA;0
+        UM;United States Minor Outlying Islands;581;UMI;1
+        US;United States of America;840;USA;1
+        UY;Uruguay;858;URY;0
+        UZ;Uzbekistan;860;UZB;1
+        VA;Holy See (Vativan City State);336;VAT;1
+        VC;Saint Vincent and Grenadines;670;VCT;1
+        VE;Venezuela, Bolivarian Republic of;862;VEN;1
+        VG;Virgin Islands, Britiish;92;VGB;1
+        VI;Virgin Islands, U.S.;850;VIR;1
+        VN;Vietnam;704;VNM;1
+        VU;Vanuatu;548;VUT;0
+        WF;Wallis and Futuna;876;WLF;0
+        WS;Samoa;882;WSM;0
+        YE;Yemen;887;YEM;1
+        YT;Mayotte;175;MYT;0
+        ZA;South Africa;710;ZAF;0
+        ZM;Zambia;894;ZMB;0
+        ZW;Zimbabwe;716;ZWE;0
         """ to sCodes        
 
         Move (StrSplitToArray(sCodes, sCRLF)) to asCodes
@@ -1811,7 +1811,11 @@ Class cCalendarHolidays is a cObject
             Move (Left(sVal, iPos -1)) to ISO_CodesArray[iItem].iISO_Code
             Move (Mid(sVal, Length(sVal), iPos +1)) to sVal
 
-            Move sVal to ISO_CodesArray[iItem].sISO_Long
+            Move (Pos(";", sVal)) to iPos
+            Move (Left(sVal, iPos -1)) to ISO_CodesArray[iItem].sISO_Long
+            Move (Mid(sVal, Length(sVal), iPos +1)) to sVal
+
+            Move sVal to ISO_CodesArray[iItem].bNorthernHemisphere
             Increment iItem
         Loop
 

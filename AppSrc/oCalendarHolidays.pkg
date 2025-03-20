@@ -1400,4 +1400,92 @@ Object oCalendarHolidays is a cCalendarHolidays
         Function_Return dDate
     End_Function
 
+    { Published = True }
+    { Description = """
+      Spring Equinox
+      Equinox is the two moments in the year when the sun is exactly above
+      the Equator and day and night are of equal length.
+      """ }
+    Function VernalEquinox Integer iYear String sISO_Short Returns Date
+        Date dDate
+        String sCountries
+        tISO_Codes[] ISO_CodesArray
+        tISO_Codes ISO_Codes
+        Integer iItem 
+        Boolean bNorthernHemisphere
+        
+        Get pISO_Codes  to ISO_CodesArray
+        Move sISO_Short to ISO_Codes.sISO_Short
+        Move (SearchArray(ISO_Codes, ISO_CodesArray, Desktop, (RefFunc(DFSTRICMP)))) to iItem
+        If (iItem <> -1) Begin
+            Move ISO_CodesArray[iItem].bNorthernHemisphere to bNorthernHemisphere
+            Move "1/1/1" to dDate
+            If (bNorthernHemisphere = True) Begin
+                If (iYear <> 2048) Begin
+                    Move (DateSetDay(dDate,20)) to dDate
+                End
+                Else Begin
+                    Move (DateSetDay(dDate,21)) to dDate
+                End
+                Move (DateSetMonth(dDate,4))    to dDate
+            End
+            Else Begin
+                If (iYear <> 2048) Begin
+                    Move (DateSetDay(dDate,22)) to dDate
+                End
+                Else Begin
+                    Move (DateSetDay(dDate,23)) to dDate
+                End
+                Move (DateSetMonth(dDate,9))   to dDate
+            End
+            Move (DateSetYear(dDate,iYear))     to dDate
+        End
+                
+        Function_Return dDate
+    End_Function
+    
+    { Published = True }
+    { Description = """
+      Autumn Equinox
+      Equinox is the two moments in the year when the sun is exactly above
+      the Equator and day and night are of equal length.
+      """ }
+    Function AutumnalEquinox Integer iYear String sISO_Short Returns Date
+        Date dDate
+        String sCountries
+        tISO_Codes[] ISO_CodesArray
+        tISO_Codes ISO_Codes
+        Integer iItem 
+        Boolean bNorthernHemisphere
+        
+        Get pISO_Codes  to ISO_CodesArray
+        Move sISO_Short to ISO_Codes.sISO_Short
+        Move (SearchArray(ISO_Codes, ISO_CodesArray, Desktop, (RefFunc(DFSTRICMP)))) to iItem
+        If (iItem <> -1) Begin
+            Move ISO_CodesArray[iItem].bNorthernHemisphere to bNorthernHemisphere
+            Move "1/1/1" to dDate
+            If (bNorthernHemisphere = True) Begin
+                If (iYear <> 2048) Begin
+                    Move (DateSetDay(dDate,23)) to dDate
+                End
+                Else Begin
+                    Move (DateSetDay(dDate,22)) to dDate
+                End
+                Move (DateSetMonth(dDate,9))   to dDate
+            End
+            Else Begin
+                If (iYear <> 2048) Begin
+                    Move (DateSetDay(dDate,20)) to dDate
+                End
+                Else Begin
+                    Move (DateSetDay(dDate,21)) to dDate
+                End
+                Move (DateSetMonth(dDate,4))    to dDate
+            End
+            Move (DateSetYear(dDate,iYear))     to dDate
+        End
+                
+        Function_Return dDate
+    End_Function
+    
 End_Object

@@ -262,7 +262,9 @@ Object oSwedishHolidays is a cNationalHolidays
         If (dInDate = dHolidayDate) Begin
             Move True to bOfficialHoliday
             Function_Return "Annandag Påsk"
-        End
+        End  
+        
+        // Vårdagjämning
 
         // Start of European (Swedish) Summer Time - last Sunday in March (at 1am)
         //
@@ -279,7 +281,21 @@ Object oSwedishHolidays is a cNationalHolidays
             Move False to bOfficialHoliday
             Function_Return "Svensk (Europeisk) sommartid slutar"
         End
-
+        
+        // Vårdagjämning
+        Get VernalEquinox of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move False to bOfficialHoliday
+            Function_Return "Vårdagjämning"
+        End
+        
+        // Höstdagjämning
+        Get AutumnalEquinox of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move False to bOfficialHoliday
+            Function_Return "Höstdagjämning"
+        End
+        
         // This day needs to be _after_ the WhitSunday.
         // So when WhitSunday falls on the last Sunday in May,
         // only the WhitSunday will get generated. Else the
