@@ -229,6 +229,20 @@ Object oDutchHolidays is a cNationalHolidays
             Function_Return "Einde zomertijd"
         End
 
+        // Sprint Equinox
+        Get VernalEquinox of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move False to bOfficialHoliday
+            Function_Return "Lente-equinox"
+        End
+        
+        // Autumn Equinox
+        Get AutumnalEquinox of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move False to bOfficialHoliday
+            Function_Return "Herfst-equinox"
+        End
+        
         // This day needs to be _after_ the WhitSunday.
         // So when WhitSunday falls on the last Sunday in May,
         // only the WhitSunday will get generated. Else the

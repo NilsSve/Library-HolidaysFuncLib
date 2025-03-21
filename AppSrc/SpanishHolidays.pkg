@@ -46,13 +46,13 @@ Object oSpanishHolidays is a cNationalHolidays
     //
     // Note that although all functions below defines two parameters, not all
     // of those functions use the second parameter.
-    Function HolidayName Date dInDate Boolean ByRef bNationalHoliday Returns String
+    Function HolidayName Date dInDate Boolean ByRef bOfficialHoliday Returns String
         Integer iYear
         Date dHolidayDate
         String sHolidayName sISO_Short
 
         Move "" to sHolidayName
-        Move 0  to bNationalHoliday
+        Move 0  to bOfficialHoliday
         Get psISO_Short to sISO_Short
 
         If (dInDate < 1) Begin
@@ -64,92 +64,92 @@ Object oSpanishHolidays is a cNationalHolidays
 
         //        Get NewYearsEve of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
         Get NewYearsDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
-            Move 0 to bNationalHoliday
+            Move 0 to bOfficialHoliday
             Function_Return "Año Nuevo"
         End
 
         //        Get EpiphanyEve of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
         Get Epiphany of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
-            Move 0 to bNationalHoliday
+            Move 0 to bOfficialHoliday
             Function_Return "Epifanía del Señor"
         End
 
         Get LaborDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
-            Move 1 to bNationalHoliday
+            Move 1 to bOfficialHoliday
             Function_Return "Fiesta del Trabajo"
         End
 
         //        Get Halloween of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "Halloween"
         //        End
 
         //        Get FeastOfChristTheKing of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
         //        Get ChristmasEve of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
         //        Get Advent1 of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
         //        Get Advent2 of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
         //        Get Advent3 of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
         // This needs to be after ChristMasEve because it can fall on the same day, and we then wants to return Christmas Eve instead.
         //        Get Advent4 of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
         Get ChristmasDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
-            Move 1 to bNationalHoliday
+            Move 1 to bOfficialHoliday
             Function_Return "Natividad del Señor"
         End
 
         //        Get SecondDayChristmas of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 1 to bNationalHoliday
+        //            Move 1 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
         Get NationalDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
-            Move 1 to bNationalHoliday
+            Move 1 to bOfficialHoliday
             Function_Return "Fiesta Nacional de España"
         End
 
@@ -159,42 +159,42 @@ Object oSpanishHolidays is a cNationalHolidays
         // want to include in a e.g. holidays date table.
         // The International Women's Day falls each year on the 8th of March.
         //        If ((DateGetMonth(dInDate) = 3) and (DateGetDay(dInDate) = 8)) Begin // 8th of March.
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "International Women's Day"
         //        End
 
         //        If ((DateGetMonth(dInDate) = 2) and (DateGetDay(dInDate) = 14)) Begin // 14th of February.
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "Valentine's Day"
         //        End
 
         If ((DateGetMonth(dInDate) = 6) and (DateGetDay(dInDate) = 24)) Begin // 24th of June.
-            Move 0 to bNationalHoliday
+            Move 0 to bOfficialHoliday
             Function_Return "San Juan"
         End
 
         If ((DateGetMonth(dInDate) = 6) and (DateGetDay(dInDate) = 29)) Begin // 29th of June.
-            Move 0 to bNationalHoliday
+            Move 0 to bOfficialHoliday
             Function_Return "San Pedro y San Pablo"
         End
 
         If ((DateGetMonth(dInDate) = 7) and (DateGetDay(dInDate) = 25)) Begin // 25th of July.
-            Move 0 to bNationalHoliday
+            Move 0 to bOfficialHoliday
             Function_Return "Santiago"
         End
 
         If ((DateGetMonth(dInDate) = 8) and (DateGetDay(dInDate) = 15)) Begin // 15th of August.
-            Move 1 to bNationalHoliday
+            Move 1 to bOfficialHoliday
             Function_Return "Asunción de la Virgen"
         End
 
         If ((DateGetMonth(dInDate) = 12) and (DateGetDay(dInDate) = 6)) Begin // 6th of December.
-            Move 1 to bNationalHoliday
+            Move 1 to bOfficialHoliday
             Function_Return "Día de la Constitución Española"
         End
 
         If ((DateGetMonth(dInDate) = 12) and (DateGetDay(dInDate) = 8)) Begin // 8th of December.
-            Move 1 to bNationalHoliday
+            Move 1 to bOfficialHoliday
             Function_Return "La Inmaculada Concepción"
         End
 
@@ -203,93 +203,93 @@ Object oSpanishHolidays is a cNationalHolidays
 
         //        Get ThanksGiving of ghoCalendarHolidays iYear "" to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "Thanksgiving Day"
         //        End
 
         Get PalmSunday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
-            Move 0 to bNationalHoliday
+            Move 0 to bOfficialHoliday
             Function_Return "Domingo de Ramos"
         End
 
         //        Get AscensionDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 1 to bNationalHoliday
+        //            Move 1 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
         //        Get WhitSunday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 1 to bNationalHoliday
+        //            Move 1 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
         //        Get WhitMonday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
         //        Get MidsummerDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 1 to bNationalHoliday
+        //            Move 1 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
         //        Get MidsummerEve of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
         Get AllSaintsDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
-            Move 1 to bNationalHoliday
+            Move 1 to bOfficialHoliday
             Function_Return "Todos los Santos"
         End
 
         //        Get AllSaintsDayEve of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
         //        Get MaundyThursday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
         Get GoodFriday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
-            Move 1 to bNationalHoliday
+            Move 1 to bOfficialHoliday
             Function_Return "Viernes Santo"
         End
 
         //        Get HolySaturday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
         Get EasterDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
-            Move 0 to bNationalHoliday
+            Move 0 to bOfficialHoliday
             Function_Return "Domingo de Resurrección"
         End
 
         //        Get EasterMonday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 1 to bNationalHoliday
+        //            Move 1 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
-        // Start of European (Swedish) Summer Time - last Sunday in March (at 1am)
+        // Start of European Summer Time - last Sunday in March (at 1am)
         //
         //        Get EUSummerTimeStart of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "Européen summertime starts"
         //        End
         //
@@ -297,23 +297,37 @@ Object oSpanishHolidays is a cNationalHolidays
         //        //
         //        Get EUSummerTimeEnd of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "Européen summertime stops"
         //        End
 
+        // Spring Equinox
+        Get VernalEquinox of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move False to bOfficialHoliday
+            Function_Return "Equinoccio de primavera"
+        End
+        
+        // Autumn Equinox
+        Get AutumnalEquinox of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move False to bOfficialHoliday
+            Function_Return "Equinoccio de otoño"
+        End
+        
         // This day needs to be _after_ the WhitSunday.
         // So when WhitSunday falls on the last Sunday in May,
         // only the WhitSunday will get generated. Else the
         // Mother's Day would show up at that same day.
         //        Get MothersDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
         //        Get FathersDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "???"
         //        End
 
@@ -322,7 +336,7 @@ Object oSpanishHolidays is a cNationalHolidays
         // an easter day will be returned instead. (More imporant)
         //        Get AprilFoolsDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         //        If (dInDate = dHolidayDate) Begin
-        //            Move 0 to bNationalHoliday
+        //            Move 0 to bOfficialHoliday
         //            Function_Return "April Fools Day"
         //        End
 

@@ -444,6 +444,20 @@ Object oBrittishHolidays is a cNationalHolidays
             Function_Return "St Andrew's Day (Skottland)"
         End
 
+        // Spring Equinox
+        Get VernalEquinox of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move 0 to iBankHoliday
+            Function_Return "Spring Equinox"
+        End
+        
+        // Autumn Equinox
+        Get AutumnalEquinox of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move 0 to iBankHoliday
+            Function_Return "Autumn Equinox"
+        End
+        
         // This day needs to be _after_ the WhitSunday.
         // So when WhitSunday falls on the last Sunday in May,
         // only the WhitSunday will get generated. Else the

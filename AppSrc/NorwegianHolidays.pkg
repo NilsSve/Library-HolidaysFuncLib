@@ -185,6 +185,20 @@ Object oNorwegianHolidays is a cNationalHolidays
             Function_Return "2. påskedag"
         End
 
+        // Vårdagjämning
+        Get VernalEquinox of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move False to bOfficialHoliday
+            Function_Return "Vårjevndøgn"
+        End
+        
+        // Höstdagjämning
+        Get AutumnalEquinox of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move False to bOfficialHoliday
+            Function_Return "Høstjevndøgn"
+        End
+        
         // This needs to be after all easter days.
         // So when April fools day falls on one of the easter days,
         // an easter day will be returned instead. (More imporant)
