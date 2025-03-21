@@ -1427,7 +1427,7 @@ Object oCalendarHolidays is a cCalendarHolidays
                 Else Begin
                     Move (DateSetDay(dDate,21)) to dDate
                 End
-                Move (DateSetMonth(dDate,4))    to dDate
+                Move (DateSetMonth(dDate,3))    to dDate
             End
             Else Begin
                 If (iYear <> 2048) Begin
@@ -1480,7 +1480,7 @@ Object oCalendarHolidays is a cCalendarHolidays
                 Else Begin
                     Move (DateSetDay(dDate,21)) to dDate
                 End
-                Move (DateSetMonth(dDate,4))    to dDate
+                Move (DateSetMonth(dDate,3))    to dDate
             End
             Move (DateSetYear(dDate,iYear))     to dDate
         End

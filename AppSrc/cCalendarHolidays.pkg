@@ -16,6 +16,7 @@
       2025-01-22  Merged much of the holiday logic that was split over several 
                   packages into one place: cCalendarHolidays and ocClalendarHoliday 
                   object. (Nils Svedmyr)
+                  Introduced new logic with usage of meta-data tags.
 
 ****************************************************************************
 */
