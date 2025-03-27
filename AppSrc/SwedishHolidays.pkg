@@ -182,7 +182,7 @@ Object oSwedishHolidays is a cNationalHolidays
         Get AscensionDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
             Move True to bOfficialHoliday
-            Function_Return "Kristi himmelsfärds dag"
+            Function_Return "Kristi himmelsfärd"
         End
 
         Get WhitSunday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
