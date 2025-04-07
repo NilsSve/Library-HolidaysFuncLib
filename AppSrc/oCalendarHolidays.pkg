@@ -93,7 +93,6 @@ Object oCalendarHolidays is a cCalendarHolidays
             End
             // Else the iDayNumber was = 6 which is the Saturday.
         End
-
         // Eastern Christian - Orthodox and Eastern Catholic church. The first Sunday after Pentecost.
         //    Else If ("" contains String(sISO_Short)) Begin // ***TODO: which countries?
         //        Get Pentecost iYear to dReturn
