@@ -923,8 +923,8 @@ Class cCalendarHolidays is a cObject
     End_Procedure
 
     { Visibility = Private }
-    { Description  = "Collects data from all functions of the oCalendarHoldays object." }
-    { Description += "Saves the data in the pHolidayFunctions struct array property." }
+    { Description  = "Collects data from all functions of the oCalendarHolidays object." }
+    { Description += "Saves that data to the pHolidayFunctions struct array property." }
     Procedure RegisterInterface Handle hMsg String sMsgName String sParams String sComment
         Handle hNewTest       
         String sReturnType
