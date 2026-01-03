@@ -150,6 +150,12 @@ Object oSwedishHolidays is a cNationalHolidays
             Function_Return "Annandag Jul"
         End
 
+        Get Knut20 of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        If (dInDate = dHolidayDate) Begin
+            Move False to bOfficialHoliday
+            Function_Return "20:e Knut (Julgransplundring)"
+        End
+        
         Get NationalDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
             Move True to bOfficialHoliday

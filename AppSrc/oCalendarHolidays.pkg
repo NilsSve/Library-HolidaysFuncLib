@@ -999,6 +999,14 @@ Object oCalendarHolidays is a cCalendarHolidays
     End_Function
 
     { Published = True } 
+    { Description = "20:e Knut - Always falls on 20th of January." }
+    Function Knut20 Integer iYear Returns Date
+        Date dReturn
+        Get ChristmasEve (iYear -1) to dReturn
+        Function_Return (dReturn + 20)
+    End_Function
+
+    { Published = True } 
     { Description = "Agong's Birthday is the first Saturday in June" }
     Function AgongBirthDay Integer iYear Returns Date
         Date dReturn
