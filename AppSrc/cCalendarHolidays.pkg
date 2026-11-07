@@ -297,6 +297,9 @@ Class cCalendarHolidays is a cObject
         String sMonthName
         Pointer lpsMonthName
         Integer iVoid iMonth
+#IF (!@ >= 200)
+        WString wName
+#ENDIF
         
         Case Begin
             Case (iMthNo = 1)                                 
@@ -405,9 +408,16 @@ Class cCalendarHolidays is a cObject
                 Case Break
         Case End
     
+#IF (!@ < 200)
         Move (ZeroString(20)) to sMonthName
         Move (AddressOf(sMonthName)) to lpsMonthName
         Move (GetLocaleInfo(LOCALE_USER_DEFAULT, iMonth, lpsMonthName, 20)) to iVoid
+#ELSE
+        // GetLocaleInfoW and CString: the name alone, without the zero byte and padding (see WinAPI_GetLocaleInfoW).
+        Move (ZeroString(80)) to wName
+        Move (WinAPI_GetLocaleInfoW(LOCALE_USER_DEFAULT, iMonth, AddressOf(wName), 80)) to iVoid
+        Move (CString(wName)) to sMonthName
+#ENDIF
        
         If (bCapsFirstLetter = True) Begin
             Move (Uppercase(Left(sMonthName, 1)) + Mid(sMonthName, Length(sMonthName), 2)) to sMonthName
@@ -422,6 +432,9 @@ Class cCalendarHolidays is a cObject
         String sDayName
         Pointer lpsDayName
         Integer iVoid iDay
+#IF (!@ >= 200)
+        WString wName
+#ENDIF
     
         Case Begin
             Case (iDayNo = 1) 
@@ -482,9 +495,16 @@ Class cCalendarHolidays is a cObject
                 Case Break
         Case End
     
+#IF (!@ < 200)
         Move (ZeroString(20)) to sDayName
         Move (AddressOf(sDayName)) to lpsDayName
         Move (GetLocaleInfo(LOCALE_USER_DEFAULT, iDay, lpsDayName, 20)) to iVoid
+#ELSE
+        // GetLocaleInfoW and CString: the name alone, without the zero byte and padding (see WinAPI_GetLocaleInfoW).
+        Move (ZeroString(80)) to wName
+        Move (WinAPI_GetLocaleInfoW(LOCALE_USER_DEFAULT, iDay, AddressOf(wName), 80)) to iVoid
+        Move (CString(wName)) to sDayName
+#ENDIF
     
         If (bCapsFirstLetter = True) Begin
             Move (Uppercase(Left(sDayName, 1)) + Mid(sDayName, Length(sDayName), 2)) to sDayName
@@ -874,6 +894,9 @@ Class cCalendarHolidays is a cObject
         Time tNullTime
         Pointer pTime psRet
         Integer iRet
+#IF (!@ >= 200)
+        WString wTimeRet
+#ENDIF
         
         If (Num_Arguments = 2) Begin
             Move sFormatToken to sTmFormat
@@ -887,6 +910,7 @@ Class cCalendarHolidays is a cObject
         End
         Else Move 0 to pTime
             
+#IF (!@ < 200)
         Move (ZeroString(30)) to sTimeRet
         Move (AddressOf(sTimeRet)) to psRet
         If (Trim(sTmFormat) <> "") Begin
@@ -895,6 +919,12 @@ Class cCalendarHolidays is a cObject
             
         Move (WindowsAPI_GetTimeFormat( LOCALE_SYSTEM_DEFAULT , 0 , pTime , sTmFormat , psRet , (Length(sTimeRet)) )) to iRet
         Move (Replaces(Character(0), sTimeRet, "")) to sTimeRet
+#ELSE
+        // GetTimeFormatW: a time marker outside ASCII (an AM/PM sign) comes back as it is.
+        Move (ZeroString(80)) to wTimeRet
+        Move (WindowsAPI_GetTimeFormatW(LOCALE_SYSTEM_DEFAULT, 0, pTime, sTmFormat, AddressOf(wTimeRet), 80)) to iRet
+        Move (CString(wTimeRet)) to sTimeRet
+#ENDIF
         
         Function_Return sTimeRet
     End_Function

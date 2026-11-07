@@ -117,6 +117,37 @@ External_Function GetLocaleInfo "GetLocaleInfoA" Kernel32.dll ;
    DWord LCID DWord LCTYPE Pointer lpLCDATA Integer cchData Returns Integer
 #ENDIF
 
+// The wide twins of GetLocaleInfo and WindowsAPI_GetTimeFormat, which MonthNameFromInteger, DayNameFromInteger and
+// TimeFormat call from DataFlex 20.
+// GetLocaleInfo: in a DataFlex 20 program it is mostly DataFlex's own wrapper (Winkern.pkg, which Windows.pkg brings
+// in before this file), and that one converts - the ANSI declaration below applies only where this file comes first.
+// Either way the name was read into a 20-character buffer and returned whole: the name, a zero byte, and padding
+// ("måndag" plus 13 more characters). The wide call and CString give the name alone.
+// WindowsAPI_GetTimeFormat is the ANSI GetTimeFormatA: a time marker outside ASCII (an AM/PM sign) came back as ANSI
+// bytes. The time format is a WString parameter as the ANSI one's is a String, so an empty format reaches Windows
+// the same way it always did.
+#IFNDEF get_WinAPI_GetLocaleInfoW
+External_Function WinAPI_GetLocaleInfoW "GetLocaleInfoW" Kernel32.dll ;
+    DWord   LCID ;
+    DWord   LCTYPE ;
+    Pointer lpLCDATA ;         // the address of a WString
+    Integer cchData ;          // its length in characters
+    Returns Integer
+#ENDIF
+
+#IF (!@ >= 200)
+#IFNDEF get_WindowsAPI_GetTimeFormatW
+    External_Function WindowsAPI_GetTimeFormatW "GetTimeFormatW" Kernel32.dll ;
+        Integer iLocale ;
+        Integer idwFlags ;
+        Pointer lpTime ;
+        WString wFormat ;
+        Pointer pwTimeStr ;    // the address of a WString
+        Integer iSizeBuffer ;  // its length in characters
+        Returns Integer
+#ENDIF
+#ENDIF
+
 #IFNDEF ghoNationalHolidayObject
     Global_Variable Integer ghoNationalHolidayObject
     Move 0 to ghoNationalHolidayObject
