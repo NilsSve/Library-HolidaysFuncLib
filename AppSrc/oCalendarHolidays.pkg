@@ -499,18 +499,12 @@ Object oCalendarHolidays is a cCalendarHolidays
         Date dReturn
         Integer iDayNumber
 
-        If (sISO_Short = "GB") Begin
-            // Start with the 1st of May and find the first Monday.
-            Get DateSetDate iYear 5 1 to dReturn
-            Get DateGetISODayOfWeek dReturn to iDayNumber
-    
-            // If iDayNumber is greater then Monday, add number of days to first Monday.
-            If (iDayNumber > 1) Begin
-                Move ((8 - iDayNumber) + dReturn) to dReturn
-            End
-    
-            // Add three more weeks to get the forth Monday.
-            Move (dReturn + 21) to dReturn
+        // The last Monday of May: Memorial Day in the US, the Spring Bank Holiday in GB.
+        If (sISO_Short = "US" or sISO_Short = "GB") Begin
+            // From the 31st of May back to a Monday: 0 to 6 days.
+            Get DateSetDate iYear 5 31 to dReturn
+            Get DateGetISODayOfWeek dReturn to iDayNumber  // 1=Monday.
+            Move (dReturn - (iDayNumber - 1)) to dReturn
         End
 
         Function_Return dReturn
@@ -745,7 +739,8 @@ Object oCalendarHolidays is a cCalendarHolidays
         Integer iDayNumber
 
         If (sISO_Short = "CA") Begin
-            Get ColumbusDay to dReturn
+            // The second Monday of October - the day ColumbusDay gives for the US.
+            Get ColumbusDay iYear "US" to dReturn
         End
 
         Else Begin
@@ -753,13 +748,8 @@ Object oCalendarHolidays is a cCalendarHolidays
             Get DateSetDate iYear 11 1 to dReturn
             Get DateGetISODayOfWeek dReturn to iDayNumber  // 1=Monday.
 
-            // If iDayNumber is less then Thursday, add number of days to next Thursday.
-            If (iDayNumber < 4) Begin
-                Move ((7 - iDayNumber) + dReturn) to dReturn
-            End
-            Else If (iDayNumber > 4) Begin
-                Move (dReturn - iDayNumber) to dReturn
-            End
+            // On to the first Thursday: 0 to 6 days (Monday + 3, Friday + 6, Sunday + 4).
+            Move (dReturn + Mod((11 - iDayNumber), 7)) to dReturn
 
             // Add three more weeks to get the fourth Thursday.
             Move (dReturn + 21) to dReturn

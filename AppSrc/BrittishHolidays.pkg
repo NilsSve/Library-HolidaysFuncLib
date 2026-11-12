@@ -155,7 +155,7 @@ Object oBrittishHolidays is a cNationalHolidays
 
         // Spring Bank Holiday - last Monday in May
         //
-        Get EarlyMayBH of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
+        Get MemorialDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
             Move 8 to iBankHoliday
             Function_Return "Spring Bank Holiday (UK)"

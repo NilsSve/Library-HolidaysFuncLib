@@ -524,7 +524,8 @@ Class cCalendarHolidays is a cObject
     
     { Visibility = Public }
     Function IsLeapYear Integer iYear Returns Boolean
-        Function_Return ((not(Mod(iYear, 4))) and (Mod(iYear, 100)) and (Mod(iYear, 400)))
+        // Every fourth year, except a century - but every fourth century is one: 2000 was, 1900 was not.
+        Function_Return (((Mod(iYear, 4) = 0) and (Mod(iYear, 100) <> 0)) or (Mod(iYear, 400) = 0))
     End_Function
 
     { Visibility = Public }
