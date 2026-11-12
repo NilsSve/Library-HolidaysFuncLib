@@ -38,6 +38,19 @@ This library provides holiday and special day functions for various regions in t
 
   The global handle `ghoCalendarHolidays` provides access to all functions, while the `cCalendarHolidays` class contains helper date functions related to the holiday function library, encapsulated in the `oCalendarHolidays.pkg` object. This object also holds the code for all country packages found in `CountryPackages.pkg`.
 
+## Unit tests
+
+`AppSrc\UnitTests.src` is the unit-test program of the library, built on
+[DFUnit](https://github.com/NilsSve/Library-DFUnit). Run `setup.bat` once: it clones DFUnit beside this folder
+(`..\DFUnit`). Then open `HolidaysFuncLibDev26.0.sws` (or `25.0` / `24.0`) and build `UnitTests.src`. The
+`HolidaysFuncLib<version>.sws` files and the DataFlex 26 package, which other workspaces use the library
+through, do not know DFUnit.
+
+The tests are in `AppSrc\o<Subject>-Tests.pkg`, one file per subject, and `AppSrc\oUnit_Tests.pkg` lists them.
+The first file checks holiday dates against the calendar - Easter in known years and the days it moves, Advent,
+the US holidays fixed by weekday, the Swedish Midsummer - and the date helpers `IsLeapYear`, the ISO week at
+New Year and `Ordinal`. `Programs\UnitTests64.exe -c` runs them on the console (exit code 0 when all passed).
+
 For demonstration of how to use this library, please refer to the `HolidayFuncLibDemo` repository.
 
 

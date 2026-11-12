@@ -1,0 +1,14 @@
+[Properties]
+Version=25.0
+[WorkspacePaths]
+ConfigFile=.\Programs\Config.ws
+[TestProjects]
+[Conditionals]
+Is$WebApp=False
+Is$Win64=True
+Is$GraphicsLibrary=False
+COMP$TIMESTAMP=True
+[Projects]
+Project0=UnitTests.src
+[Libraries]
+Lib1=..\DFUnit\DFUnit-25.0.sws

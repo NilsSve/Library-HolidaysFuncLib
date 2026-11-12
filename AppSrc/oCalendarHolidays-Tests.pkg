@@ -1,0 +1,155 @@
+// oCalendarHolidays-Tests.pkg - the holiday dates of oCalendarHolidays.pkg and the date helpers of
+// cCalendarHolidays.pkg, checked against the calendar.
+//
+// Dates are compared as "yyyy-mm-dd" text built from DateGetYear/Month/Day, and made with DateSet: a date
+// literal would be read in the date format of the machine that runs the tests.
+
+Use DFUnit\Fixturing\Fixture.pkg
+Use oCalendarHolidays.pkg
+Use CountryPackages.pkg          // the national holiday objects HolidayName asks, by ISO code
+
+Object oCalendarHolidays_Tests is a cTestFixture
+    Set psTestFixtureName to "oCalendarHolidays - holiday dates and date helpers"
+
+    // A date as yyyy-mm-dd, whatever the date format of the machine.
+    Function YMD Date dDate Returns String
+        Integer iMonth iDay
+        Move (DateGetMonth(dDate)) to iMonth
+        Move (DateGetDay(dDate))   to iDay
+        Function_Return (String(DateGetYear(dDate)) + "-" + Right(("0" + String(iMonth)), 2) + "-" + Right(("0" + String(iDay)), 2))
+    End_Function
+
+    // ---------------------------------------------------------------- Easter and the days it moves
+
+    { Published=True }
+    Procedure Test_EasterDay_In_Known_Years
+        Send AssertSAreEqual "2000-04-23" (YMD(Self, EasterDay(ghoCalendarHolidays, 2000))) "2000."
+        Send AssertSAreEqual "2008-03-23" (YMD(Self, EasterDay(ghoCalendarHolidays, 2008))) "2008, an early Easter."
+        Send AssertSAreEqual "2011-04-24" (YMD(Self, EasterDay(ghoCalendarHolidays, 2011))) "2011."
+        Send AssertSAreEqual "2019-04-21" (YMD(Self, EasterDay(ghoCalendarHolidays, 2019))) "2019."
+        Send AssertSAreEqual "2024-03-31" (YMD(Self, EasterDay(ghoCalendarHolidays, 2024))) "2024."
+        Send AssertSAreEqual "2025-04-20" (YMD(Self, EasterDay(ghoCalendarHolidays, 2025))) "2025."
+        Send AssertSAreEqual "2026-04-05" (YMD(Self, EasterDay(ghoCalendarHolidays, 2026))) "2026."
+        Send AssertSAreEqual "2038-04-25" (YMD(Self, EasterDay(ghoCalendarHolidays, 2038))) "2038, the latest date Easter can fall on."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_Easter_Week_2026
+        Send AssertSAreEqual "2026-03-29" (YMD(Self, PalmSunday(ghoCalendarHolidays, 2026)))     "Palm Sunday."
+        Send AssertSAreEqual "2026-04-02" (YMD(Self, MaundyThursday(ghoCalendarHolidays, 2026))) "Maundy Thursday."
+        Send AssertSAreEqual "2026-04-03" (YMD(Self, GoodFriday(ghoCalendarHolidays, 2026)))     "Good Friday."
+        Send AssertSAreEqual "2026-04-04" (YMD(Self, HolySaturday(ghoCalendarHolidays, 2026)))   "Holy Saturday."
+        Send AssertSAreEqual "2026-04-06" (YMD(Self, EasterMonday(ghoCalendarHolidays, 2026)))   "Easter Monday."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_The_Other_Movable_Feasts_2026
+        Send AssertSAreEqual "2026-02-18" (YMD(Self, AshWednesday(ghoCalendarHolidays, 2026))) "Ash Wednesday, 46 days before Easter."
+        Send AssertSAreEqual "2026-05-14" (YMD(Self, AscensionDay(ghoCalendarHolidays, 2026))) "Ascension Day, 39 days after."
+        Send AssertSAreEqual "2026-05-24" (YMD(Self, WhitSunday(ghoCalendarHolidays, 2026)))   "Whit Sunday, 49 days after."
+        Send AssertSAreEqual "2026-05-25" (YMD(Self, WhitMonday(ghoCalendarHolidays, 2026)))   "Whit Monday."
+    End_Procedure
+
+    // ---------------------------------------------------------------- fixed by weekday
+
+    // The four Sundays before Christmas; Christmas Day 2026 is a Friday.
+    { Published=True }
+    Procedure Test_Advent_2026
+        Send AssertSAreEqual "2026-11-29" (YMD(Self, Advent1(ghoCalendarHolidays, 2026))) "First Sunday of Advent."
+        Send AssertSAreEqual "2026-12-06" (YMD(Self, Advent2(ghoCalendarHolidays, 2026))) "Second."
+        Send AssertSAreEqual "2026-12-13" (YMD(Self, Advent3(ghoCalendarHolidays, 2026))) "Third."
+        Send AssertSAreEqual "2026-12-20" (YMD(Self, Advent4(ghoCalendarHolidays, 2026))) "Fourth."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_US_Holidays_2026
+        Send AssertSAreEqual "2026-01-19" (YMD(Self, MLKDay(ghoCalendarHolidays, 2026, "US")))      "Martin Luther King Day, the third Monday of January."
+        Send AssertSAreEqual "2026-05-25" (YMD(Self, MemorialDay(ghoCalendarHolidays, 2026, "US"))) "Memorial Day, the last Monday of May."
+        Send AssertSAreEqual "2026-09-07" (YMD(Self, LaborDay(ghoCalendarHolidays, 2026, "US")))    "Labor Day, the first Monday of September."
+        Send AssertSAreEqual "2026-11-26" (YMD(Self, Thanksgiving(ghoCalendarHolidays, 2026, "US"))) "Thanksgiving, the fourth Thursday of November."
+        Send AssertSAreEqual "2026-11-27" (YMD(Self, BlackFriday(ghoCalendarHolidays, 2026)))       "Black Friday, the day after."
+    End_Procedure
+
+    // Thanksgiving whatever weekday 1 November is: a Thursday (2018), a Saturday (2025), a Monday (2027).
+    { Published=True }
+    Procedure Test_Thanksgiving_From_Any_First_Of_November
+        Send AssertSAreEqual "2018-11-22" (YMD(Self, Thanksgiving(ghoCalendarHolidays, 2018, "US"))) "1 November a Thursday."
+        Send AssertSAreEqual "2025-11-27" (YMD(Self, Thanksgiving(ghoCalendarHolidays, 2025, "US"))) "1 November a Saturday."
+        Send AssertSAreEqual "2027-11-25" (YMD(Self, Thanksgiving(ghoCalendarHolidays, 2027, "US"))) "1 November a Monday."
+        Send AssertSAreEqual "2026-10-12" (YMD(Self, Thanksgiving(ghoCalendarHolidays, 2026, "CA"))) "Canada: the second Monday of October."
+    End_Procedure
+
+    // The LAST Monday of May - in 2027 that is the fifth, the 31st.
+    { Published=True }
+    Procedure Test_Last_Monday_Of_May
+        Send AssertSAreEqual "2025-05-26" (YMD(Self, MemorialDay(ghoCalendarHolidays, 2025, "US"))) "Memorial Day 2025."
+        Send AssertSAreEqual "2027-05-31" (YMD(Self, MemorialDay(ghoCalendarHolidays, 2027, "US"))) "Memorial Day 2027, a May with five Mondays."
+        Send AssertSAreEqual "2027-05-31" (YMD(Self, MemorialDay(ghoCalendarHolidays, 2027, "GB"))) "The Spring Bank Holiday 2027."
+    End_Procedure
+
+    // HolidayName asks the national object of the ISO code. The Spring Bank Holiday used to be looked up as
+    // the Early May one, so it never matched.
+    { Published=True }
+    Procedure Test_HolidayName_For_The_Last_Monday_Of_May
+        Date dDate
+        Boolean bOfficial
+
+        Get DateSetDate of ghoCalendarHolidays 2027 5 31 to dDate
+        Send AssertSAreEqual "Memorial Day" (HolidayName(ghoCalendarHolidays, dDate, "US", &bOfficial)) "US."
+        Send AssertSAreEqual "Spring Bank Holiday (UK)" (HolidayName(ghoCalendarHolidays, dDate, "GB", &bOfficial)) "GB."
+        Get DateSetDate of ghoCalendarHolidays 2027 5 3 to dDate
+        Send AssertSAreEqual "Early May Bank Holiday (UK)" (HolidayName(ghoCalendarHolidays, dDate, "GB", &bOfficial)) "GB, the first Monday of May."
+    End_Procedure
+
+    // Midsummer Eve is the Friday from 19 to 25 June, Midsummer Day the Saturday after it.
+    { Published=True }
+    Procedure Test_Swedish_Midsummer_2026
+        Send AssertSAreEqual "2026-06-19" (YMD(Self, MidsummerEve(ghoCalendarHolidays, 2026, "SE"))) "Midsummer Eve."
+        Send AssertSAreEqual "2026-06-20" (YMD(Self, MidsummerDay(ghoCalendarHolidays, 2026, "SE"))) "Midsummer Day."
+    End_Procedure
+
+    // ---------------------------------------------------------------- date helpers
+
+    { Published=True }
+    Procedure Test_IsLeapYear
+        Send Assert      (IsLeapYear(ghoCalendarHolidays, 2024)) "2024: divisible by 4."
+        Send AssertFalse (IsLeapYear(ghoCalendarHolidays, 2026)) "2026: not divisible by 4."
+        Send AssertFalse (IsLeapYear(ghoCalendarHolidays, 1900)) "1900: a century not divisible by 400."
+        Send Assert      (IsLeapYear(ghoCalendarHolidays, 2000)) "2000: a century divisible by 400 is a leap year."
+    End_Procedure
+
+    // ISO 8601: week 1 is the week with the year's first Thursday. 2026 starts on a Thursday, so it has 53 weeks
+    // and 1 January 2027 (a Friday) is in week 53 of 2026; Monday 30 December 2024 is in week 1 of 2025.
+    { Published=True }
+    Procedure Test_ISO_Week_At_New_Year
+        Date dDate
+
+        Get DateSetDate of ghoCalendarHolidays 2026 1 1 to dDate
+        Send AssertIAreEqual 1    (DateGetISOWeek(ghoCalendarHolidays, dDate)) "1 January 2026: week 1."
+        Send AssertIAreEqual 2026 (DateGetISOYear(ghoCalendarHolidays, dDate)) "... of 2026."
+
+        Get DateSetDate of ghoCalendarHolidays 2027 1 1 to dDate
+        Send AssertIAreEqual 53   (DateGetISOWeek(ghoCalendarHolidays, dDate)) "1 January 2027: week 53."
+        Send AssertIAreEqual 2026 (DateGetISOYear(ghoCalendarHolidays, dDate)) "... of 2026."
+
+        Get DateSetDate of ghoCalendarHolidays 2024 12 30 to dDate
+        Send AssertIAreEqual 1    (DateGetISOWeek(ghoCalendarHolidays, dDate)) "30 December 2024: week 1."
+        Send AssertIAreEqual 2025 (DateGetISOYear(ghoCalendarHolidays, dDate)) "... of 2025."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_Ordinal
+        Send AssertSAreEqual "1st"   (Ordinal(1))   "1."
+        Send AssertSAreEqual "2nd"   (Ordinal(2))   "2."
+        Send AssertSAreEqual "3rd"   (Ordinal(3))   "3."
+        Send AssertSAreEqual "4th"   (Ordinal(4))   "4."
+        Send AssertSAreEqual "11th"  (Ordinal(11))  "11, not 11st."
+        Send AssertSAreEqual "12th"  (Ordinal(12))  "12, not 12nd."
+        Send AssertSAreEqual "13th"  (Ordinal(13))  "13, not 13rd."
+        Send AssertSAreEqual "21st"  (Ordinal(21))  "21."
+        Send AssertSAreEqual "22nd"  (Ordinal(22))  "22."
+        Send AssertSAreEqual "101st" (Ordinal(101)) "101."
+        Send AssertSAreEqual "111th" (Ordinal(111)) "111."
+    End_Procedure
+
+End_Object
