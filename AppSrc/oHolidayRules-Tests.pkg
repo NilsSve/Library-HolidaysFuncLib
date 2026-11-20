@@ -1,0 +1,327 @@
+// oHolidayRules-Tests.pkg - holiday dates, names and official flags checked against the official calendars, in
+// the years where a rule is easy to get wrong: a start day that is a Friday, 1 January on a Sunday or a Monday,
+// a month with five Mondays, a one-off year.
+//
+// Written 2026-11-15 from a review of the library; every test up to the IsDateAHoliday one failed on release
+// 1.0.2. Each asserts once, so a failure names the one rule that broke. The tests after it (2026-11-20) cover
+// what was found beside them: the UK one-off bank holidays, Christmas at a weekend, Juneteenth, NL and SE.
+//
+// Dates are compared as "yyyy-mm-dd" text and made with DateSetDate: a date literal would be read in the date
+// format of the machine that runs the tests.
+Use DFUnit\Fixturing\Fixture.pkg
+Use oCalendarHolidays.pkg
+
+Object oHolidayRules_Tests is a cTestFixture
+    Set psTestFixtureName to "Holiday rules - the years where a rule is easy to get wrong"
+
+    // A date as yyyy-mm-dd, whatever the date format of the machine.
+    Function YMD Date dDate Returns String
+        Integer iMonth iDay
+        Move (DateGetMonth(dDate)) to iMonth
+        Move (DateGetDay(dDate))   to iDay
+        Function_Return (String(DateGetYear(dDate)) + "-" + Right(("0" + String(iMonth)), 2) + "-" + Right(("0" + String(iDay)), 2))
+    End_Function
+
+    // What HolidayName says about a date: "name|official" or "name|not official".
+    Function NameAndFlag Integer iYear Integer iMonth Integer iDay String sISO_Short Returns String
+        Date dDate
+        Boolean bOfficial
+        String sName
+        Get DateSetDate of ghoCalendarHolidays iYear iMonth iDay to dDate
+        Move False to bOfficial
+        Get HolidayName of ghoCalendarHolidays dDate sISO_Short (&bOfficial) to sName
+        Function_Return (sName + "|" + If(bOfficial, "official", "not official"))
+    End_Function
+
+    // Only the official flag HolidayName gives a date: "official" or "not official".
+    Function OfficialFlag Integer iYear Integer iMonth Integer iDay String sISO_Short Returns String
+        Date dDate
+        Boolean bOfficial
+        String sName
+        Get DateSetDate of ghoCalendarHolidays iYear iMonth iDay to dDate
+        Move False to bOfficial
+        Get HolidayName of ghoCalendarHolidays dDate sISO_Short (&bOfficial) to sName
+        Function_Return (If(bOfficial, "official", "not official"))
+    End_Function
+
+    // ---------------------------------------------------------------- a Saturday from a start day
+    // Swedish Midsummer Day is the Saturday from 20 to 26 June, All Saints' Day the Saturday from 31 October to
+    // 6 November. When the first day of the span is a Friday the next day is the answer, not the Friday.
+    // 20 June 2025 and 31 October 2025 are Fridays.
+    { Published=True }
+    Procedure Test_Swedish_Midsummer_Day_When_20_June_Is_A_Friday
+        Send AssertSAreEqual "2025-06-21" (YMD(Self, MidsummerDay(ghoCalendarHolidays, 2025, "SE"))) "Midsummer Day 2025 is Saturday 21 June."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_Swedish_Midsummer_Eve_When_20_June_Is_A_Friday
+        Send AssertSAreEqual "2025-06-20" (YMD(Self, MidsummerEve(ghoCalendarHolidays, 2025, "SE"))) "Midsummer Eve 2025 is Friday 20 June."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_Swedish_All_Saints_Day_When_31_October_Is_A_Friday
+        Send AssertSAreEqual "2025-11-01" (YMD(Self, AllSaintsDay(ghoCalendarHolidays, 2025, "SE"))) "All Saints' Day 2025 is Saturday 1 November."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_Swedish_HolidayName_Of_Midsummer_Day_2025
+        Send AssertSAreEqual "Midsommardagen|official" (NameAndFlag(Self, 2025, 6, 21, "SE")) "Saturday 21 June 2025."
+    End_Procedure
+
+    // The library's UK national day is the second Saturday of June; 1 June 2029 is a Friday.
+    { Published=True }
+    Procedure Test_UK_National_Day_When_1_June_Is_A_Friday
+        Send AssertSAreEqual "2029-06-09" (YMD(Self, NationalDay(ghoCalendarHolidays, 2029, "GB"))) "The second Saturday of June 2029 is the 9th."
+    End_Procedure
+
+    // ---------------------------------------------------------------- Martin Luther King Day
+    // The third Monday of January, whatever weekday 1 January is.
+    { Published=True }
+    Procedure Test_MLK_Day_When_1_January_Is_A_Sunday
+        Send AssertSAreEqual "2023-01-16" (YMD(Self, MLKDay(ghoCalendarHolidays, 2023, "US"))) "2023: Monday 16 January."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_MLK_Day_When_1_January_Is_A_Monday
+        Send AssertSAreEqual "2024-01-15" (YMD(Self, MLKDay(ghoCalendarHolidays, 2024, "US"))) "2024: Monday 15 January."
+    End_Procedure
+
+    // ---------------------------------------------------------------- UK
+    // The late summer bank holiday is the LAST Monday of August; August 2026 has five Mondays.
+    { Published=True }
+    Procedure Test_UK_Late_Summer_Bank_Holiday_In_An_August_With_Five_Mondays
+        Send AssertSAreEqual "2026-08-31" (YMD(Self, LateSummerBankDay(ghoCalendarHolidays, 2026, "GB"))) "Monday 31 August 2026."
+    End_Procedure
+
+    // Remembrance Sunday is the second Sunday of November.
+    { Published=True }
+    Procedure Test_UK_Remembrance_Sunday_Is_The_Second_Sunday_Of_November
+        Send AssertSAreEqual "2025-11-09" (YMD(Self, RemembranceSunday(ghoCalendarHolidays, 2025, "GB"))) "Sunday 9 November 2025."
+    End_Procedure
+
+    // 2012, the Diamond Jubilee: the Early May bank holiday stayed on Monday 7 May; the Spring bank holiday moved
+    // from 28 May to Monday 4 June, and Tuesday 5 June was an extra one.
+    { Published=True }
+    Procedure Test_UK_2012_Early_May_Bank_Holiday_Stayed_In_May
+        Send AssertSAreEqual "2012-05-07" (YMD(Self, EarlyMayBH(ghoCalendarHolidays, 2012, "GB"))) "EarlyMayBH 2012."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_UK_2012_May_Bank_Day_Stayed_In_May
+        Send AssertSAreEqual "2012-05-07" (YMD(Self, MayBankDay(ghoCalendarHolidays, 2012, "GB"))) "MayBankDay 2012."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_UK_2012_Spring_Bank_Holiday_Moved_To_4_June
+        Send AssertSAreEqual "2012-06-04" (YMD(Self, MemorialDay(ghoCalendarHolidays, 2012, "GB"))) "The Spring bank holiday 2012 (MemorialDay GB)."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_UK_2012_HolidayName_Of_7_May
+        Send AssertSAreEqual "Early May Bank Holiday (UK)|official" (NameAndFlag(Self, 2012, 5, 7, "GB")) "Monday 7 May 2012."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_UK_2012_HolidayName_Of_4_June
+        Send AssertSAreEqual "Spring Bank Holiday (UK)|official" (NameAndFlag(Self, 2012, 6, 4, "GB")) "Monday 4 June 2012."
+    End_Procedure
+
+    // St David's Day is 1 March and St Patrick's Day 17 March - not 1 and 17 February.
+    { Published=True }
+    Procedure Test_UK_1_February_Is_No_Saints_Day
+        Send AssertSAreEqual "|not official" (NameAndFlag(Self, 2026, 2, 1, "GB")) "Sunday 1 February 2026."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_UK_17_February_Is_No_Saints_Day
+        Send AssertSAreEqual "|not official" (NameAndFlag(Self, 2025, 2, 17, "GB")) "Monday 17 February 2025."
+    End_Procedure
+
+    // ---------------------------------------------------------------- the Netherlands
+    // King's Day is 27 April, or Saturday 26 April when the 27th is a Sunday (2025).
+    { Published=True }
+    Procedure Test_Dutch_Kings_Day_When_27_April_Is_A_Sunday
+        Send AssertSAreEqual "2025-04-26" (YMD(Self, NationalDay(ghoCalendarHolidays, 2025, "NL"))) "Koningsdag 2025."
+    End_Procedure
+
+    // ---------------------------------------------------------------- Father's Day and Mother's Day
+    // The UK's ISO code is GB; its Father's Day is the third Sunday of June.
+    { Published=True }
+    Procedure Test_UK_Fathers_Day_Is_The_Third_Sunday_Of_June
+        Send AssertSAreEqual "2026-06-21" (YMD(Self, FathersDay(ghoCalendarHolidays, 2026, "GB"))) "Sunday 21 June 2026."
+    End_Procedure
+
+    // Austria's Vatertag is the second Sunday of June (the first Sunday of September is Australia's and New Zealand's).
+    { Published=True }
+    Procedure Test_Austrian_Fathers_Day_Is_The_Second_Sunday_Of_June
+        Send AssertSAreEqual "2026-06-14" (YMD(Self, FathersDay(ghoCalendarHolidays, 2026, "AT"))) "Sunday 14 June 2026."
+    End_Procedure
+
+    // Norway's morsdag is the second Sunday of February.
+    { Published=True }
+    Procedure Test_Norwegian_Mothers_Day_Is_A_Sunday
+        Send AssertSAreEqual "2027-02-14" (YMD(Self, MothersDay(ghoCalendarHolidays, 2027, "NO"))) "Sunday 14 February 2027."
+    End_Procedure
+
+    // Argentina's Dia de la Madre is the third Sunday of October.
+    { Published=True }
+    Procedure Test_Argentine_Mothers_Day_Is_In_October
+        Send AssertSAreEqual "2026-10-18" (YMD(Self, MothersDay(ghoCalendarHolidays, 2026, "AR"))) "Sunday 18 October 2026."
+    End_Procedure
+
+    // Malawi's Mother's Day is the second Monday of October.
+    { Published=True }
+    Procedure Test_Malawi_Mothers_Day_Is_A_Monday
+        Send AssertSAreEqual "2026-10-12" (YMD(Self, MothersDay(ghoCalendarHolidays, 2026, "MW"))) "Monday 12 October 2026."
+    End_Procedure
+
+    // Kenya (last Sunday of June) and Russia (last Sunday of November) must come back without an error: the date
+    // is right today, but it is reached through 31 June / 31 November, which raises "invalid date" on every call.
+    // The result is "date|last error number"; 0 is no error.
+    { Published=True }
+    Procedure Test_Kenyan_Mothers_Day_Raises_No_Error
+        Date dDate
+        Move 0 to LastErr
+        Get MothersDay of ghoCalendarHolidays 2026 "KE" to dDate
+        Send AssertSAreEqual "2026-06-28|0" (YMD(Self, dDate) + "|" + String(LastErr)) "Sunday 28 June 2026, no error."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_Russian_Mothers_Day_Raises_No_Error
+        Date dDate
+        Move 0 to LastErr
+        Get MothersDay of ghoCalendarHolidays 2026 "RU" to dDate
+        Send AssertSAreEqual "2026-11-29|0" (YMD(Self, dDate) + "|" + String(LastErr)) "Sunday 29 November 2026, no error."
+    End_Procedure
+
+    // ---------------------------------------------------------------- official flags
+    // US federal holidays: Thanksgiving and Juneteenth (since 2021) are; Epiphany, Ascension Day and Whit Sunday
+    // are not.
+    { Published=True }
+    Procedure Test_US_Thanksgiving_Is_Official
+        Send AssertSAreEqual "official" (OfficialFlag(Self, 2026, 11, 26, "US")) "Thursday 26 November 2026."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_US_Juneteenth_Is_Official
+        Send AssertSAreEqual "official" (OfficialFlag(Self, 2026, 6, 19, "US")) "Friday 19 June 2026."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_US_Epiphany_Is_Not_Official
+        Send AssertSAreEqual "not official" (OfficialFlag(Self, 2026, 1, 6, "US")) "Tuesday 6 January 2026."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_US_Ascension_Day_Is_Not_Official
+        Send AssertSAreEqual "not official" (OfficialFlag(Self, 2026, 5, 14, "US")) "Thursday 14 May 2026."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_US_Whit_Sunday_Is_Not_Official
+        Send AssertSAreEqual "not official" (OfficialFlag(Self, 2026, 5, 24, "US")) "Sunday 24 May 2026."
+    End_Procedure
+
+    // Spain: New Year's Day and Epiphany are national holidays.
+    { Published=True }
+    Procedure Test_Spanish_New_Years_Day_Is_Official
+        Send AssertSAreEqual "official" (OfficialFlag(Self, 2026, 1, 1, "ES")) "1 January 2026."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_Spanish_Epiphany_Is_Official
+        Send AssertSAreEqual "official" (OfficialFlag(Self, 2026, 1, 6, "ES")) "6 January 2026."
+    End_Procedure
+
+    // ---------------------------------------------------------------- helpers
+    // DateGetDayName of a Sunday is the short name GetDayName gives day 7 (GetDayName counts from Monday).
+    { Published=True }
+    Procedure Test_DateGetDayName_Of_A_Sunday
+        Date dDate
+        String sSunday
+        Get DateSetDate of ghoCalendarHolidays 2026 11 15 to dDate
+        Get GetDayName of ghoCalendarHolidays 7 to sSunday
+        Send AssertSAreEqual sSunday (DateGetDayName(ghoCalendarHolidays, dDate)) "Sunday 15 November 2026."
+    End_Procedure
+
+    // IsDateAHoliday must leave the "enter a valid date" error as it found it, or the program stops reporting
+    // invalid dates typed in any form. The test puts it back itself so the tests after it are not affected.
+    { Published=True }
+    Procedure Test_IsDateAHoliday_Leaves_The_Valid_Date_Error_Trapped
+        Date dDate
+        Boolean bBefore bAfter bIsHoliday bFound
+        String sHolidayName sFunctionName
+        Get IsTrapped of (TrappedErrors(Error_Object_Id)) DFERR_ENTER_VALID_DATE to bBefore
+        Get DateSetDate of ghoCalendarHolidays 2026 12 25 to dDate
+        Get IsDateAHoliday of ghoCalendarHolidays dDate "SE" (&bIsHoliday) (&sHolidayName) (&sFunctionName) to bFound
+        Get IsTrapped of (TrappedErrors(Error_Object_Id)) DFERR_ENTER_VALID_DATE to bAfter
+        If (bBefore and not(bAfter)) Begin
+            Send Trap_Error to Error_Object_Id DFERR_ENTER_VALID_DATE
+        End
+        Send AssertSAreEqual (String(bBefore)) (String(bAfter)) "Trapped before and after the call."
+    End_Procedure
+
+    // ---- The issues found beside the 16 (2026-11-20) ----
+
+    { Published = True }
+    Procedure Test_UK_2020_Early_May_Bank_Holiday_Moved_To_VE_Day
+        Send AssertSAreEqual "2020-05-08" (YMD(Self, EarlyMayBH(ghoCalendarHolidays, 2020, "GB"))) "Friday 8 May 2020."
+    End_Procedure
+
+    { Published = True }
+    Procedure Test_UK_2022_Spring_Bank_Holiday_Moved_To_2_June
+        Send AssertSAreEqual "2022-06-02" (YMD(Self, MemorialDay(ghoCalendarHolidays, 2022, "GB"))) "Thursday 2 June 2022."
+    End_Procedure
+
+    { Published = True }
+    Procedure Test_UK_2022_Extra_Bank_Holidays
+        Send AssertSAreEqual "Platinum Jubilee Bank Holiday (UK)|official|State Funeral of Queen Elizabeth II (UK)|official" ;
+            (NameAndFlag(Self, 2022, 6, 3, "GB") + "|" + NameAndFlag(Self, 2022, 9, 19, "GB")) "3 June and 19 September 2022."
+    End_Procedure
+
+    { Published = True }
+    Procedure Test_UK_2023_Coronation_Bank_Holiday
+        Send AssertSAreEqual "Coronation of King Charles III (UK)|official" (NameAndFlag(Self, 2023, 5, 8, "GB")) "Monday 8 May 2023."
+    End_Procedure
+
+    // 2022: Christmas Day on a Sunday - Monday 26th is Boxing Day, Tuesday 27th the Christmas Day substitute.
+    { Published = True }
+    Procedure Test_UK_Christmas_On_A_Sunday
+        Send AssertSAreEqual "Boxing Day (UK)|official|Christmas Day Holiday (UK)|official" ;
+            (NameAndFlag(Self, 2022, 12, 26, "GB") + "|" + NameAndFlag(Self, 2022, 12, 27, "GB")) "26 and 27 December 2022."
+    End_Procedure
+
+    // 2021: Christmas Day on a Saturday - Monday 27th and Tuesday 28th.
+    { Published = True }
+    Procedure Test_UK_Christmas_On_A_Saturday
+        Send AssertSAreEqual "Christmas Day Holiday (UK)|official|Boxing Day Holiday (UK)|official" ;
+            (NameAndFlag(Self, 2021, 12, 27, "GB") + "|" + NameAndFlag(Self, 2021, 12, 28, "GB")) "27 and 28 December 2021."
+    End_Procedure
+
+    // Juneteenth 2027 is a Saturday: observed Friday 18 June. 2022 was a Sunday: observed Monday 20 June.
+    { Published = True }
+    Procedure Test_US_Juneteenth_Observed
+        Send AssertSAreEqual "Juneteenth (observed)|official|Juneteenth (observed)|official" ;
+            (NameAndFlag(Self, 2027, 6, 18, "US") + "|" + NameAndFlag(Self, 2022, 6, 20, "US")) "18 June 2027 and 20 June 2022."
+    End_Procedure
+
+    { Published = True }
+    Procedure Test_Dutch_Liberation_Day_Is_Official
+        Send AssertSAreEqual "official" (OfficialFlag(Self, 2026, 5, 5, "NL")) "5 May 2026."
+    End_Procedure
+
+    // Sweden: Whit Monday was a public holiday until 2004, the National Day from 2005.
+    { Published = True }
+    Procedure Test_Swedish_Whit_Monday_And_National_Day_Before_And_After_2005
+        Send AssertSAreEqual "official|not official|not official|official" ;
+            (OfficialFlag(Self, 2004, 5, 31, "SE") + "|" + OfficialFlag(Self, 2004, 6, 6, "SE") + "|" + ;
+             OfficialFlag(Self, 2026, 5, 25, "SE") + "|" + OfficialFlag(Self, 2026, 6, 6, "SE")) "Whit Monday 2004, 6 June 2004, Whit Monday 2026, 6 June 2026."
+    End_Procedure
+
+    // UKNationalDay reads the month and day from the date, in any date format.
+    { Published = True }
+    Procedure Test_UK_National_Day_Text_Is_MMDD
+        Send AssertSAreEqual "0613" (UKNationalDay(ghoCalendarHolidays, 2026)) "Saturday 13 June 2026."
+    End_Procedure
+
+End_Object

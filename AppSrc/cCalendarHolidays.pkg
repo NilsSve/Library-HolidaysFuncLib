@@ -235,6 +235,10 @@ Class cCalendarHolidays is a cObject
         If (Err = False and bFound = True and sISO_Short <> "") Begin
             Get HolidayName dInDate sISO_Short (&bIsHoliday) to sHolidayName
         End
+        // Back on, as it was: ignored, it would stay off for every date typed in the program afterwards.
+        If (bWasTrappd) Begin
+            Send Trap_Error to Error_Object_Id DFERR_ENTER_VALID_DATE
+        End
 
         Move (Err = False and LastErr <> DFERR_ENTER_VALID_DATE and String(dDate) <> "") to bFound
         Move bErr to Err
@@ -623,7 +627,7 @@ Class cCalendarHolidays is a cObject
     Function DateGetDayName DateTime dtDate Returns String
         Integer iWeekday 
         String sDay
-        Move (DateGetDayofWeek(dtDate)) to iWeekday
+        Get DateGetISODayOfWeek dtDate to iWeekday  // 1 = Monday, as GetDayName counts.
         Get GetDayName iWeekday to sDay
         Function_Return sDay
     End_Function
@@ -1067,19 +1071,16 @@ Class cCalendarHolidays is a cObject
             Move (6 + dDate) to dDate
         End
         // Else if iDayNumber is less then Saturday, add number of days to next Saturday.
-        Else If (iDayNumber < 5) Begin
+        Else If (iDayNumber < 6) Begin
             Move ((6 - iDayNumber) + dDate) to dDate
         End
     
         // Add the second week.
         Move (dDate + 7) to dDate
     
-        // And get the month and day.
-        Get_Attribute DF_DATE_FORMAT to iDateFormat
-        Set_Attribute DF_DATE_FORMAT to DF_DATE_USA
-        Move (Left(dDate, 2))        to sMonth
-        Move (Mid(dDate, 2, 4))      to sDay
-        Set_Attribute DF_DATE_FORMAT to iDateFormat // Reset date format.
+        // The month and day, read from the date itself - no switch of the global date format, no text cut-up.
+        Move (Right("0" + String(DateGetMonth(dDate)), 2)) to sMonth
+        Move (Right("0" + String(DateGetDay(dDate)), 2))   to sDay
     
         Function_Return (String(sMonth) + String(sDay))
     End_Function

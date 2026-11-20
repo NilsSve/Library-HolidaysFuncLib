@@ -168,9 +168,10 @@ Object oSwedishHolidays is a cNationalHolidays
             Function_Return "20:e Knut (Julgransplundring)"
         End
         
+        // A public holiday since 2005, when it replaced Whit Monday (Annandag pingst).
         Get NationalDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
+            Move (iYear >= 2005) to bOfficialHoliday
             Function_Return "Sveriges nationaldag"
         End
 
@@ -209,9 +210,10 @@ Object oSwedishHolidays is a cNationalHolidays
             Function_Return "Pingstdagen"
         End
 
+        // A public holiday until 2004; the National Day (6 June) replaced it in 2005.
         Get WhitMonday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
+            Move (iYear < 2005) to bOfficialHoliday
             Function_Return "Annandag Pingst"
         End
 

@@ -97,6 +97,31 @@ Object oBrittishHolidays is a cNationalHolidays
             End
         End
 
+        // **************************************************
+        // Special holidays for 2022: the Platinum Jubilee (the Spring bank holiday moved to 2nd June), and the
+        // state funeral of Queen Elizabeth II.
+        //
+        If (iYear = 2022) Begin
+            If (DateGetDay(dInDate) = 3 and DateGetMonth(dInDate) = 6) Begin
+                Move 8 to iBankHoliday
+                Function_Return "Platinum Jubilee Bank Holiday (UK)"
+            End
+            If (DateGetDay(dInDate) = 19 and DateGetMonth(dInDate) = 9) Begin
+                Move 8 to iBankHoliday
+                Function_Return "State Funeral of Queen Elizabeth II (UK)"
+            End
+        End
+
+        // **************************************************
+        // Special holidays for 2023: the coronation of King Charles III.
+        //
+        If (iYear = 2023) Begin
+            If (DateGetDay(dInDate) = 8 and DateGetMonth(dInDate) = 5) Begin
+                Move 8 to iBankHoliday
+                Function_Return "Coronation of King Charles III (UK)"
+            End
+        End
+
         // *** Bank holidays ***
 
         // New Year's Day - 1st January.  But if that is a Saturday or Sunday the
@@ -424,12 +449,12 @@ Object oBrittishHolidays is a cNationalHolidays
             Function_Return "National Day"
         End
 
-        If ((DateGetMonth(dInDate) = 2) and (DateGetDay(dInDate) = 1)) Begin // 1 of March.
+        If ((DateGetMonth(dInDate) = 3) and (DateGetDay(dInDate) = 1)) Begin // 1 of March.
             Move 0 to iBankHoliday
             Function_Return "St David's Day (Wales)"
         End
 
-        If ((DateGetMonth(dInDate) = 2) and (DateGetDay(dInDate) = 17)) Begin // 17 of March.
+        If ((DateGetMonth(dInDate) = 3) and (DateGetDay(dInDate) = 17)) Begin // 17 of March.
             Move 0 to iBankHoliday
             Function_Return "St Patrick's Day (Northern Ireland)"
         End

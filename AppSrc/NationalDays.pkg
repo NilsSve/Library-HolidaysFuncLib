@@ -516,11 +516,20 @@ Function NationalDay Integer iYear String sISO_Short Returns Date
             Move "0707" to sDate
             Case Break
         Case (sISO_Short = "NL") // Netherlands
+            // Koningsdag (from 2014) on a Sunday is kept on the Saturday before; so was Koninginnedag from 1980.
             If (iYear <= 2013) Begin
                 Move "0430" to sDate
+                Get DateSetDate iYear 4 30 to dReturn
+                If (iYear >= 1980 and DateGetISODayOfWeek(Self, dReturn) = 7) Begin
+                    Move "0429" to sDate
+                End
             End
             Else Begin
                 Move "0427" to sDate
+                Get DateSetDate iYear 4 27 to dReturn
+                If (DateGetISODayOfWeek(Self, dReturn) = 7) Begin
+                    Move "0426" to sDate
+                End
             End
             Case Break
         Case (sISO_Short = "AN") // Netherlands Antilles

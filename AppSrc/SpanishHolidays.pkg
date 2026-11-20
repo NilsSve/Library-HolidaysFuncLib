@@ -70,7 +70,7 @@ Object oSpanishHolidays is a cNationalHolidays
 
         Get NewYearsDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
-            Move 0 to bOfficialHoliday
+            Move 1 to bOfficialHoliday
             Function_Return "Año Nuevo"
         End
 
@@ -82,7 +82,7 @@ Object oSpanishHolidays is a cNationalHolidays
 
         Get Epiphany of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
-            Move 0 to bOfficialHoliday
+            Move 1 to bOfficialHoliday
             Function_Return "Epifanía del Señor"
         End
 

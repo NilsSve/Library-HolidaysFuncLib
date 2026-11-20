@@ -108,7 +108,7 @@ Object oAmericanHolidays is a cNationalHolidays
 
         Get Epiphany of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
+            Move False to bOfficialHoliday
             Function_Return "Twelfthday (Epiphany)"
         End
 
@@ -167,6 +167,21 @@ Object oAmericanHolidays is a cNationalHolidays
             Function_Return "Independence Day"
         End
 
+        // Juneteenth National Independence Day, the 19th of June: a federal holiday since 2021. On a Saturday it is
+        // observed on the Friday before, on a Sunday on the Monday after.
+        If (iYear >= 2021 and DateGetMonth(dInDate) = 6) Begin
+            If (DateGetDay(dInDate) = 19) Begin
+                Move True to bOfficialHoliday
+                Function_Return "Juneteenth"
+            End
+            Get DateSetDate of ghoCalendarHolidays iYear 6 19 to dHolidayDate
+            If ((DateGetISODayOfWeek(ghoCalendarHolidays, dHolidayDate) = 6 and dInDate = (dHolidayDate - 1)) or ;
+                (DateGetISODayOfWeek(ghoCalendarHolidays, dHolidayDate) = 7 and dInDate = (dHolidayDate + 1))) Begin
+                Move True to bOfficialHoliday
+                Function_Return "Juneteenth (observed)"
+            End
+        End
+
         // *** New 2010-03-30 NGS ***
         // This is an example on how to add a 'holiday'
         // for any special day that you might
@@ -201,7 +216,7 @@ Object oAmericanHolidays is a cNationalHolidays
 
         Get ThanksGiving of ghoCalendarHolidays iYear sISO_Short  to dHolidayDate
         If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
+            Move True to bOfficialHoliday
             Function_Return "Thanksgiving Day"
         End
 
@@ -219,13 +234,13 @@ Object oAmericanHolidays is a cNationalHolidays
 
         Get AscensionDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
+            Move False to bOfficialHoliday
             Function_Return "Ascension Day"
         End
 
         Get WhitSunday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
         If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
+            Move False to bOfficialHoliday
             Function_Return "Whit Sunday"
         End
 

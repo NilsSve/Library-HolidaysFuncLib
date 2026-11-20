@@ -910,9 +910,10 @@ Function LastSundayJune Integer iYear Returns Date
     Date dReturn
     Integer iDayNumber
 
-    Get DateSetDate iYear 6 31 to dReturn
+    // From the 30th of June back to a Sunday: 0 to 6 days.
+    Get DateSetDate iYear 6 30 to dReturn
     Get DateGetISODayOfWeek dReturn to iDayNumber
-    Move (dReturn - iDayNumber) to dReturn
+    Move (dReturn - Mod(iDayNumber, 7)) to dReturn
 
     Function_Return dReturn
 End_Function
@@ -924,13 +925,13 @@ Function SecondMondayOctober Integer iYear Returns Date
 
     Get DateSetDate iYear 10 1 to dReturn
     Get DateGetISODayOfWeek dReturn to iDayNumber
-    // If iDayNumber < Monday, add number of days to first Monday.
-    If (iDayNumber < 6) Begin
-        Move ((7 - iDayNumber) + dReturn) to dReturn
+    // If iDayNumber is after Monday, add number of days to the first Monday (ISO: 1 = Monday).
+    If (iDayNumber > 1) Begin
+        Move ((8 - iDayNumber) + dReturn) to dReturn
     End
 
     // Add another week.
-    Move (dReturn + 7) to dReturn // Second Sunday.
+    Move (dReturn + 7) to dReturn // Second Monday.
     Function_Return dReturn
 End_Function
     
@@ -939,8 +940,8 @@ Function ThirdSundayOctober Integer iYear Returns Date
     Date dReturn
     Integer iDayNumber
 
-    // Start with the 1st of June.
-    Get DateSetDate iYear 6 1 to dReturn
+    // Start with the 1st of October.
+    Get DateSetDate iYear 10 1 to dReturn
     Get DateGetISODayOfWeek dReturn to iDayNumber
     // If iDayNumber < Sunday, add number of days to first Sunday.
     If (iDayNumber < 7) Begin
@@ -957,9 +958,10 @@ Function LastSundayNovember Integer iYear Returns Date
     Date dReturn
     Integer iDayNumber
 
-    Get DateSetDate iYear 11 31 to dReturn
+    // From the 30th of November back to a Sunday: 0 to 6 days.
+    Get DateSetDate iYear 11 30 to dReturn
     Get DateGetISODayOfWeek dReturn to iDayNumber
-    Move (dReturn - iDayNumber) to dReturn
+    Move (dReturn - Mod(iDayNumber, 7)) to dReturn
     Function_Return dReturn
 End_Function
 
@@ -979,13 +981,9 @@ Function NorwayMothersDay Integer iYear Returns Date
     // ***
     Get DateGetISODayOfWeek dReturn to iDayNumber
 
-    // If iDayNumber = Sunday, do nothing.
-    If (iDayNumber = 7) Begin
-        Move (0 + dReturn) to dReturn
-    End
-    // Else if iDayNumber is less then Sunday, add number of days to next Sunday.
-    Else If (iDayNumber < 5) Begin
-        Move ((6 - iDayNumber) + dReturn) to dReturn
+    // If iDayNumber is less then Sunday, add number of days to the first Sunday; a Sunday stays.
+    If (iDayNumber < 7) Begin
+        Move ((7 - iDayNumber) + dReturn) to dReturn
     End
     // Add the second week.
     Move (dReturn + 7) to dReturn

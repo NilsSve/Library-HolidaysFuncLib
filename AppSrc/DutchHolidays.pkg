@@ -145,8 +145,9 @@ Object oDutchHolidays is a cNationalHolidays
             Function_Return "Dodenherdenking"             // Memorial Day in The Netherlands
         End
 
+        // A national holiday by law (Algemene termijnenwet); whether it is a day off is up to the employer.
         If ((DateGetMonth(dInDate) = 5) and (DateGetDay(dInDate) = 5)) Begin // 5th of May.
-            Move False to bOfficialHoliday
+            Move True to bOfficialHoliday
             Function_Return "Bevrijdingsdag"              // Liberation Day in The Netherlands
         End
 

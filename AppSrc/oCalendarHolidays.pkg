@@ -88,7 +88,7 @@ Object oCalendarHolidays is a cCalendarHolidays
                 Move (6 + dReturn) to dReturn
             End
             // Else if iDayNumber is less then Saturday, add number of days to next Saturday.
-            Else If (iDayNumber < 5) Begin
+            Else If (iDayNumber < 6) Begin
                 Move ((6 - iDayNumber) + dReturn) to dReturn
             End
             // Else the iDayNumber was = 6 which is the Saturday.
@@ -376,11 +376,11 @@ Object oCalendarHolidays is a cCalendarHolidays
             Get DateSetDate iYear 1 1 to dReturn
             Get DateGetISODayOfWeek dReturn to iDayNumber
     
-            // If iDayNumber is greater then Monday, add number of days to next Monday.
-            If (DateGetDayOfWeek(dReturn) > 1) Begin
+            // If iDayNumber is greater then Monday, add number of days to next Monday (ISO: 1 = Monday).
+            If (iDayNumber > 1) Begin
                 Move ((8 - iDayNumber) + dReturn) to dReturn
             End
-    
+
             // Add two more weeks to get the third Monday.
             Move (dReturn + 14) to dReturn
         End
@@ -418,38 +418,38 @@ Object oCalendarHolidays is a cCalendarHolidays
     { Description  = """
       May Day Bank Holiday.
       Brittish holiday on the first Monday in May.
-      In the year 2012 this date is moved to June 4 to mark the Queen's
-      diamond jubilee and an extra bank holiday added on June 5 (GB).
+      In 2012 it stayed on May 7: the Spring bank holiday (MemorialDay, GB) moved to June 4 to mark
+      the Queen's diamond jubilee, and an extra bank holiday was added on June 5 (GB).
+      In 2020 it moved to Friday May 8, the 75th anniversary of VE Day.
       """ }
     Function MayBankDay Integer iYear String sISO_Short Returns Date
         Date dReturn
         Integer iDayNumber
 
         If (sISO_Short = "GB") Begin
-            If (iYear <> 2012) Begin
-                // Start with the 1st of May and find the first Monday.
-                Get DateSetDate iYear 5 1 to dReturn
-                Get DateGetISODayOfWeek dReturn to iDayNumber
-    
-                // If iDayNumber is greater then Monday, add number of days to first Monday.
-                If (iDayNumber > 1) Begin
-                    Move ((8- iDayNumber) + dReturn) to dReturn
-                End
+            // Start with the 1st of May and find the first Monday.
+            Get DateSetDate iYear 5 1 to dReturn
+            Get DateGetISODayOfWeek dReturn to iDayNumber
+
+            // If iDayNumber is greater then Monday, add number of days to first Monday.
+            If (iDayNumber > 1) Begin
+                Move ((8- iDayNumber) + dReturn) to dReturn
             End
-    
-            // Special handling 2012 due to Queens jubilee.
-            Else If (iYear = 2012) Begin
-                Get DateSetDate iYear 6 4 to dReturn
+            // 2020: moved to Friday 8 May for VE Day's 75th anniversary.
+            If (iYear = 2020) Begin
+                Get DateSetDate iYear 5 8 to dReturn
             End
         End
 
         Function_Return dReturn
     End_Function
 
-    { Published = True } 
+    { Published = True }
     { Description  = """
-      In the year 2012 the MayBankDay date is moved to June 4 to mark the Brittish Queen's
-      diamond jubilee and an extra bank holiday is added on June 5 (GB).
+      An extra UK bank holiday of one year (GB): June 5 2012, the Queen's diamond jubilee (the Spring bank
+      holiday moved to June 4); June 3 2022, the platinum jubilee (the Spring bank holiday moved to June 2);
+      May 8 2023, the coronation of King Charles III. 2022 had a second one, the Queen's state funeral on
+      September 19 - see the GB HolidayName. Other years return no date.
       """ }
     Function ExtraBankHoliday Integer iYear String sISO_Short Returns Date
         Date dReturn
@@ -458,6 +458,12 @@ Object oCalendarHolidays is a cCalendarHolidays
         If (sISO_Short = "GB") Begin
             If (iYear = 2012) Begin
                 Get DateSetDate iYear 6 5 to dReturn
+            End
+            Else If (iYear = 2022) Begin
+                Get DateSetDate iYear 6 3 to dReturn
+            End
+            Else If (iYear = 2023) Begin
+                Get DateSetDate iYear 5 8 to dReturn
             End
         End
         
@@ -474,17 +480,10 @@ Object oCalendarHolidays is a cCalendarHolidays
         Integer iDayNumber
 
         If (sISO_Short = "GB") Begin
-            // Start with the 1st of August and find the first Monday.
-            Get DateSetDate iYear 8 1 to dReturn
-            Get DateGetISODayOfWeek dReturn to iDayNumber
-    
-            // If iDayNumber is greater then Monday, add number of days to first Monday.
-            If (iDayNumber > 1) Begin
-                Move ((8- iDayNumber) + dReturn) to dReturn
-            End
-    
-            // Add three more weeks to get the forth Monday.
-            Move (dReturn + 21) to dReturn
+            // From the 31st of August back to a Monday: 0 to 6 days (an August can have five Mondays).
+            Get DateSetDate iYear 8 31 to dReturn
+            Get DateGetISODayOfWeek dReturn to iDayNumber  // 1=Monday.
+            Move (dReturn - (iDayNumber - 1)) to dReturn
         End
 
         Function_Return dReturn
@@ -493,7 +492,8 @@ Object oCalendarHolidays is a cCalendarHolidays
     { Published = True } 
     { Description  = """
       Memorial Day is the last Monday in May.
-      Holiday in the US.
+      Holiday in the US. In GB the same Monday is the Spring Bank Holiday - which moved to June 4 in 2012
+      for the Queen's diamond jubilee, and to Thursday June 2 in 2022 for the platinum jubilee.
       """ }
     Function MemorialDay Integer iYear String sISO_Short Returns Date
         Date dReturn
@@ -505,6 +505,13 @@ Object oCalendarHolidays is a cCalendarHolidays
             Get DateSetDate iYear 5 31 to dReturn
             Get DateGetISODayOfWeek dReturn to iDayNumber  // 1=Monday.
             Move (dReturn - (iDayNumber - 1)) to dReturn
+            // 2012 and 2022: the Spring bank holiday moved for the Queen's diamond and platinum jubilees (GB).
+            If (sISO_Short = "GB" and iYear = 2012) Begin
+                Get DateSetDate iYear 6 4 to dReturn
+            End
+            If (sISO_Short = "GB" and iYear = 2022) Begin
+                Get DateSetDate iYear 6 2 to dReturn
+            End
         End
 
         Function_Return dReturn
@@ -515,7 +522,7 @@ Object oCalendarHolidays is a cCalendarHolidays
       Father's Day falls mostly on the second Sunday in June, but it differs for many countries.
       In Sweden it falls on the second Sunday of November
       In Denmark it is fixed and always falls on the fifth of June.
-      In Austria and New Zealand it falls on the first Sunday of September
+      In Australia and New Zealand it falls on the first Sunday of September
       In Germany it is celebrated on Ascension Day (forty days after Easter)
       In Brazil it falls on the second Sunday of August
       In Argentina,United Kingdom, Netherlands and United States it falls on the third Sunday in June.
@@ -538,7 +545,7 @@ Object oCalendarHolidays is a cCalendarHolidays
             Function_Return dReturn
         End
 
-        Else If (sISO_Short = "AT" or sISO_Short = "NZ") Begin
+        Else If (sISO_Short = "AU" or sISO_Short = "NZ") Begin
             Get DateSetDate iYear 9 1 to dReturn
             // Adjust for the addition of seven days below.
             Move (dReturn -7) to dReturn
@@ -566,7 +573,8 @@ Object oCalendarHolidays is a cCalendarHolidays
         // Add another week.
         Move (dReturn + 7) to dReturn // Second Sunday.
         
-        If (sISO_Short = "AR" or sISO_Short = "UK" or sISO_Short = "NL" or sISO_Short = "US") Begin
+        // "GB" is the library's code for the United Kingdom; "UK" is still accepted.
+        If (sISO_Short = "AR" or sISO_Short = "GB" or sISO_Short = "UK" or sISO_Short = "NL" or sISO_Short = "US") Begin
             Move (7 + dReturn) to dReturn
         End
 
@@ -642,7 +650,7 @@ Object oCalendarHolidays is a cCalendarHolidays
                 Move (6 + dReturn) to dReturn
             End
             // Else if iDayNumber is less then Saturday, add number of days to next Saturday.
-            Else If (iDayNumber < 5) Begin
+            Else If (iDayNumber < 6) Begin
                 Move ((6 - iDayNumber) + dReturn) to dReturn
             End
             // Else the iDayNumber was = 6 which is the Saturday.
@@ -989,7 +997,7 @@ Object oCalendarHolidays is a cCalendarHolidays
     End_Function
 
     { Published = True } 
-    { Description = "20:e Knut - Always falls on 20th of January." }
+    { Description = "20:e Knut - the twentieth day of Christmas, counted from Christmas Eve: always the 13th of January." }
     Function TwentiethKnut Integer iYear Returns Date
         Date dReturn
         Get ChristmasEve (iYear -1) to dReturn
@@ -1010,7 +1018,7 @@ Object oCalendarHolidays is a cCalendarHolidays
             Move (6 + dReturn) to dReturn
         End
         // Else if iDayNumber is less then Saturday, add number of days to next Saturday.
-        Else If (iDayNumber < 5) Begin
+        Else If (iDayNumber < 6) Begin
             Move ((6 - iDayNumber) + dReturn) to dReturn
         End
         Function_Return dReturn
@@ -1056,7 +1064,7 @@ Object oCalendarHolidays is a cCalendarHolidays
             Move (6 + dReturn) to dReturn
         End
         // Else if iDayNumber is less then Saturday, add number of days to next Saturday.
-        Else If (iDayNumber < 5) Begin
+        Else If (iDayNumber < 6) Begin
             Move ((6 - iDayNumber) + dReturn) to dReturn
         End
         // Add 1 weeks.
@@ -1078,7 +1086,7 @@ Object oCalendarHolidays is a cCalendarHolidays
             Move (6 + dReturn) to dReturn
         End
         // Else if iDayNumber is less then Saturday, add number of days to next Saturday.
-        Else If (iDayNumber < 5) Begin
+        Else If (iDayNumber < 6) Begin
             Move ((6 - iDayNumber) + dReturn) to dReturn
         End
         // Add 1 weeks.
@@ -1087,7 +1095,7 @@ Object oCalendarHolidays is a cCalendarHolidays
     End_Function
 
     { Published = True }
-    { Description = "Christmas Day bank holiday - the Monday following Christmas Day if the latter is at a weekend. (GB)" }
+    { Description = "Christmas Day bank holiday - the Monday after a Saturday Christmas Day, the Tuesday after a Sunday one: Monday 26th is then Boxing Day itself. (GB)" }
     Function ChristmasDayBH Integer iYear String sISO_Short Returns Date
         Integer iDayOfWeek
         Date    dDate
@@ -1102,7 +1110,7 @@ Object oCalendarHolidays is a cCalendarHolidays
                 Move (dDate + 2) to dDate      // Saturday
             End
             Else If (iDayOfWeek = 1) Begin
-                Move (dDate + 1) to dDate      // Sunday
+                Move (dDate + 2) to dDate      // Sunday: Monday 26th is Boxing Day, so Tuesday 27th.
             End
         End
 
@@ -1111,8 +1119,8 @@ Object oCalendarHolidays is a cCalendarHolidays
 
     { Published = True }
     { Description = """
-      Boxing Day bank holiday - the Monday (if Boxing Day is on a Saturday) or Tuesday 
-      (if on a Sunday) following. (GB)
+      Boxing Day bank holiday - the Monday (if Boxing Day is on a Saturday) or Tuesday
+      (if on a Sunday) following. On a Monday it stays: the Christmas Day substitute is the Tuesday. (GB)
       """ }
     Function BoxingDayBH Integer iYear String sISO_Short Returns Date
         Integer iDayOfWeek
@@ -1124,13 +1132,10 @@ Object oCalendarHolidays is a cCalendarHolidays
             Move (DateSetMonth(dDate,12))   to dDate
             Move (DateSetYear(dDate,iYear)) to dDate
             Move (DateGetDayOfWeek(dDate))  to iDayOfWeek
-            // If it falls on a Saturday move it to the Monday
-            // If it falls on a Sunday or Monday move it to the Tuesday (Monday will be the Christmas Day BH)
-            If      (iDayOfWeek = 7 or iDayOfWeek = 1) Begin
+            // On a Saturday it moves to the Monday, on a Sunday to the Tuesday. On a Monday (Christmas on a Sunday)
+            // it stays - the Christmas Day substitute is then the Tuesday, as gov.uk lists it.
+            If (iDayOfWeek = 7 or iDayOfWeek = 1) Begin
                 Move (dDate + 2) to dDate   // Saturday or Sunday
-            End
-            Else If (iDayOfWeek = 2) Begin
-                Move (dDate + 1) to dDate   // Monday
             End
         End
 
@@ -1220,37 +1225,32 @@ Object oCalendarHolidays is a cCalendarHolidays
     { Description = """
       Early May Bank Holiday.
       The first Monday in May.
-      In the year 2012 this date is moved to June 4 to mark the Queen's
-      diamond jubilee and an extra bank holiday added on June 5 (GB).
+      In 2012 it stayed on May 7: the Spring bank holiday (MemorialDay, GB) moved to June 4 to mark
+      the Queen's diamond jubilee, and an extra bank holiday was added on June 5 (GB).
+      In 2020 it moved to Friday May 8, the 75th anniversary of VE Day.
       """ }
     Function EarlyMayBH Integer iYear String sISO_Short Returns Date
         Integer iDayOfWeek
         Date    dDate
 
-        If (sISO_Short = "GB") Begin        
-            If (iYear <> 2012) Begin
-                // Start with the 1st of May and find the first Monday.
-                Move "1/1/1" to dDate
-                Move (DateSetMonth(dDate,5))    to dDate
-                Move (DateSetYear(dDate,iYear)) to dDate
-                Move (DateGetDayOfWeek(dDate))  to iDayOfWeek
-                If (iDayOfWeek = 1) Begin
-                    Add 1                to dDate   // Sunday
-                End
-                If (iDayOfWeek > 2) Begin
-                    Add (9 - iDayOfWeek) to dDate
-                End
+        If (sISO_Short = "GB") Begin
+            // Start with the 1st of May and find the first Monday.
+            Move "1/1/1" to dDate
+            Move (DateSetMonth(dDate,5))    to dDate
+            Move (DateSetYear(dDate,iYear)) to dDate
+            Move (DateGetDayOfWeek(dDate))  to iDayOfWeek
+            If (iDayOfWeek = 1) Begin
+                Add 1                to dDate   // Sunday
             End
-    
-            // Special handling for 2012 for Queen's jubilee.
-            Else If (iYear = 2012) Begin
-                Move "1/1/1" to dDate
-                Move (DateSetDay(dDate,4))      to dDate
-                Move (DateSetMonth(dDate,6))    to dDate
-                Move (DateSetYear(dDate,iYear)) to dDate
+            If (iDayOfWeek > 2) Begin
+                Add (9 - iDayOfWeek) to dDate
+            End
+            // 2020: moved to Friday 8 May for VE Day's 75th anniversary.
+            If (iYear = 2020) Begin
+                Get DateSetDate iYear 5 8 to dDate
             End
         End
-        
+
         Function_Return dDate
     End_Function
 
@@ -1340,14 +1340,14 @@ Object oCalendarHolidays is a cCalendarHolidays
     End_Function
 
     { Published = True }
-    { Description = "Remembrance Sunday - the first Sunday on or after 11th November (GB)." }
+    { Description = "Remembrance Sunday - the second Sunday of November, the first Sunday on or after 8th November (GB)." }
     Function RemembranceSunday Integer iYear String sISO_Short Returns Date
         Integer iDayOfWeek
         Date dDate
 
         If (sISO_Short = "GB") Begin
             Move "1/1/1" to dDate
-            Move (DateSetDay(dDate,11))     to dDate
+            Move (DateSetDay(dDate,8))      to dDate
             Move (DateSetMonth(dDate,11))   to dDate
             Move (DateSetYear(dDate,iYear)) to dDate
             Move (DateGetDayOfWeek(dDate))  to iDayOfWeek
