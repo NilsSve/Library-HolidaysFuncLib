@@ -17,5 +17,6 @@ Object oWorkspace_Tests is a cTestFixture
     // *** Test files below - one Use line per subject: ***
     Use oCalendarHolidays-Tests.pkg
     Use oHolidayRules-Tests.pkg
+    Use oWorkingDays-Tests.pkg
 
 End_Object

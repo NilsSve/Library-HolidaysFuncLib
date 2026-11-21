@@ -33,6 +33,17 @@
 //
 Use cNationalHolidays.pkg
 
+// The regions of the UK bank holidays (2026-11-21). They are the bits HolidayName returns in iBankHoliday, and the
+// values for ghoCalendarHolidays' piHolidayRegion, which tells the working-day functions (IsWorkingDay,
+// AddWorkingDays, WorkingDaysBetween) whose bank holidays are days off:
+//     Set piHolidayRegion of ghoCalendarHolidays to CI_UKRegionScotland
+// 0, the default, is England and Wales. A bank holiday of the whole UK is a day off in every region.
+Define CI_UKRegionEnglandWales    for 1
+Define CI_UKRegionScotland        for 2
+Define CI_UKRegionNorthernIreland for 4
+Define CI_UKRegionAny             for 7   // a bank holiday in any part of the UK is a day off
+Define CI_UKBankHolidayAllRegions for 8   // the bit HolidayName gives a bank holiday of the whole UK
+
 Object oBrittishHolidays is a cNationalHolidays
 
     // A 2-character ISO_Short string, according to the list:
@@ -500,6 +511,24 @@ Object oBrittishHolidays is a cNationalHolidays
         End
 
         Function_Return sHolidayName
+    End_Function
+
+    // Is the date a bank holiday - a day off by law - in the region? Asked by the working-day functions of
+    // cCalendarHolidays (IsWorkingDay), with its piHolidayRegion: one or more CI_UKRegion* bits, 0 for England and
+    // Wales. A bank holiday of the whole UK is a day off in every region.
+    Function IsOfficialDayOff Date dDate Integer iRegion Returns Boolean
+        Integer iBankHoliday
+        String sName
+
+        If (iRegion = 0) Begin
+            Move CI_UKRegionEnglandWales to iRegion
+        End
+        Move 0 to iBankHoliday
+        Get HolidayName dDate (&iBankHoliday) to sName
+        If ((iBankHoliday iand CI_UKBankHolidayAllRegions) <> 0) Begin
+            Function_Return True
+        End
+        Function_Return ((iBankHoliday iand iRegion) <> 0)
     End_Function
 
 End_Object

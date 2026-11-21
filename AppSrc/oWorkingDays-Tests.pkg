@@ -1,0 +1,181 @@
+// oWorkingDays-Tests.pkg - IsWorkingDay, AddWorkingDays and WorkingDaysBetween (2026-11-21).
+//
+// The holiday weeks of December 2026 in Great Britain carry most of it: Christmas Day is a Friday, Boxing Day a
+// Saturday, so its bank holiday moves to Monday 28 December, and New Year's Day 2027 is a Friday again. Counting
+// across them tests the weekend, the official holidays and a substitute day at once.
+//
+// Dates are compared as "yyyy-mm-dd" text and made with DateSetDate: a date literal would be read in the date
+// format of the machine that runs the tests. Every test puts the weekend mask and the closure days back.
+Use DFUnit\Fixturing\Fixture.pkg
+Use oCalendarHolidays.pkg
+
+Object oWorkingDays_Tests is a cTestFixture
+    Set psTestFixtureName to "Working days"
+
+    // A date as yyyy-mm-dd, whatever the date format of the machine.
+    Function YMD Date dDate Returns String
+        Integer iMonth iDay
+        Move (DateGetMonth(dDate)) to iMonth
+        Move (DateGetDay(dDate))   to iDay
+        Function_Return (String(DateGetYear(dDate)) + "-" + Right(("0" + String(iMonth)), 2) + "-" + Right(("0" + String(iDay)), 2))
+    End_Function
+
+    Function D Integer iYear Integer iMonth Integer iDay Returns Date
+        Date dDate
+        Get DateSetDate of ghoCalendarHolidays iYear iMonth iDay to dDate
+        Function_Return dDate
+    End_Function
+
+    Function Working Integer iYear Integer iMonth Integer iDay String sISO_Short Returns Boolean
+        Boolean bWorking
+        Get IsWorkingDay of ghoCalendarHolidays (D(Self, iYear, iMonth, iDay)) sISO_Short to bWorking
+        Function_Return bWorking
+    End_Function
+
+    // The defaults: Saturday and Sunday off, no closure days.
+    Procedure ResetWorkingDays
+        Date[] adNone
+        Set psWeekendMask of ghoCalendarHolidays to "0000011"
+        Set padClosedDays of ghoCalendarHolidays to adNone
+        Set piHolidayRegion of ghoCalendarHolidays to 0
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_Weekend_Days_Are_Not_Working_Days
+        Send ResetWorkingDays
+        Send AssertFalse (Working(Self, 2026, 11, 21, "")) "Saturday 21 November 2026."
+        Send AssertFalse (Working(Self, 2026, 11, 22, "")) "Sunday 22 November 2026."
+        Send Assert (Working(Self, 2026, 11, 23, "")) "Monday 23 November 2026."
+    End_Procedure
+
+    // Official holidays are days off in their country; a special day that is not official is a working day.
+    { Published=True }
+    Procedure Test_Official_Holidays_Are_Not_Working_Days
+        Send ResetWorkingDays
+        Send AssertFalse (Working(Self, 2026, 12, 25, "GB")) "Christmas Day, GB."
+        Send AssertFalse (Working(Self, 2026, 12, 25, "US")) "Christmas Day, US."
+        Send AssertFalse (Working(Self, 2026, 11, 26, "US")) "Thanksgiving 2026, US."
+        Send Assert (Working(Self, 2026, 11, 26, "GB")) "Thanksgiving is not a holiday in GB."
+        Send Assert (Working(Self, 2026, 12, 25, ""))   "No country: holidays are left out."
+    End_Procedure
+
+    // Boxing Day 2026 is a Saturday; its bank holiday is Monday 28 December.
+    { Published=True }
+    Procedure Test_A_Substitute_Bank_Holiday_Is_Not_A_Working_Day
+        Send ResetWorkingDays
+        Send AssertFalse (Working(Self, 2026, 12, 28, "GB")) "Monday 28 December 2026, GB."
+        Send Assert (Working(Self, 2026, 12, 29, "GB")) "Tuesday 29 December 2026, GB."
+    End_Procedure
+
+    // Christmas Eve is a special day in Sweden, not an official holiday - so by the library it is a working day.
+    // A company that closes then lists it in padClosedDays.
+    { Published=True }
+    Procedure Test_A_Closure_Day_Is_Not_A_Working_Day
+        Date[] adClosed
+        Send ResetWorkingDays
+        Send Assert (Working(Self, 2026, 12, 24, "SE")) "Christmas Eve is not an official holiday in Sweden."
+        Move (D(Self, 2026, 12, 24)) to adClosed[0]
+        Set padClosedDays of ghoCalendarHolidays to adClosed
+        Send AssertFalse (Working(Self, 2026, 12, 24, "SE")) "Listed as a closure day."
+        Send AssertFalse (Working(Self, 2026, 12, 24, ""))   "A closure day counts without a country, too."
+        Send ResetWorkingDays
+        Send Assert (Working(Self, 2026, 12, 24, "SE")) "Taken off the list again."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_The_Weekend_Mask_Moves_The_Weekend
+        Send ResetWorkingDays
+        Set psWeekendMask of ghoCalendarHolidays to "0000110"
+        Send AssertFalse (Working(Self, 2026, 11, 20, "")) "Friday is off with a Friday-Saturday weekend."
+        Send AssertFalse (Working(Self, 2026, 11, 21, "")) "So is Saturday."
+        Send Assert (Working(Self, 2026, 11, 22, "")) "Sunday is a working day."
+        Send ResetWorkingDays
+    End_Procedure
+
+    // dDate itself is not counted: Thursday + 1 is Friday, Friday + 1 is Monday.
+    { Published=True }
+    Procedure Test_AddWorkingDays_Over_A_Weekend
+        Date dDate
+        Send ResetWorkingDays
+        Get AddWorkingDays of ghoCalendarHolidays (D(Self, 2026, 11, 19)) 1 "" to dDate
+        Send AssertSAreEqual "2026-11-20" (YMD(Self, dDate)) "Thursday + 1."
+        Get AddWorkingDays of ghoCalendarHolidays (D(Self, 2026, 11, 20)) 1 "" to dDate
+        Send AssertSAreEqual "2026-11-23" (YMD(Self, dDate)) "Friday + 1 is Monday."
+        Get AddWorkingDays of ghoCalendarHolidays (D(Self, 2026, 11, 20)) 5 "" to dDate
+        Send AssertSAreEqual "2026-11-27" (YMD(Self, dDate)) "Friday + 5 is the next Friday."
+        Get AddWorkingDays of ghoCalendarHolidays (D(Self, 2026, 11, 22)) 0 "" to dDate
+        Send AssertSAreEqual "2026-11-22" (YMD(Self, dDate)) "0 returns the date unchanged, even a Sunday."
+    End_Procedure
+
+    // Across Christmas in GB: the 25th, the weekend and the substitute Monday are skipped, both ways.
+    { Published=True }
+    Procedure Test_AddWorkingDays_Across_The_Holidays
+        Date dDate
+        Send ResetWorkingDays
+        Get AddWorkingDays of ghoCalendarHolidays (D(Self, 2026, 12, 24)) 1 "GB" to dDate
+        Send AssertSAreEqual "2026-12-29" (YMD(Self, dDate)) "Thursday 24 + 1 is Tuesday 29."
+        Get AddWorkingDays of ghoCalendarHolidays (D(Self, 2026, 12, 29)) -1 "GB" to dDate
+        Send AssertSAreEqual "2026-12-24" (YMD(Self, dDate)) "Tuesday 29 - 1 is Thursday 24."
+        Get AddWorkingDays of ghoCalendarHolidays (D(Self, 2026, 12, 31)) 1 "GB" to dDate
+        Send AssertSAreEqual "2027-01-04" (YMD(Self, dDate)) "Over New Year's Day and a weekend."
+    End_Procedure
+
+    // Both days are counted; the other way round the count is negative.
+    { Published=True }
+    Procedure Test_WorkingDaysBetween
+        Integer iDays
+        Send ResetWorkingDays
+        Get WorkingDaysBetween of ghoCalendarHolidays (D(Self, 2026, 11, 23)) (D(Self, 2026, 11, 27)) "" to iDays
+        Send AssertIAreEqual 5 iDays "Monday to Friday."
+        Get WorkingDaysBetween of ghoCalendarHolidays (D(Self, 2026, 11, 23)) (D(Self, 2026, 11, 23)) "" to iDays
+        Send AssertIAreEqual 1 iDays "One working day."
+        Get WorkingDaysBetween of ghoCalendarHolidays (D(Self, 2026, 12, 21)) (D(Self, 2027, 1, 1)) "GB" to iDays
+        Send AssertIAreEqual 7 iDays "21-24 and 29-31 December 2026 in GB."
+        Get WorkingDaysBetween of ghoCalendarHolidays (D(Self, 2027, 1, 1)) (D(Self, 2026, 12, 21)) "GB" to iDays
+        Send AssertIAreEqual -7 iDays "The same days the other way round."
+    End_Procedure
+
+    // The UK's regions (BrittishHolidays.pkg). The default is England and Wales: Scotland's 2 January holiday -
+    // Monday 4 January 2027, as the 2nd is a Saturday - and St Andrew's Day are working days there.
+    { Published=True }
+    Procedure Test_GB_Is_England_And_Wales_By_Default
+        Send ResetWorkingDays
+        Send Assert      (Working(Self, 2027, 1, 4, "GB"))   "Scotland's 2 January holiday is a working day in England and Wales."
+        Send Assert      (Working(Self, 2026, 11, 30, "GB")) "St Andrew's Day 2026 (a Monday) too."
+        Send AssertFalse (Working(Self, 2026, 4, 6, "GB"))   "Easter Monday 2026 is a bank holiday there."
+        Send AssertFalse (Working(Self, 2026, 12, 25, "GB")) "A bank holiday of the whole UK is one everywhere."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_GB_Regions
+        Send ResetWorkingDays
+        Set piHolidayRegion of ghoCalendarHolidays to CI_UKRegionScotland
+        Send AssertFalse (Working(Self, 2027, 1, 4, "GB"))   "Scotland: 2 January moved to Monday 4."
+        Send AssertFalse (Working(Self, 2026, 11, 30, "GB")) "Scotland: St Andrew's Day."
+        Send Assert      (Working(Self, 2026, 4, 6, "GB"))   "Scotland: Easter Monday is a working day."
+        Send AssertFalse (Working(Self, 2026, 12, 25, "GB")) "Scotland: Christmas Day."
+        Set piHolidayRegion of ghoCalendarHolidays to CI_UKRegionNorthernIreland
+        Send AssertFalse (Working(Self, 2026, 7, 13, "GB"))  "Northern Ireland: the 12 July holiday, moved off a Sunday."
+        Send Assert      (Working(Self, 2027, 1, 4, "GB"))   "Northern Ireland: not Scotland's 2 January."
+        Set piHolidayRegion of ghoCalendarHolidays to CI_UKRegionAny
+        Send AssertFalse (Working(Self, 2027, 1, 4, "GB"))   "Any region: Scotland's day counts."
+        Send AssertFalse (Working(Self, 2026, 7, 13, "GB"))  "Any region: Northern Ireland's too."
+        Send ResetWorkingDays
+        Send Assert      (Working(Self, 2026, 7, 13, "GB"))  "Back to England and Wales."
+    End_Procedure
+
+    // A mask with no working day must not loop for ever.
+    { Published=True }
+    Procedure Test_No_Working_Day_In_The_Week_Does_Not_Hang
+        Date dDate
+        Integer iDays
+        Send ResetWorkingDays
+        Set psWeekendMask of ghoCalendarHolidays to "1111111"
+        Get AddWorkingDays of ghoCalendarHolidays (D(Self, 2026, 11, 23)) 3 "" to dDate
+        Get WorkingDaysBetween of ghoCalendarHolidays (D(Self, 2026, 11, 23)) (D(Self, 2026, 11, 29)) "" to iDays
+        Send ResetWorkingDays
+        Send AssertSAreEqual "2026-11-23" (YMD(Self, dDate)) "The date comes back unchanged."
+        Send AssertIAreEqual 0 iDays "No working days."
+    End_Procedure
+
+End_Object

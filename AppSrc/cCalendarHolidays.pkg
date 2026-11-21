@@ -26,6 +26,9 @@ Use Dferror.pkg
 Use GlobalDateTimeFunctions.pkg
 Use cCalendarHolidays.h.pkg
 
+// Answered by every cNationalHolidays object (cNationalHolidays.pkg comes later); IsWorkingDay asks it.
+Register_Function IsOfficialDayOff Date dDate Integer iRegion Returns Boolean
+
 /*   What is the function library for "Holidays and other special dates"?
      
      The library consists of holiday & special day functions for most parts of the Western world.
@@ -168,6 +171,27 @@ Class cCalendarHolidays is a cObject
         
         { Visibility = Private }
         Property String[] psArrayAsYear
+
+        { Visibility = Public }
+        { MethodType = Property }
+        { Description  = "The days of the week that are not working days, Monday to Sunday: '1' is a day off, '0' a working day." }
+        { Description += "The default '0000011' is Saturday and Sunday; '0000110' is Friday and Saturday. Excel's WORKDAY.INTL" }
+        { Description += "writes the weekend the same way. Used by IsWorkingDay, AddWorkingDays and WorkingDaysBetween." }
+        Property String psWeekendMask "0000011"
+
+        { Visibility = Public }
+        { MethodType = Property }
+        { Description  = "Days the company is closed although they are not official holidays: a Christmas week, a bridge" }
+        { Description += "day. IsWorkingDay treats them as days off. For a rule rather than a list, augment IsClosedDay." }
+        Property Date[] padClosedDays
+
+        { Visibility = Public }
+        { MethodType = Property }
+        { Description  = "The region whose holidays are days off, for a country whose holidays differ by region. 0, the" }
+        { Description += "default, is the country's usual one. The values belong to the country package: BrittishHolidays.pkg" }
+        { Description += "defines CI_UKRegionEnglandWales (the default), CI_UKRegionScotland, CI_UKRegionNorthernIreland and" }
+        { Description += "CI_UKRegionAny. Used by IsWorkingDay, AddWorkingDays and WorkingDaysBetween." }
+        Property Integer piHolidayRegion 0
 
         Send CollectISOCodes
     End_Procedure
@@ -952,6 +976,118 @@ Class cCalendarHolidays is a cObject
     { Description = "Amended to use built-in date functions" }
     Function YearFromDate Date dDate Returns Integer
         Function_Return (DateGetYear(dDate))
+    End_Function
+
+    // ---------------------------------------------------------------- Working days (2026-11-21)
+    //
+    // A working day is a day that is not a weekend day (psWeekendMask), not an official holiday in the country
+    // (the country package says so - Christmas Eve in Sweden is a special day, not an official holiday, so it
+    // counts as a working day; in the UK, the region piHolidayRegion names decides) and not a company closure day
+    // (padClosedDays, IsClosedDay).
+    // An empty country code leaves the holidays out: only the weekend and the closure days count.
+
+    { Visibility = Public }
+    { Description  = "True when the date is one of the closure days in padClosedDays. Augment it for a rule of your own," }
+    { Description += "such as 'the Friday after Ascension Day', and forward to keep the list." }
+    Function IsClosedDay Date dDate String sISO_Short Returns Boolean
+        Date[] adClosed
+        Integer i iLast
+        Get padClosedDays to adClosed
+        Move (SizeOfArray(adClosed) - 1) to iLast
+        For i from 0 to iLast
+            If (adClosed[i] = dDate) Begin
+                Function_Return True
+            End
+        Loop
+        Function_Return False
+    End_Function
+
+    { Visibility = Public }
+    { Description  = "True when the date is a working day in the country: not a weekend day (psWeekendMask), not an" }
+    { Description += "official holiday there, and not a company closure day (IsClosedDay). Pass '' as the country code" }
+    { Description += "to leave the holidays out. Example: Get IsWorkingDay of ghoCalendarHolidays dDate 'GB' to bWorking" }
+    Function IsWorkingDay Date dDate String sISO_Short Returns Boolean
+        String sMask
+        Integer iDay
+        Handle hoCountry
+        Boolean bOfficial bClosed
+
+        If (dDate < 1) Begin
+            Function_Return False
+        End
+        Get psWeekendMask to sMask
+        Move (DateGetISODayOfWeek(Self, dDate)) to iDay
+        If (Mid(sMask, 1, iDay) = "1") Begin
+            Function_Return False
+        End
+        // The country decides (cNationalHolidays' IsOfficialDayOff): from HolidayName's official flag, or - for one
+        // whose holidays differ by region, like the British package - for the region piHolidayRegion names.
+        If (sISO_Short <> "") Begin
+            Get NationalHolidaysObject sISO_Short to hoCountry
+            If (hoCountry <> 0) Begin
+                Get IsOfficialDayOff of hoCountry dDate (piHolidayRegion(Self)) to bOfficial
+                If (bOfficial = True) Begin
+                    Function_Return False
+                End
+            End
+        End
+        Get IsClosedDay dDate sISO_Short to bClosed
+        Function_Return (not(bClosed))
+    End_Function
+
+    { Visibility = Public }
+    { Description  = "The date that is iDays working days after dDate - before it when iDays is negative. dDate itself is" }
+    { Description += "not counted, as Excel's WORKDAY does not count it: Thursday + 1 is Friday, Friday + 1 is Monday." }
+    { Description += "0 returns dDate unchanged. A weekend mask with no working day at all returns dDate as well." }
+    Function AddWorkingDays Date dDate Integer iDays String sISO_Short Returns Date
+        Integer iStep iLeft
+        Boolean bWorking
+
+        If (iDays = 0 or dDate < 1 or psWeekendMask(Self) = "1111111") Begin
+            Function_Return dDate
+        End
+        Move (If(iDays > 0, 1, -1)) to iStep
+        Move (Abs(iDays)) to iLeft
+        While (iLeft > 0)
+            Move (dDate + iStep) to dDate
+            Get IsWorkingDay dDate sISO_Short to bWorking
+            If (bWorking = True) Begin
+                Decrement iLeft
+            End
+        Loop
+        Function_Return dDate
+    End_Function
+
+    { Visibility = Public }
+    { Description  = "The number of working days from dStart to dEnd, both days counted, as Excel's NETWORKDAYS counts" }
+    { Description += "them: Monday to Friday of one week is 5. Negative when dEnd is before dStart." }
+    Function WorkingDaysBetween Date dStart Date dEnd String sISO_Short Returns Integer
+        Date dDate dLast
+        Integer iCount iSign
+        Boolean bWorking
+
+        If (dStart < 1 or dEnd < 1) Begin
+            Function_Return 0
+        End
+        Move 1 to iSign
+        If (dEnd < dStart) Begin
+            Move -1    to iSign
+            Move dStart to dLast
+            Move dEnd   to dDate
+        End
+        Else Begin
+            Move dStart to dDate
+            Move dEnd   to dLast
+        End
+        Move 0 to iCount
+        While (dDate <= dLast)
+            Get IsWorkingDay dDate sISO_Short to bWorking
+            If (bWorking = True) Begin
+                Increment iCount
+            End
+            Move (dDate + 1) to dDate
+        Loop
+        Function_Return (iCount * iSign)
     End_Function
     
     Procedure PRIVATE_MESSAGES // For the Studio Code Explorer

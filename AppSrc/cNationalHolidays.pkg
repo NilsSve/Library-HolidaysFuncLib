@@ -41,4 +41,16 @@ Class cNationalHolidays is a cObject
         End
     End_Procedure
     
+    // Is the date an official holiday - a day off by law - in this country? Asked by the working-day functions of
+    // cCalendarHolidays (IsWorkingDay) with its piHolidayRegion. A country whose holidays differ by region answers
+    // it itself (the British package, for the UK's regions); any other ignores the region and answers from
+    // HolidayName's official flag.
+    Function IsOfficialDayOff Date dDate Integer iRegion Returns Boolean
+        Boolean bOfficial
+        String sName
+        Move False to bOfficial
+        Get HolidayName dDate (&bOfficial) to sName
+        Function_Return bOfficial
+    End_Function
+
 End_Class
