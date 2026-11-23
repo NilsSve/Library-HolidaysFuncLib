@@ -321,7 +321,7 @@ Class cCalendarHolidays is a cObject
     End_Function
     
     { Visibility = Public }
-    Function  Integer iMthNo Boolean bLongName Boolean bCapsFirstLetter Returns String
+    Function MonthNameFromInteger Integer iMthNo Boolean bLongName Boolean bCapsFirstLetter Returns String
         String sMonthName
         Pointer lpsMonthName
         Integer iVoid iMonth
