@@ -321,7 +321,7 @@ Class cCalendarHolidays is a cObject
     End_Function
     
     { Visibility = Public }
-    Function MonthNameFromInteger Integer iMthNo Boolean bLongName Boolean bCapsFirstLetter Returns String
+    Function  Integer iMthNo Boolean bLongName Boolean bCapsFirstLetter Returns String
         String sMonthName
         Pointer lpsMonthName
         Integer iVoid iMonth
@@ -620,11 +620,21 @@ Class cCalendarHolidays is a cObject
     End_Function
 
     { Visibility = Public }
-    { Description  = "Given the number of a day in the week, return its short name." }
+    { Description  = "Given the number of a day in the week, return its short name (3-characters)." }
     { Description += "Day 1 is Monday." }
     Function GetDayName Integer iWeekDay Returns String
         String sDayName
         Get DayNameFromInteger iWeekDay False True to sDayName
+        Function_Return sDayName
+    End_Function
+    
+    { Visibility = Public }
+    { Description  = "Given the number of a day in the week, return its 2-letter name." }
+    { Description += "Day 1 is Monday." }
+    Function GetDayNameShort Integer iWeekDay Returns String
+        String sDayName
+        Get DayNameFromInteger iWeekDay False True to sDayName
+        Move (Left(sDayName, (Length(sDayName) -1))) to sDayName
         Function_Return sDayName
     End_Function
     
