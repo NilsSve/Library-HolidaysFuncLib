@@ -1,0 +1,191 @@
+﻿//****************************************************************************
+// $Module type: Class Package
+// $Module name: cHolidayMonthCalendar
+// $Author     : Nils Svedmyr, RDC Tools International, <mailto:support@rdctools.com>
+// Web-site    : http://www.rdctools.com
+// Created     : 2026-11-23
+//
+// Description : One month of a country's calendar, for a FlexTron program: RDCFlexTron's cFTMonthCalendar with
+//               every day marked from this library - its holiday name, whether it is an official holiday, a day
+//               off every week, a closure day or a working day - in the country's own language.
+//
+// This code is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+//****************************************************************************
+
+/* AN OPTIONAL PART OF THE LIBRARY. It needs RDCFlexTron 0.9.40 or later (cFTMonthCalendar) and DataFlex 26, so
+   none of the library's own packages Use it, and the package does not name RDCFlexTron as a dependency: a program
+   that only wants holiday dates installs nothing more. A FlexTron program adds RDCFlexTron to its workspace and Uses
+   this package:
+
+       Use cHolidayMonthCalendar.pkg
+
+       Object oJuly is a cHolidayMonthCalendar
+           Set psISO_Short to "US"
+           Set piYear to 2026
+           Set piMonth to 7
+       End_Object
+
+   and sends Refresh - in End_Construct_Object for the first drawing, and when the country, the month or the
+   library's settings have changed. Twelve of them make a year: HolidaysFuncLibDemo's Year Overview is one.
+
+   WHAT A DAY IS. The marks are cFTMonthCalendar's (tFTCalendarDay, FTCalendar.pkg):
+     ftcal-off            an official holiday on a working weekday - a day off
+     ftcal-off ftcal-wkd  an official holiday on a weekend day
+     ftcal-spc            a named day that is worked (Mother's Day, Christmas Eve in many countries)
+     ftcal-spc ftcal-wkd  a named day on a weekend day
+     ftcal-wkd            a day off every week (psWeekendMask)
+     ftcal-cls            a closure day (padClosedDays)
+   The working days follow the library's settings - psWeekendMask, padClosedDays, piHolidayRegion - as IsWorkingDay
+   does. The month and day names come in the country's language (CountryLocaleName); the words of the tooltips are
+   properties (psTextHoliday ...), English unless a program sets its own.
+
+   WHAT IT COUNTS, for a page that sums a year: after Refresh, piWorkingDays, piHolidays (official holidays on
+   working weekdays) and piSpecial (named days that are worked), and paNamedDays - the month's named days and
+   closure days. Each day's cell carries data-wk (its ISO week), data-w (1 for a working day) and data-n (the working
+   days up to and including it, counted from piWorkingDaysBefore - the working days of the months before it). */
+Use cFTMonthCalendar.pkg       // RDCFlexTron 0.9.40: the month, the marks, the click
+Use oCalendarHolidays.pkg      // ghoCalendarHolidays: the holidays, the working days, the names in a country's language
+
+// A named day of the month - or a closure day - as the calendar marked it.
+Struct tHolidayCalendarDay
+    Date   dDate
+    String sName         // the holiday's name; for a closure day without one, psTextClosedDay
+    String sClass        // its marks: "ftcal-off", "ftcal-spc ftcal-wkd" ...
+    String sWhat         // what it is, in words: psTextHoliday ...
+    Boolean bWorking
+End_Struct
+
+Class cHolidayMonthCalendar is a cFTMonthCalendar
+
+    Procedure Construct_Object
+        Forward Send Construct_Object
+        // The country: its holidays, and the language of the month and day names.
+        Property String psISO_Short ""
+        // The working days of the months before this one, for each day's data-n (a year's running count).
+        Property Integer piWorkingDaysBefore 0
+        // What Refresh counted.
+        Property Integer piWorkingDays 0
+        Property Integer piHolidays 0
+        Property Integer piSpecial 0
+        Property tHolidayCalendarDay[] paNamedDays
+        // The words: the note in the heading (%1 = the working days), and what a day is.
+        Property String psTextWorkingDaysNote "%1 working days"
+        Property String psTextHoliday "Holiday, day off"
+        Property String psTextHolidayWeekend "Holiday on a weekend"
+        Property String psTextSpecial "Special day, worked"
+        Property String psTextSpecialWeekend "Special day, weekend"
+        Property String psTextWeekend "Off every week"
+        Property String psTextClosed "Closed"
+        Property String psTextClosedDay "Closure day"
+        Property String psTextWorkingDay "Working day"
+    End_Procedure
+
+    // Draw the month: the counts start again, and the names take the country's language.
+    Procedure Refresh
+        tHolidayCalendarDay[] aNone
+        Set piWorkingDays to 0
+        Set piHolidays to 0
+        Set piSpecial to 0
+        Set paNamedDays to aNone
+        Set psLocaleName to (CountryLocaleName(ghoCalendarHolidays, psISO_Short(Self)))
+        Forward Send Refresh
+    End_Procedure
+
+    /* ONE DAY. HolidayName once - it works out the year's holiday dates on every call - and IsWorkingDay only for a
+       named weekday: a day without a name is no official holiday, so whether it is worked is the weekend's and the
+       closure days' to say (IsWorkingDay would ask HolidayName twice more). */
+    Procedure OnDefineDay Date dDate tFTCalendarDay ByRef Day
+        String sISO_Short sName sMask sWhat sClass sDayName
+        Boolean bOfficial bWeekend bClosed bWorking
+        Integer iIsoDay iWorking
+        tHolidayCalendarDay[] aNamed
+        tHolidayCalendarDay Named
+
+        Get psISO_Short to sISO_Short
+        Move False to bOfficial
+        Get HolidayName of ghoCalendarHolidays dDate sISO_Short (&bOfficial) to sName
+        Move (Trim(sName)) to sName
+        Get psWeekendMask of ghoCalendarHolidays to sMask
+        Move (FTIsoDayOfWeek(dDate)) to iIsoDay
+        Move (Mid(sMask, 1, iIsoDay) = "1") to bWeekend
+        Get IsClosedDay of ghoCalendarHolidays dDate sISO_Short to bClosed
+        If (bWeekend or bClosed) ;
+            Move False to bWorking
+        Else If (sName = "") ;
+            Move True to bWorking
+        Else ;
+            Get IsWorkingDay of ghoCalendarHolidays dDate sISO_Short to bWorking
+
+        // What it is: the marks and the words.
+        Case Begin
+            Case (bClosed)
+                Move "ftcal-cls" to sClass
+                Get psTextClosed to sWhat
+                Case Break
+            Case ((bWorking = False) and (bWeekend = False))
+                Move "ftcal-off" to sClass
+                Get psTextHoliday to sWhat
+                Case Break
+            Case (bWeekend and (sName <> "") and bOfficial)
+                Move "ftcal-off ftcal-wkd" to sClass
+                Get psTextHolidayWeekend to sWhat
+                Case Break
+            Case (bWeekend and (sName <> ""))
+                Move "ftcal-spc ftcal-wkd" to sClass
+                Get psTextSpecialWeekend to sWhat
+                Case Break
+            Case (bWeekend)
+                Move "ftcal-wkd" to sClass
+                Get psTextWeekend to sWhat
+                Case Break
+            Case (sName <> "")
+                Move "ftcal-spc" to sClass
+                Get psTextSpecial to sWhat
+                Case Break
+            Case Else
+                Move "" to sClass
+                Get psTextWorkingDay to sWhat
+        Case End
+
+        // The counts.
+        Get piWorkingDays to iWorking
+        If (bWorking) Begin
+            Increment iWorking
+            Set piWorkingDays to iWorking
+        End
+        If (sClass = "ftcal-off") ;
+            Set piHolidays to (piHolidays(Self) + 1)
+        If (sClass = "ftcal-spc") ;
+            Set piSpecial to (piSpecial(Self) + 1)
+
+        // A named day, or a closure day, for the page's list.
+        If ((sName <> "") or bClosed) Begin
+            Move dDate to Named.dDate
+            Move (If(sName = "", psTextClosedDay(Self), sName)) to Named.sName
+            Move sClass to Named.sClass
+            Move sWhat to Named.sWhat
+            Move bWorking to Named.bWorking
+            Get paNamedDays to aNamed
+            Move Named to aNamed[SizeOfArray(aNamed)]
+            Set paNamedDays to aNamed
+        End
+
+        // The cell: its marks, its tooltip - "Sat 2026-07-04 - Independence Day - Holiday on a weekend" - and the
+        // data a page's script reads.
+        Get DayNameOfCountry of ghoCalendarHolidays iIsoDay False True sISO_Short to sDayName
+        Move sClass to Day.sClass
+        Move (sDayName + " " + FTIsoDate(dDate)) to Day.sTip
+        If (sName <> "") ;
+            Move (Day.sTip + " - " + sName) to Day.sTip
+        Move (Day.sTip + " - " + sWhat) to Day.sTip
+        Move ('data-wk="' + String(DateGetWeekOfYearISO(dDate)) + '" data-w="' + If(bWorking, "1", "0") + ;
+              '" data-n="' + String(piWorkingDaysBefore(Self) + iWorking) + '"') to Day.sAttributes
+    End_Procedure
+
+    // The heading's note: the month's working days.
+    Function MonthNote Returns String
+        Function_Return (Replace("%1", psTextWorkingDaysNote(Self), String(piWorkingDays(Self))))
+    End_Function
+
+End_Class

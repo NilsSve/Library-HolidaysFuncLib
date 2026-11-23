@@ -58,6 +58,22 @@ This library provides holiday and special day functions for various regions in t
 
   The global handle `ghoCalendarHolidays` provides access to all functions, while the `cCalendarHolidays` class contains helper date functions related to the holiday function library, encapsulated in the `oCalendarHolidays.pkg` object. This object also holds the code for all country packages found in `CountryPackages.pkg`.
 
+## A month calendar for FlexTron programs (optional)
+
+`AppSrc\cHolidayMonthCalendar.pkg` is one month of a country's calendar for a DataFlex 26 FlexTron program: [RDCFlexTron](https://github.com/NilsSve/Library-RDCFlexTron)'s `cFTMonthCalendar` (0.9.40 or later) with every day marked from this library - official holidays, special days, the weekend and the closure days, the working days counted, the month and day names in the country's language. None of the library's own packages Use it, and the package does not name RDCFlexTron as a dependency, so a program that only wants holiday dates installs nothing more. To use it, add RDCFlexTron to your workspace, then:
+
+```
+Use cHolidayMonthCalendar.pkg
+
+Object oJuly is a cHolidayMonthCalendar
+    Set psISO_Short to "US"
+    Set piYear to 2026
+    Set piMonth to 7
+End_Object
+```
+
+and `Send Refresh` when the country, the month or the settings have changed. After a Refresh it tells what it counted: `piWorkingDays`, `piHolidays`, `piSpecial` and `paNamedDays`. Twelve of them make a year - the demo's Year Overview.
+
 ## Unit tests
 
 `AppSrc\UnitTests.src` is the unit-test program of the library, built on
