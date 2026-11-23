@@ -29,6 +29,7 @@ Object oDutchHolidays is a cNationalHolidays
     // A 2-character ISO_Short string, according to the list:
     // https://www.iso.org/obp/ui/#search/code/
     Set psISO_Short to "NL"
+    Set psLocaleName to "nl-NL"    // the month and day names in the country's language
 
     // Function that returns the name of Dutch 'holidays' from a date variable.
     //

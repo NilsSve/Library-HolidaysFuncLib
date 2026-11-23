@@ -152,4 +152,20 @@ Object oCalendarHolidays_Tests is a cTestFixture
         Send AssertSAreEqual "111th" (Ordinal(111)) "111."
     End_Procedure
 
+    // The month and day names in a country's language (1.0.6): the language of its holiday package, whatever the
+    // computer's own language is.
+    { Published=True }
+    Procedure Test_Names_In_The_Countrys_Language
+        Send AssertSAreEqual "sv-SE"    (CountryLocaleName(ghoCalendarHolidays, "SE")) "Sweden's package is Swedish."
+        Send AssertSAreEqual ""         (CountryLocaleName(ghoCalendarHolidays, "XX")) "No package, no language."
+        Send AssertSAreEqual "January"  (MonthNameOfCountry(ghoCalendarHolidays, 1, True, True, "GB"))  "January in English."
+        Send AssertSAreEqual "Januari"  (MonthNameOfCountry(ghoCalendarHolidays, 1, True, True, "SE"))  "January in Swedish, capital first."
+        Send AssertSAreEqual "oktober"  (MonthNameOfCountry(ghoCalendarHolidays, 10, True, False, "NO")) "October in Norwegian."
+        Send AssertSAreEqual "Monday"   (DayNameOfCountry(ghoCalendarHolidays, 1, True, True, "US"))    "Day 1 is Monday."
+        Send AssertSAreEqual "Sunday"   (DayNameOfCountry(ghoCalendarHolidays, 7, True, True, "GB"))    "Day 7 is Sunday."
+        Send AssertSAreEqual "Tisdag"   (DayNameOfCountry(ghoCalendarHolidays, 2, True, True, "SE"))    "Tuesday in Swedish (a test file without a BOM is read as OEM: no letters outside ASCII here)."
+        Send AssertSAreEqual "Mo"       (ShortestDayNameOfCountry(ghoCalendarHolidays, 1, True, "US"))  "The shortest English Monday."
+        Send AssertSAreEqual ""         (MonthNameOfCountry(ghoCalendarHolidays, 13, True, True, "SE")) "No 13th month."
+    End_Procedure
+
 End_Object

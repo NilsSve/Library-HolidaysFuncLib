@@ -16,6 +16,10 @@ Class cNationalHolidays is a cObject
         Property String private_psISO_Short
         { Visibility = Public }
         Property String psOfficial_Short
+        // The Windows locale name of the country's language and the country - "sv-SE", "en-GB" - for the month and
+        // day names in that language (MonthNameOfCountry, DayNameOfCountry). "" = the computer's own language.
+        { Visibility = Public }
+        Property String psLocaleName ""
         
     End_Procedure
     

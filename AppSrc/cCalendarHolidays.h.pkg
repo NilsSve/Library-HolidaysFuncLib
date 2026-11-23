@@ -206,3 +206,8 @@ External_Function WinAPI_GetLocaleInfoW "GetLocaleInfoW" Kernel32.dll ;
     Define LOCALE_SABBREVDAYNAME6    for |CI$00000036 // Native abbreviated name for Saturday. The maximum Number of characters allowed for this String is 80, including a terminating null character.
     Define LOCALE_SABBREVDAYNAME7    for |CI$00000037 // Native abbreviated name for Sunday. The maximum Number of characters allowed for this String is 80, including a terminating null character.
 #ENDIF
+
+// The shortest day names, Monday first (Mo, Tu ... - a calendar's column headings); ShortestDayNameOfCountry.
+#IFNDEF LOCALE_SSHORTESTDAYNAME1
+    Define LOCALE_SSHORTESTDAYNAME1 for |CI$00000060
+#ENDIF

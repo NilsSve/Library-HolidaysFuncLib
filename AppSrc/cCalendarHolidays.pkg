@@ -28,6 +28,8 @@ Use cCalendarHolidays.h.pkg
 
 // Answered by every cNationalHolidays object (cNationalHolidays.pkg comes later); IsWorkingDay asks it.
 Register_Function IsOfficialDayOff Date dDate Integer iRegion Returns Boolean
+// The language of a country package (cNationalHolidays), which MonthNameOfCountry and DayNameOfCountry ask.
+Register_Function psLocaleName Returns String
 
 /*   What is the function library for "Holidays and other special dates"?
      
@@ -636,6 +638,100 @@ Class cCalendarHolidays is a cObject
         Get DayNameFromInteger iWeekDay False True to sDayName
         Move (Left(sDayName, (Length(sDayName) -1))) to sDayName
         Function_Return sDayName
+    End_Function
+
+    // ---- Month and day names in a country's language (1.0.6) ----
+    // MonthNameFromInteger and DayNameFromInteger answer in the computer's language. These answer in the language of
+    // the country's holiday package (its psLocaleName: "sv-SE", "en-GB" ...), so a calendar for Norway reads in
+    // Norwegian on any computer - and in the computer's language for a country the library has no package for.
+
+    { Visibility = Public }
+    { Description  = "The Windows locale name of a country's holiday package - its language and the country, such as sv-SE." }
+    { Description += "Empty for a country the library has no package for." }
+    Function CountryLocaleName String sISO_Short Returns String
+        Handle hoCountry
+        String sLocaleName
+        Get NationalHolidaysObject sISO_Short to hoCountry
+        If (hoCountry = 0) ;
+            Function_Return ""
+        Get psLocaleName of hoCountry to sLocaleName
+        Function_Return sLocaleName
+    End_Function
+
+    // One value of a named locale (GetLocaleInfoEx) - of the computer's own locale when sLocaleName is "".
+    { Visibility = Private }
+    Function LocaleValueOf String sLocaleName Integer iLCType Returns String
+        WString wsLocale wsResult
+        Pointer pLocale
+        Integer iLength
+        Move 0 to pLocale                                   // NULL: LOCALE_NAME_USER_DEFAULT
+        If (sLocaleName <> "") Begin
+            Move (sLocaleName + Character(0)) to wsLocale
+            Move (AddressOf(wsLocale)) to pLocale
+        End
+        Move (WinAPI_GetLocaleInfoEx(pLocale, iLCType, 0, 0)) to iLength
+        If (iLength <= 0) ;
+            Function_Return ""
+        Move (ZeroString(iLength)) to wsResult
+        Move (WinAPI_GetLocaleInfoEx(pLocale, iLCType, AddressOf(wsResult), iLength)) to iLength
+        Function_Return (CString(wsResult))
+    End_Function
+
+    // The first letter upper case, as the names are written at the start of a line.
+    { Visibility = Private }
+    Function CapsFirstLetter String sName Returns String
+        If (sName = "") ;
+            Function_Return ""
+        Function_Return (Uppercase(Left(sName, 1)) + Right(sName, (Length(sName) - 1)))
+    End_Function
+
+    { Visibility = Public }
+    { Description  = "The name of a month (1-12) in a country's language - the language of its holiday package." }
+    { Description += "bLongName False gives the abbreviated name. In the computer's language for a country without a package." }
+    Function MonthNameOfCountry Integer iMthNo Boolean bLongName Boolean bCapsFirstLetter String sISO_Short Returns String
+        String sName
+        Integer iLCType
+        If ((iMthNo < 1) or (iMthNo > 12)) ;
+            Function_Return ""
+        If (bLongName) ;
+            Move (LOCALE_SMONTHNAME1 + iMthNo - 1) to iLCType
+        Else ;
+            Move (LOCALE_SABBREVMONTHNAME1 + iMthNo - 1) to iLCType
+        Get LocaleValueOf (CountryLocaleName(Self, sISO_Short)) iLCType to sName
+        If (bCapsFirstLetter) ;
+            Get CapsFirstLetter sName to sName
+        Function_Return sName
+    End_Function
+
+    { Visibility = Public }
+    { Description  = "The name of a day of the week in a country's language. Day 1 is Monday." }
+    { Description += "bLongName False gives the abbreviated name. In the computer's language for a country without a package." }
+    Function DayNameOfCountry Integer iDayNo Boolean bLongName Boolean bCapsFirstLetter String sISO_Short Returns String
+        String sName
+        Integer iLCType
+        If ((iDayNo < 1) or (iDayNo > 7)) ;
+            Function_Return ""
+        If (bLongName) ;
+            Move (LOCALE_SDAYNAME1 + iDayNo - 1) to iLCType
+        Else ;
+            Move (LOCALE_SABBREVDAYNAME1 + iDayNo - 1) to iLCType
+        Get LocaleValueOf (CountryLocaleName(Self, sISO_Short)) iLCType to sName
+        If (bCapsFirstLetter) ;
+            Get CapsFirstLetter sName to sName
+        Function_Return sName
+    End_Function
+
+    { Visibility = Public }
+    { Description  = "The shortest name of a day of the week in a country's language - Mo, Tu ... in English, må, ti ... in Swedish -" }
+    { Description += "as a calendar's column heading writes it. Day 1 is Monday." }
+    Function ShortestDayNameOfCountry Integer iDayNo Boolean bCapsFirstLetter String sISO_Short Returns String
+        String sName
+        If ((iDayNo < 1) or (iDayNo > 7)) ;
+            Function_Return ""
+        Get LocaleValueOf (CountryLocaleName(Self, sISO_Short)) (LOCALE_SSHORTESTDAYNAME1 + iDayNo - 1) to sName
+        If (bCapsFirstLetter) ;
+            Get CapsFirstLetter sName to sName
+        Function_Return sName
     End_Function
     
     { Visibility = Public }

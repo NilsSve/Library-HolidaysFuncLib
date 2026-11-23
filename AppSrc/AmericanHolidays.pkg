@@ -23,6 +23,7 @@ Object oAmericanHolidays is a cNationalHolidays
     // A 2-character ISO_Short string, according to the list:
     // https://www.iso.org/obp/ui/#search/code/
     Set psISO_Short to "US"
+    Set psLocaleName to "en-US"    // the month and day names in the country's language
 
     // Function that returns the name of American (US) 'holidays' for a date variable.
     //
