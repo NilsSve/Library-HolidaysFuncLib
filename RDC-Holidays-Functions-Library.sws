@@ -5,7 +5,7 @@
         "df-min": 26.0,
         "icon": "RDC-Mark.svg",
         "license": "MIT",
-        "version": "1.0.5"
+        "version": "1.0.6"
     },
     "studio": {
         "conditionals": {
