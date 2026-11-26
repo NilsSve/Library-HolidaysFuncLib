@@ -219,58 +219,52 @@ Class cCalendarHolidays is a cObject
         Function_Return sHolidayName
     End_Function  
     
+    { Visibility  = Public }
+    { Description = "Everything about the holiday or special day on a date in a country, as a tHoliday struct:"}
+    { Description += "the name in the country's language (sHolidayName), whether it is an official holiday - a day"}
+    { Description += "off by law (bNationalHoliday), the library function that gives the day (sFunction; '' for a"}
+    { Description += "fixed date in the country's package) and, in the UK, the bank holiday's regions (iRegions, the"}
+    { Description += "CI_UKRegion... bits). sHolidayName is '' when the country's package names no day on the"}
+    { Description += "date, or the country has no holiday package."}
+    { Description += "Example: Get HolidayDetails of ghoCalendarHolidays dDate 'SE' to Holiday"}
+    Function HolidayDetails Date dInDate String sISO_Short Returns tHoliday
+        tHoliday Holiday
+        Handle hoNationalHolidays
+
+        Get NationalHolidaysObject sISO_Short to hoNationalHolidays
+        If (hoNationalHolidays <> 0) Begin
+            Get HolidayDetails of hoNationalHolidays dInDate to Holiday
+        End
+        Else Begin
+            Move dInDate to Holiday.dDate
+            Move (Uppercase(Trim(sISO_Short))) to Holiday.sISO_Short
+        End
+        Function_Return Holiday
+    End_Function
+
     { Visibility   = Public }
     { Description  = "This is the reciprocal function, compared to making a call to"}
     { Description  += "anything from the 'Holiday Function Library', where you"}
     { Description += "pass a year and get a date variable as the return value."}
     { Description += "For this function: Pass a known date and an ISO_Short 2-character country code."}
-    { Description += "Returns a boolean True/False if the date is found in the function library."}
-    { Description += "If 'True' is returned, it also returns;"}
-    { Description += " - A boolean 'bIsHoliday' as ByRef and a" }
-    { Description += " - A ByRef String with the Holiday Name, and a"}
-    { Description += " - A ByRef String with the Function Name,"}
-    { Description += "for the passed sISO_Short country code."}
+    { Description += "Returns True when the country's holiday package names the date - a holiday or a special"}
+    { Description += "day in that country - and then also returns;"}
+    { Description += " - A boolean 'bIsHoliday' as ByRef: True for an official holiday, a day off by law, and a" }
+    { Description += " - A ByRef String with the Holiday Name, in the country's language, and a"}
+    { Description += " - A ByRef String with the Function Name: the library function that gives the day"}
+    { Description += "   ('' for a day on a fixed date in the package)."}
+    { Description += "Returns False when the country has no holiday package, or its package does not name"}
+    { Description += "the date - even when one of the library's functions falls on it (Thanksgiving is not"}
+    { Description += "a Swedish day). HolidayDetails gives all of it as one struct."}
     Function IsDateAHoliday Date dInDate String sISO_Short Boolean ByRef bIsHoliday String ByRef sHolidayName String ByRef sFunctionName Returns Boolean
-        Boolean bFound bErr bWasTrappd
-        tHolidayFunc[] HolidayFunctions
-        Integer iSize iCount iFuncID iYear iLastErr 
-        Date dDate
-
-        Move False to bFound
-        Move Err to bErr
-        Move LastErr to iLastErr
-        Move False to Err
-        Get IsTrapped of (TrappedErrors(Error_Object_Id)) DFERR_ENTER_VALID_DATE to bWasTrappd
-        Send Ignore_Error to Error_Object_Id DFERR_ENTER_VALID_DATE
-
-        Move (DateGetYear(dInDate)) to iYear
-        Get pHolidayFunctions to HolidayFunctions
-        Move (SizeOfArray(HolidayFunctions)) to iSize
-        Decrement iSize 
-        
-        For iCount from 0 to iSize
-            Move (Eval("get_" - HolidayFunctions[iCount].sName)) to iFuncID
-            Get iFuncID iYear sISO_Short to dDate
-            Move (dInDate = dDate) to bFound
-            If (Err = True or bFound = True) Begin
-                Move HolidayFunctions[iCount].sName to sFunctionName
-                Move iSize to iCount // We're out of here
-            End
-        Loop
-        
-        If (Err = False and bFound = True and sISO_Short <> "") Begin
-            Get HolidayName dInDate sISO_Short (&bIsHoliday) to sHolidayName
-        End
-        // Back on, as it was: ignored, it would stay off for every date typed in the program afterwards.
-        If (bWasTrappd) Begin
-            Send Trap_Error to Error_Object_Id DFERR_ENTER_VALID_DATE
-        End
-
-        Move (Err = False and LastErr <> DFERR_ENTER_VALID_DATE and String(dDate) <> "") to bFound
-        Move bErr to Err
-        Move iLastErr to LastErr
-        
-        Function_Return bFound
+        tHoliday Holiday
+        // The country decides: only its package knows which days are holidays or special days there (2026-11-26 -
+        // until then the first of all the library's functions that fell on the date answered, for any country).
+        Get HolidayDetails dInDate sISO_Short to Holiday
+        Move Holiday.bNationalHoliday to bIsHoliday
+        Move Holiday.sHolidayName     to sHolidayName
+        Move Holiday.sFunction        to sFunctionName
+        Function_Return (Holiday.sHolidayName <> "")
     End_Function
 
     { Visibility = Public }

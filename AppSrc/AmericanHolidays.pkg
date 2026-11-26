@@ -25,329 +25,88 @@ Object oAmericanHolidays is a cNationalHolidays
     Set psISO_Short to "US"
     Set psLocaleName to "en-US"    // the month and day names in the country's language
 
-    // Function that returns the name of American (US) 'holidays' for a date variable.
-    //
-    // Function HolidayName takes two parameters;
-    // A 4-year digit date variable and a boolean as a ByRef variable.
-    //
-    // Returns: A string with the 'holidayname' as text AND it changes the boolean ByRef
-    // variable if the returned holiday is considered to be a official holiday - these
-    // national holidays are regulated by law. So if the boolean is false the date
-    // is really not a holiday at all - but rather some sort of 'special' date that one
-    // wants to have included in the function.
-    //
-    // To include your own special days see *** New 2010-03-30 NGS *** below for an example
-    // on how to add e.g. the "International Women's Day" wich falls on the 8th of March
-    // each year. It's really simple to do, or you can just add another function to the base
-    // date library for it (CalendarHolidays.pkg).
-    //
-    // Note that although all functions below defines two parameters, not all
-    // of those functions use the second parameter.
-    Function HolidayName Date dInDate Boolean ByRef bOfficialHoliday Returns String
-        Integer iYear
-        Date dHolidayDate
-        String sHolidayName sISO_Short
+    // THE DAYS (2026-11-26): looked up in this order - the first that falls on a date names it, so when two fall on
+    // the same date the one listed first wins. AddDay gives a day by one of the library's date functions
+    // (oCalendarHolidays.pkg), AddFixedDay by its month and day; the last argument is True for an official holiday -
+    // a day off by law - and False for a special day that is not. HolidayName and IsDateAHoliday both read this list
+    // (cNationalHolidays.pkg).
 
-        Move "" to sHolidayName
-        Move False to bOfficialHoliday
-        Get psISO_Short to sISO_Short
+    // *** Fixed 'Holidays' ***
+    Send AddDay "NewYearsEve" "New Year's Eve" False
+    Send AddDay "NewYearsDay" "New Year's Day" True
+    Send AddDay "MLKDay" "Martin Luther King, Jr. Day" True
+    Send AddDay "PresidentsDay" "President's Day" True
+    Send AddDay "MemorialDay" "Memorial Day" True
+    Send AddDay "LaborDay" "Labor Day" True
+    Send AddDay "ColumbusDay" "Columbus Day" True
+    Send AddDay "VeteransDay" "Veterans Day" True
+    Send AddDay "Epiphany" "Twelfthday (Epiphany)" False
+    Send AddDay "Halloween" "Halloween" False
+    Send AddDay "FeastOfChristTheKing" "Feast of Christ the King" False
+    Send AddDay "ChristmasEve" "Christmas Eve" False
+    Send AddDay "Advent1" "Advent Sunday" False
+    Send AddDay "Advent2" "2nd Advent Sunday" False
+    Send AddDay "Advent3" "3d Advent Sunday" False
 
-        If (dInDate < 1) Begin
-            Function_Return ""
-        End
-        Move (DateGetYear(dInDate)) to iYear
+    // This needs to be after ChristMasEve because it can fall on the same day, and we then wants to return Christmas Eve instead.
+    Send AddDay "Advent4" "4th Advent Sunday" False
+    Send AddDay "ChristmasDay" "Christmas" True
+    Send AddDay "NationalDay" "Independence Day" True
 
-        // *** Fixed 'Holidays' ***
+    // Juneteenth National Independence Day, the 19th of June: a federal holiday since 2021. On a Saturday it
+    // is observed on the Friday before, on a Sunday on the Monday after.
+    Send AddFixedDay 6 19 "Juneteenth" True
+    Send SetDayYears 2021 0
+    Send AddFixedDay 6 19 "Juneteenth (observed)" True
+    Send SetDayYears 2021 0
+    Send SetDayOffset -1 6
+    Send AddFixedDay 6 19 "Juneteenth (observed)" True
+    Send SetDayYears 2021 0
+    Send SetDayOffset 1 7
 
-        Get NewYearsEve of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "New Year's Eve"
-        End
+    // *** New 2010-03-30 NGS ***
+    // This is an example on how to add a 'holiday'
+    // for any special day that you might
+    // want to include in a e.g. holidays date table.
+    // The International Women's Day falls each year on the 8th of March:
+    //    Send AddFixedDay 3 8 "International Women's Day" False
 
-        Get NewYearsDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "New Year's Day"
-        End
+    // Valentine's Day - 14th February
+    Send AddDay "ValentinesDay" "Valentine's Day" False
+    Send AddDay "SaintPatricksDay" "Saint Patrick's Day" False
+    Send AddDay "AprilFoolsDay" "April Fools' Day" False
 
-        Get MLKDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Martin Luther King, Jr. Day"
-        End
+    // *** Movable holidays ***
+    // Easter functions at the bottom; they are the most complicated to calculate.
+    Send AddDay "Thanksgiving" "Thanksgiving Day" True
+    Send AddDay "AshWednesday" "Ash Wednesday" False
+    Send AddDay "PalmSunday" "Palm Sunday" False
+    Send AddDay "AscensionDay" "Ascension Day" False
+    Send AddDay "WhitSunday" "Whit Sunday" False
+    Send AddDay "WhitMonday" "Whit Monday" False
+    Send AddDay "AllSaintsDay" "All Saints Day" False
+    Send AddDay "MaundyThursday" "Maundy Thursday" False
+    Send AddDay "GoodFriday" "Good Friday" False
+    Send AddDay "HolySaturday" "Holy Saturday" False
+    Send AddDay "EasterDay" "Easter Day" False
+    Send AddDay "EasterMonday" "Easter Monday" False
+    Send AddDay "FlagDay" "Flag Day" False
+    Send AddDay "PatriotsDay" "Patriot Day" False
+    Send AddDay "ConstitutionDay" "Constitution/Citizenship Day" False
+    Send AddDay "LeifEriksonDay" "Leif Erikson Day" False
+    Send AddDay "GroundHogDay" "Ground Hog Day" False
 
-        Get PresidentsDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "President's Day"
-        End
+    // Spring Equinox
+    Send AddDay "VernalEquinox" "Spring Equinox" False
 
-        Get MemorialDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Memorial Day"
-        End
+    // Autumn Equinox
+    Send AddDay "AutumnalEquinox" "Autumn Equinox" False
 
-        Get LaborDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Labor Day"
-        End
-
-        Get ColumbusDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Columbus Day"
-        End
-
-        Get VeteransDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Veterans Day"
-        End
-
-        Get Epiphany of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Twelfthday (Epiphany)"
-        End
-
-        Get Halloween of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Halloween"
-        End
-
-        Get FeastOfChristTheKing of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Feast of Christ the King"
-        End
-
-        Get ChristmasEve of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Christmas Eve"
-        End
-
-        Get Advent1 of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Advent Sunday"
-        End
-
-        Get Advent2 of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "2nd Advent Sunday"
-        End
-
-        Get Advent3 of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "3d Advent Sunday"
-        End
-
-        // This needs to be after ChristMasEve because it can fall on the same day, and we then wants to return Christmas Eve instead.
-        Get Advent4 of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "4th Advent Sunday"
-        End
-
-        Get ChristmasDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Christmas"
-        End
-
-        Get NationalDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Independence Day"
-        End
-
-        // Juneteenth National Independence Day, the 19th of June: a federal holiday since 2021. On a Saturday it is
-        // observed on the Friday before, on a Sunday on the Monday after.
-        If (iYear >= 2021 and DateGetMonth(dInDate) = 6) Begin
-            If (DateGetDay(dInDate) = 19) Begin
-                Move True to bOfficialHoliday
-                Function_Return "Juneteenth"
-            End
-            Get DateSetDate of ghoCalendarHolidays iYear 6 19 to dHolidayDate
-            If ((DateGetISODayOfWeek(ghoCalendarHolidays, dHolidayDate) = 6 and dInDate = (dHolidayDate - 1)) or ;
-                (DateGetISODayOfWeek(ghoCalendarHolidays, dHolidayDate) = 7 and dInDate = (dHolidayDate + 1))) Begin
-                Move True to bOfficialHoliday
-                Function_Return "Juneteenth (observed)"
-            End
-        End
-
-        // *** New 2010-03-30 NGS ***
-        // This is an example on how to add a 'holiday'
-        // for any special day that you might
-        // want to include in a e.g. holidays date table.
-        // The International Women's Day falls each year on the 8th of March.
-        //        If ((DateGetMonth(dInDate) = 2) and (DateGetDay(dInDate) = 14)) Begin // 14th of February.
-        //            Move False to bOfficialHoliday
-        //            Function_Return "International Women's Day"
-        //        End
-
-        // This is the same day as the "International Women's Day"
-        Get ValentinesDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Valentine's Day"
-        End
-
-        Get SaintPatricksDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Saint Patrick's Day"
-        End
-
-        Get AprilFoolsDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "April Fools' Day"
-        End
-
-        // *** Movable holidays ***
-        // Easter functions at the bottom; they are the most complicated to calculate.
-
-        Get ThanksGiving of ghoCalendarHolidays iYear sISO_Short  to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Thanksgiving Day"
-        End
-
-        Get AshWednesday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Ash Wednesday"
-        End
-
-        Get PalmSunday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Palm Sunday"
-        End
-
-        Get AscensionDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Ascension Day"
-        End
-
-        Get WhitSunday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Whit Sunday"
-        End
-
-        Get WhitMonday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Whit Monday"
-        End
-
-        Get AllSaintsDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "All Saints Day"
-        End
-
-        Get MaundyThursday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Maundy Thursday"
-        End
-
-        Get GoodFriday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Good Friday"
-        End
-
-        Get HolySaturday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Holy Saturday"
-        End
-
-        Get EasterDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Easter Day"
-        End
-
-        Get EasterMonday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Easter Monday"
-        End
-
-        Get FlagDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Flag Day"
-        End
-
-        Get PatriotsDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Patriot Day"
-        End
-
-        Get ConstitutionDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Constitution/Citizenship Day"
-        End
-
-        Get LeifEriksonDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Leif Erikson Day"
-        End
-
-        Get GroundHogDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Ground Hog Day"
-        End
-
-        // Spring Equinox
-        Get VernalEquinox of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Spring Equinox"
-        End
-        
-        // Autumn Equinox
-        Get AutumnalEquinox of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Autumn Equinox"
-        End
-        
-        // This day needs to be _after_ the WhitSunday.
-        // So when WhitSunday falls on the last Sunday in May,
-        // only the WhitSunday will get generated. Else the
-        // Mother's Day would show up at that day.
-        Get MothersDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Mothers Day"
-        End
-
-        Get FathersDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Fathers Day"
-        End
-
-        Function_Return sHolidayName
-    End_Function
+    // This day needs to be _after_ the WhitSunday.
+    // So when WhitSunday falls on the last Sunday in May,
+    // only the WhitSunday will get generated. Else the
+    // Mother's Day would show up at that day.
+    Send AddDay "MothersDay" "Mothers Day" False
+    Send AddDay "FathersDay" "Fathers Day" False
 
 End_Object

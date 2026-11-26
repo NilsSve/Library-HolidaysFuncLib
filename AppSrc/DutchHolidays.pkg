@@ -31,237 +31,74 @@ Object oDutchHolidays is a cNationalHolidays
     Set psISO_Short to "NL"
     Set psLocaleName to "nl-NL"    // the month and day names in the country's language
 
-    // Function that returns the name of Dutch 'holidays' from a date variable.
+    // THE DAYS (2026-11-26): looked up in this order - the first that falls on a date names it, so when two fall on
+    // the same date the one listed first wins. AddDay gives a day by one of the library's date functions
+    // (oCalendarHolidays.pkg), AddFixedDay by its month and day; the last argument is True for an official holiday -
+    // a day off by law - and False for a special day that is not. HolidayName and IsDateAHoliday both read this list
+    // (cNationalHolidays.pkg).
+
+    // *** Fixed Holidays ***
+    Send AddDay "NewYearsEve" "Oudejaarsavond" False
+    Send AddDay "NewYearsDay" "Nieuwjaarsdag" True
+    Send AddDay "Epiphany" "Driekoningen" False
+    Send AddDay "ValentinesDay" "Valentijnsdag" False
+    Send AddDay "LaborDay" "Dag van de Arbeid" False
+    Send AddDay "Halloween" "Halloween" False
+    Send AddDay "ChristmasEve" "Kerstavond" False
+    Send AddDay "ChristmasDay" "Eerste Kerstdag" True
+    Send AddDay "SecondDayChristmas" "Tweede Kerstdag" True
+    Send AddDay "NationalDay" "Koninginnedag" True  // 30-04
+    Send SetDayYears 0 2013
+    Send AddDay "NationalDay" "Koningsdag" True     // 27-04
+    Send SetDayYears 2014 0
+
+    // This is an example on how to add a 'holiday'
+    // for any special day that you might
+    // want to include in a e.g. holidays date table.
+    // The International Women's Day falls each year on the 8th of March.
+    Send AddFixedDay 3 8 "Internationale vrouwendag" False  // 8th of March.
+    Send AddFixedDay 5 4 "Dodenherdenking" False  // 4th of May.
+
+    // A national holiday by law (Algemene termijnenwet); whether it is a day off is up to the employer.
+    Send AddFixedDay 5 5 "Bevrijdingsdag" True  // 5th of May.
+
+    // *** Movable holidays ***
+    // Easter functions at the bottom; they are the most complicated to calculate.
+    Send AddDay "PalmSunday" "Palmzondag" False
+    Send AddDay "AscensionDay" "Hemelvaartsdag" True
+    Send AddDay "WhitSunday" "Eerste Pinksterdag" True
+    Send AddDay "WhitMonday" "Tweede Pinksterdag" True
+    Send AddDay "AllSaintsDay" "Allerheiligen" False
+    Send AddDay "MaundyThursday" "Witte Donderdag" False
+    Send AddDay "GoodFriday" "Goede Vrijdag" False
+
+    //  Get HolySaturday iYear sISO_Short to dHolidayDate
+    //  If (dInDate = dHolidayDate) Begin
+    //      Move False to bOfficialHoliday
+    //      Function_Return "Paaszaterdag"
+    //  End
+    Send AddDay "EasterDay" "Eerste Paasdag" True
+    Send AddDay "EasterMonday" "Tweede Paasdag" True
+
+    // Start of European Summer Time - last Sunday in March (at 1am)
     //
-    // Function HolidayName takes two parameters;
-    // A 4-year digit date variable and a boolean as a ByRef variable.
+    Send AddDay "EUSummerTimeStart" "Begin zomertijd" False
+
+    // End of European Summer Time - last Sunday in October (at 1am)
     //
-    // Returns: A string with the 'holidayname' as text AND it changes the boolean ByRef
-    // variable if the returned holiday is considered to be a national holiday - these
-    // national holidays are regulated by law. So if the boolean is false the date
-    // is really not a holiday at all - but rather some sort of 'special' date that one
-    // wants to have included in the functionality.
-    //
-    // For example; Christmas Eve is a "holiday" but not a national holiday (regulated by law),
-    // In contrast Christmas Day is a national holiday and so the ByRef bOfficialHoliday will be TRUE 
-    // for Christmas Day, but false for Christmas Eve.
-    // To include your own special days see *** New 2010-03-30 NGS *** below for an example
-    // on how to add e.g. the "International Women's Day" wich falls on the 8th of March
-    // each year. It's really simple to do.
-    //
-    // Note that although all functions below defines two parameters, not all
-    // of those functions use the second parameter.
-    Function HolidayName Date dInDate Boolean ByRef bOfficialHoliday Returns String
-        Integer iYear
-        Date dHolidayDate
-        String sHolidayName sISO_Short
+    Send AddDay "EUSummerTimeEnd" "Einde zomertijd" False
 
-        Move "" to sHolidayName
-        Move False to bOfficialHoliday
-        Get psISO_Short to sISO_Short
+    // Sprint Equinox
+    Send AddDay "VernalEquinox" "Lente-equinox" False
 
-        If (dInDate < 1) Begin
-            Function_Return ""
-        End
-        Move (DateGetYear(dInDate)) to iYear
+    // Autumn Equinox
+    Send AddDay "AutumnalEquinox" "Herfst-equinox" False
 
-        // *** Fixed Holidays ***
-
-        Get NewYearsEve of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Oudejaarsavond"
-        End
-
-        Get NewYearsDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Nieuwjaarsdag"
-        End
-
-        Get Epiphany of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Driekoningen"
-        End
-
-        Get ValentinesDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Valentijnsdag"
-        End
-
-        Get LaborDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Dag van de Arbeid"
-        End
-
-        Get Halloween of ghoCalendarHolidays iYear sISO_Short to dHolidayDate      // Not a National Holiday in The Netherlands. but there is some US influence :-)
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Halloween"
-        End
-
-        Get ChristmasEve of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Kerstavond"
-        End
-
-        Get ChristmasDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Eerste Kerstdag"
-        End
-
-        Get SecondDayChristmas of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Tweede Kerstdag"
-        End
-
-        Get NationalDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            If (iYear <= 2013) Begin
-                Function_Return "Koninginnedag"  // 30-04.
-            End
-            Else Begin
-                Function_Return "Koningsdag"      // 27-04.
-            End
-        End
-
-        // This is an example on how to add a 'holiday'
-        // for any special day that you might
-        // want to include in a e.g. holidays date table.
-        // The International Women's Day falls each year on the 8th of March.
-        If ((DateGetMonth(dInDate) = 3) and (DateGetDay(dInDate) = 8)) Begin // 8th of March.
-            Move False to bOfficialHoliday
-            Function_Return "Internationale vrouwendag"   // "International Women's Day"
-        End
-
-        If ((DateGetMonth(dInDate) = 5) and (DateGetDay(dInDate) = 4)) Begin // 4th of May.
-            Move False to bOfficialHoliday
-            Function_Return "Dodenherdenking"             // Memorial Day in The Netherlands
-        End
-
-        // A national holiday by law (Algemene termijnenwet); whether it is a day off is up to the employer.
-        If ((DateGetMonth(dInDate) = 5) and (DateGetDay(dInDate) = 5)) Begin // 5th of May.
-            Move True to bOfficialHoliday
-            Function_Return "Bevrijdingsdag"              // Liberation Day in The Netherlands
-        End
-
-        // *** Movable holidays ***
-        // Easter functions at the bottom; they are the most complicated to calculate.
-
-        Get PalmSunday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Palmzondag"
-        End
-
-        Get AscensionDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Hemelvaartsdag"
-        End
-
-        Get WhitSunday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Eerste Pinksterdag"
-        End
-
-        Get WhitMonday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Tweede Pinksterdag"
-        End
-
-        Get AllSaintsDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Allerheiligen"
-        End
-
-        Get MaundyThursday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Witte Donderdag"
-        End
-
-        Get GoodFriday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Goede Vrijdag"
-        End
-
-        //  Get HolySaturday iYear sISO_Short to dHolidayDate
-        //  If (dInDate = dHolidayDate) Begin
-        //      Move False to bOfficialHoliday
-        //      Function_Return "Paaszaterdag"
-        //  End
-
-        Get EasterDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Eerste Paasdag"
-        End
-
-        Get EasterMonday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Tweede Paasdag"
-        End
-
-        // Start of European Summer Time - last Sunday in March (at 1am)
-        //
-        Get EUSummerTimeStart of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Begin zomertijd"
-        End
-
-        // End of European Summer Time - last Sunday in October (at 1am)
-        //
-        Get EUSummerTimeEnd of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Einde zomertijd"
-        End
-
-        // Sprint Equinox
-        Get VernalEquinox of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Lente-equinox"
-        End
-        
-        // Autumn Equinox
-        Get AutumnalEquinox of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Herfst-equinox"
-        End
-        
-        // This day needs to be _after_ the WhitSunday.
-        // So when WhitSunday falls on the last Sunday in May,
-        // only the WhitSunday will get generated. Else the
-        // Mother's Day would show up at that same day.
-        Get MothersDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Moederdag"
-        End
-
-        Get FathersDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Vaderdag"
-        End
-
-        Function_Return sHolidayName
-    End_Function
+    // This day needs to be _after_ the WhitSunday.
+    // So when WhitSunday falls on the last Sunday in May,
+    // only the WhitSunday will get generated. Else the
+    // Mother's Day would show up at that same day.
+    Send AddDay "MothersDay" "Moederdag" False
+    Send AddDay "FathersDay" "Vaderdag" False
     
 End_Object

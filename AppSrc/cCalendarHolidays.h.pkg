@@ -20,10 +20,16 @@ Struct tLunar
     Boolean bLeap
 End_Struct
 
+// One holiday or special day. HolidayDetails gives all of it (2026-11-26); the holiday lookup list gives the date, the
+// official flag and the name.
 Struct tHoliday
     Date    dDate
-    Boolean bNationalHoliday
-    String  sHolidayName
+    Boolean bNationalHoliday   // an official holiday - a day off by law; in the UK a bank holiday in any of its regions
+    String  sHolidayName       // in the country's language; "" when no holiday or special day falls on the date
+    String  sISO_Short         // the country
+    String  sFunction          // the library function that gives the day: "EasterDay", "AshWednesday - 1 day"; "" for a
+                               // day on a fixed date in the country's package
+    Integer iRegions           // the UK: the bank holiday's regions, the CI_UKRegion... bits (8: the whole UK); 0 elsewhere
 End_Struct  
 
 Struct tHolidayFuncVar

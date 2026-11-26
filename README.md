@@ -15,7 +15,7 @@ This library provides holiday and special day functions for various regions in t
    Get EasterDay of ghoCalendarHolidays 2025 "US" to dDate
    ```
 
-   The country code is necessary because some holidays are observed on different dates in various countries. While not all functions need the country code, it can be provided for consistency across all function calls. A list of all 2-character ISO Short codes can be found in the `cCalendarHolidays.pkg` file under the procedure "AddAllOfficialShort," or by accessing the `pAllISOCodes` struct array property.  The `WindowsLocaleISO_Short` function can be utilized to determine the Windows locale ISO Short 2-character code for the current machine.
+   The country code is necessary because some holidays are observed on different dates in various countries. **You can always pass the country code**: a function whose date does not depend on the country simply ignores it, so every call can look the same. A list of all 2-character ISO Short codes can be found in the `cCalendarHolidays.pkg` file under the procedure "AddAllOfficialShort," or by accessing the `pAllISOCodes` struct array property.  The `WindowsLocaleISO_Short` function can be utilized to determine the Windows locale ISO Short 2-character code for the current machine.
 
 2. **Holiday Name Function**: This function returns the name of a holiday or special day given a specific date. It requires three parameters:
    - A date (this can be the return value from the holiday date functions).
@@ -29,12 +29,25 @@ This library provides holiday and special day functions for various regions in t
    Get HolidayName of ghoCalendarHolidays 03/16/2025 "US" (&bIsHoliday) to sHolidayName
    ```
 
-   The `HolidayName` function within this library calls an `HolidayName` function relevant to the corresponding ISO Short code for the country packages defined in the `CountryPackages.pkg` file. If your country is not represented in `CountryPackages.pkg`, you can create one by reviewing the existing packages and emailing it to support@rdctools.com.
+   **Everything about a day at once**: `HolidayDetails` returns a `tHoliday` struct - the name (`sHolidayName`), whether it is an official holiday (`bNationalHoliday`), the library function that gives the day (`sFunction`, empty for a fixed date such as 8 March), the country (`sISO_Short`) and, in the UK, the bank holiday's regions (`iRegions`, the `CI_UKRegion...` bits). The name is empty when nothing falls on the date.
+   ```
+   tHoliday Holiday
+   Get HolidayDetails of ghoCalendarHolidays dDate "GB" to Holiday
+   ```
 
-3. **Reciprocal Function**: The library includes a reciprocal function to the holiday date functions, named `IsDateAHoliday`. It takes a date and an ISO Short code parameter, returning a boolean value of True or False to indicate whether the date corresponds to a recognized holiday. Additionally, it uses three ByRef parameters: 
-   - Boolean `bIsHoliday`
-   - String `sHolidayName`
-   - String `sFunctionName`
+   The names come from the country packages listed in `CountryPackages.pkg`. Each package is a list of the country's days, looked up in order - the first that falls on a date names it:
+   ```
+   Send AddDay "ChristmasEve" "Julafton" False                       // a library date function, the name, official?
+   Send AddFixedDay 3 8 "Internationella Kvinnodagen" False          // the same month and day every year
+   Send AddDay "NationalDay" "Sveriges nationaldag" True
+   Send SetDayYears 2005 0                                           // ... official from 2005
+   ```
+   `SetDayYears`, `SetDayOffset` and `SetDayAlsoOn` cover days that change over the years, fall a day before or after a function's date, or count only when a bank holiday falls on them; see `cNationalHolidays.pkg`. If your country is not represented in `CountryPackages.pkg`, you can create one by copying an existing package and emailing it to support@rdctools.com.
+
+3. **Reciprocal Function**: The library includes a reciprocal function to the holiday date functions, named `IsDateAHoliday`. It takes a date and an ISO Short code parameter and returns True when the country's package names the date - a holiday or a special day in that country. It returns False when the country has no package, or its package does not name the date, even when one of the library's functions falls on it: Thanksgiving is not a Swedish day. Additionally, it uses three ByRef parameters: 
+   - Boolean `bIsHoliday` - True for an official holiday
+   - String `sHolidayName` - in the country's language
+   - String `sFunctionName` - the library function that gives the day; empty for a day on a fixed date
 
 4. **Working-day Functions**: For delivery dates, due dates and lead times. A working day is a day that is not a weekend day, not an official holiday in the country, and not a company closure day.
    - `IsWorkingDay dDate sISO_Short` returns True or False.

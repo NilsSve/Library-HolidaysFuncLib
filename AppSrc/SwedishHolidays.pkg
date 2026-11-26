@@ -29,320 +29,97 @@ Object oSwedishHolidays is a cNationalHolidays
     Set psISO_Short to "SE"
     Set psLocaleName to "sv-SE"    // the month and day names in the country's language
 
-    // Function that returns the name of Swedish 'holidays' from a date variable.
+    // THE DAYS (2026-11-26): looked up in this order - the first that falls on a date names it, so when two fall on
+    // the same date the one listed first wins. AddDay gives a day by one of the library's date functions
+    // (oCalendarHolidays.pkg), AddFixedDay by its month and day; the last argument is True for an official holiday -
+    // a day off by law - and False for a special day that is not. HolidayName and IsDateAHoliday both read this list
+    // (cNationalHolidays.pkg).
+
+    // *** Fixed Holidays ***
+    Send AddDay "NewYearsEve" "Nyårsafton" False
+    Send AddDay "NewYearsDay" "Nyårsdagen" True
+    Send AddDay "EpiphanyEve" "Trettondagsafton" False
+    Send AddDay "Epiphany" "Trettondagen" True
+    Send AddDay "ValborgsEve" "Valborgsmässoafton" False
+    Send AddDay "LaborDay" "Arbetarrörelsens dag" True
+    Send AddDay "FeastOfChristTheKing" "Domsöndagen" False
+    Send AddDay "ChristmasEve" "Julafton" False
+    Send AddDay "Advent1" "1:a Advent" False
+    Send AddDay "Advent2" "2:a Advent" False
+    Send AddDay "Advent3" "3:e Advent" False
+
+    // This needs to be after ChristMasEve because it can fall on the same day, and we then wants to return Christmas Eve instead.
+    Send AddDay "Advent4" "4:e Advent" False
+    Send AddDay "ChristmasDay" "Juldagen" True
+    Send AddDay "SecondDayChristmas" "Annandag Jul" True
+    Send AddDay "EpiphanyEve" "Trettondagsafton" False
+    Send AddDay "Epiphany" "Trettondagen (Tretton dagar efter jul)" False
+    Send AddDay "TwentiethKnut" "20:e Knut (Julgransplundring)" False
+
+    // A public holiday since 2005, when it replaced Whit Monday (Annandag pingst).
+    Send AddDay "NationalDay" "Sveriges nationaldag" True
+    Send SetDayYears 2005 0
+    Send AddDay "NationalDay" "Sveriges nationaldag" False
+    Send SetDayYears 0 2004
+
+    // *** New 2010-03-30 NGS ***
+    // This is an example on how to add a 'holiday'
+    // for any special day that you might
+    // want to include in a e.g. holidays date table.
+    // The International Women's Day falls each year on the 8th of March.
+    Send AddFixedDay 3 8 "Internationella Kvinnodagen" False  // 8th of March.
+    Send AddFixedDay 2 14 "Alla Hjärtans dag" False  // 14th of February.
+
+    // *** Movable holidays ***
+    Send AddDay "PalmSunday" "Palmsöndagen" False
+    Send AddDay "AscensionDay" "Kristi himmelsfärd" True
+    Send AddDay "WhitSunday" "Pingstdagen" True
+
+    // A public holiday until 2004; the National Day (6 June) replaced it in 2005.
+    Send AddDay "WhitMonday" "Annandag Pingst" True
+    Send SetDayYears 0 2004
+    Send AddDay "WhitMonday" "Annandag Pingst" False
+    Send SetDayYears 2005 0
+    Send AddDay "MidsummerDay" "Midsommardagen" True
+    Send AddDay "MidsummerEve" "Midsommarafton" False
+    Send AddDay "AllSaintsDay" "Alla helgons dag" True
+    Send AddDay "AllSaintsDayEve" "All helgona afton" False
+
+    // Needs to be defined after the AllSaintsDay test.
+    Send AddDay "Halloween" "Halloween" False
+    Send AddDay "AshWednesday" "Askonsdag" False
+    Send AddDay "MaundyThursday" "Skärtorsdagen" False
+    Send AddDay "GoodFriday" "Långfredagen" True
+    Send AddDay "HolySaturday" "Påskafton" False
+    Send AddDay "EasterDay" "Påskdagen" True
+    Send AddDay "EasterMonday" "Annandag Påsk" True
+
+    // Vårdagjämning
+
+    // Start of European (Swedish) Summer Time - last Sunday in March (at 1am)
     //
-    // Function HolidayName takes two parameters;
-    // A 4-year digit date variable and a boolean as a ByRef variable.
+    Send AddDay "EUSummerTimeStart" "Svensk (Europeisk) sommartid börjar" False
+
+    // End of European (Swedish) Summer Time - last Sunday in October (at 1am)
     //
-    // Returns: A string with the 'holidayname' as text AND it changes the boolean ByRef
-    // variable if the returned holiday is considered to be a national holiday - these
-    // national holidays are regulated by law. So if the boolean is false the date
-    // is really not a holiday at all - but rather some sort of 'special' date that one
-    // wants to have included in the functionality.
-    //
-    // For example; Christmas Eve is a "holiday" but not a national holiday (regulated by law),
-    // In contrast Christmas Day is a national holiday and so the ByRef bOfficialHoliday will be TRUE for Christmas Day,
-    // but false for Christmas Eve. 
-    //
-    // To include your own special days see *** New 2010-03-30 NGS *** below for an example
-    // on how to add e.g. the "International Women's Day" wich falls on the 8th of March
-    // each year. It's really simple to do.
-    //
-    // Note that although all functions below defines two parameters, not all
-    // of those functions use the second parameter.
-    Function HolidayName Date dInDate Boolean ByRef bOfficialHoliday Returns String
-        Integer iYear
-        Date dHolidayDate
-        String sHolidayName sISO_Short
+    Send AddDay "EUSummerTimeEnd" "Svensk (Europeisk) sommartid slutar" False
 
-        Move "" to sHolidayName
-        Move False to bOfficialHoliday               
-        Get psISO_Short to sISO_Short
-        
-        If (dInDate < 1) Begin
-            Function_Return ""
-        End
-        Move (DateGetYear(dInDate)) to iYear
+    // Vårdagjämning
+    Send AddDay "VernalEquinox" "Vårdagjämning" False
 
-        // *** Fixed Holidays ***
+    // Höstdagjämning
+    Send AddDay "AutumnalEquinox" "Höstdagjämning" False
 
-        Get NewYearsEve of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Nyårsafton"
-        End
+    // This day needs to be _after_ the WhitSunday.
+    // So when WhitSunday falls on the last Sunday in May,
+    // only the WhitSunday will get generated. Else the
+    // Mother's Day would show up at that same day.
+    Send AddDay "MothersDay" "Mors Dag" False
+    Send AddDay "FathersDay" "Fars Dag" False
 
-        Get NewYearsDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Nyårsdagen"
-        End
-
-        Get EpiphanyEve of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Trettondagsafton"
-        End
-
-        Get Epiphany of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Trettondagen"
-        End
-
-        Get ValborgsEve of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Valborgsmässoafton"
-        End
-
-        Get LaborDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Arbetarrörelsens dag"
-        End
-
-        Get FeastOfChristTheKing of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Domsöndagen"
-        End
-
-        Get ChristmasEve of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Julafton"
-        End
-
-        Get Advent1 of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "1:a Advent"
-        End
-
-        Get Advent2 of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "2:a Advent"
-        End
-
-        Get Advent3 of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "3:e Advent"
-        End
-
-        // This needs to be after ChristMasEve because it can fall on the same day, and we then wants to return Christmas Eve instead.
-        Get Advent4 of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "4:e Advent"
-        End
-
-        Get ChristmasDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Juldagen"
-        End
-
-        Get SecondDayChristmas of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Annandag Jul"
-        End
-
-        Get EpiphanyEve iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Trettondagsafton"
-        End
-        
-        Get Epiphany iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Trettondagen (Tretton dagar efter jul)"
-        End
-        
-        Get TwentiethKnut of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "20:e Knut (Julgransplundring)"
-        End
-        
-        // A public holiday since 2005, when it replaced Whit Monday (Annandag pingst).
-        Get NationalDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move (iYear >= 2005) to bOfficialHoliday
-            Function_Return "Sveriges nationaldag"
-        End
-
-        // *** New 2010-03-30 NGS ***
-        // This is an example on how to add a 'holiday'
-        // for any special day that you might
-        // want to include in a e.g. holidays date table.
-        // The International Women's Day falls each year on the 8th of March.
-        If ((DateGetMonth(dInDate) = 3) and (DateGetDay(dInDate) = 8)) Begin // 8th of March.
-            Move False to bOfficialHoliday
-            Function_Return "Internationella Kvinnodagen" // "International Women's Day"
-        End
-
-        If ((DateGetMonth(dInDate) = 2) and (DateGetDay(dInDate) = 14)) Begin // 14th of February.
-            Move False to bOfficialHoliday
-            Function_Return "Alla Hjärtans dag"           // "Valentine's Day"
-        End
-
-        // *** Movable holidays ***
-
-        Get PalmSunday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Palmsöndagen"
-        End
-
-        Get AscensionDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Kristi himmelsfärd"
-        End
-
-        Get WhitSunday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Pingstdagen"
-        End
-
-        // A public holiday until 2004; the National Day (6 June) replaced it in 2005.
-        Get WhitMonday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move (iYear < 2005) to bOfficialHoliday
-            Function_Return "Annandag Pingst"
-        End
-
-        Get MidsummerDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Midsommardagen"
-        End
-
-        Get MidsummerEve of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Midsommarafton"
-        End
-
-        Get AllSaintsDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Alla helgons dag"
-        End
-
-        Get AllSaintsDayEve of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "All helgona afton"
-        End
-        
-        // Needs to be defined after the AllSaintsDay test.
-        Get Halloween of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Halloween"
-        End
-
-        Get AshWednesday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Askonsdag"
-        End
-
-        Get MaundyThursday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Skärtorsdagen"
-        End
-
-        Get GoodFriday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Långfredagen"
-        End
-
-        Get HolySaturday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Påskafton"
-        End
-
-        Get EasterDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Påskdagen"
-        End
-
-        Get EasterMonday of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move True to bOfficialHoliday
-            Function_Return "Annandag Påsk"
-        End  
-        
-        // Vårdagjämning
-
-        // Start of European (Swedish) Summer Time - last Sunday in March (at 1am)
-        //
-        Get EUSummerTimeStart of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Svensk (Europeisk) sommartid börjar"
-        End
-
-        // End of European (Swedish) Summer Time - last Sunday in October (at 1am)
-        //
-        Get EUSummerTimeEnd of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Svensk (Europeisk) sommartid slutar"
-        End
-        
-        // Vårdagjämning
-        Get VernalEquinox of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Vårdagjämning"
-        End
-        
-        // Höstdagjämning
-        Get AutumnalEquinox of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Höstdagjämning"
-        End
-        
-        // This day needs to be _after_ the WhitSunday.
-        // So when WhitSunday falls on the last Sunday in May,
-        // only the WhitSunday will get generated. Else the
-        // Mother's Day would show up at that same day.
-        Get MothersDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Mors Dag"
-        End
-
-        Get FathersDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Fars Dag"
-        End
-
-        // This needs to be after all easter days.
-        // So when April fools day falls on one of the easter days,
-        // an easter day will be returned instead. (More imporant)
-        Get AprilFoolsDay of ghoCalendarHolidays iYear sISO_Short to dHolidayDate
-        If (dInDate = dHolidayDate) Begin
-            Move False to bOfficialHoliday
-            Function_Return "Första April! (April, april!)"
-        End
-
-        Function_Return sHolidayName
-    End_Function
+    // This needs to be after all easter days.
+    // So when April fools day falls on one of the easter days,
+    // an easter day will be returned instead. (More imporant)
+    Send AddDay "AprilFoolsDay" "Första April! (April, april!)" False
 
 End_Object

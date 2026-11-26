@@ -168,4 +168,83 @@ Object oCalendarHolidays_Tests is a cTestFixture
         Send AssertSAreEqual ""         (MonthNameOfCountry(ghoCalendarHolidays, 13, True, True, "SE")) "No 13th month."
     End_Procedure
 
+
+    // ---------------------------------------------------------------- HolidayDetails and IsDateAHoliday (2026-11-26)
+    // The country's package decides: a day it does not name is no holiday there, whichever library function falls on it.
+
+    { Published=True }
+    Procedure Test_HolidayDetails_Of_A_Swedish_Christmas
+        tHoliday Holiday
+        Date dDate
+        Get DateSetDate of ghoCalendarHolidays 2026 12 24 to dDate
+        Get HolidayDetails of ghoCalendarHolidays dDate "SE" to Holiday
+        Send AssertSAreEqual "Julafton"     Holiday.sHolidayName "Christmas Eve in Sweden."
+        Send AssertSAreEqual "ChristmasEve" Holiday.sFunction    "The function that gives it."
+        Send AssertSAreEqual "SE"           Holiday.sISO_Short   "The country."
+        Send AssertSAreEqual "2026-12-24"   (YMD(Self, Holiday.dDate)) "The date."
+        Send AssertFalse Holiday.bNationalHoliday "Christmas Eve is not an official holiday in Sweden."
+        Send AssertIAreEqual 0 Holiday.iRegions "Region bits are the UK's only."
+        Get DateSetDate of ghoCalendarHolidays 2026 12 25 to dDate
+        Get HolidayDetails of ghoCalendarHolidays dDate "SE" to Holiday
+        Send AssertSAreEqual "Juldagen" Holiday.sHolidayName "Christmas Day in Sweden."
+        Send AssertIAreEqual 1 (If(Holiday.bNationalHoliday, 1, 0)) "Christmas Day is an official holiday."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_HolidayDetails_Of_A_Fixed_Date_Has_No_Function
+        tHoliday Holiday
+        Date dDate
+        Get DateSetDate of ghoCalendarHolidays 2026 3 8 to dDate
+        Get HolidayDetails of ghoCalendarHolidays dDate "SE" to Holiday
+        Send AssertSAreEqual "Internationella Kvinnodagen" Holiday.sHolidayName "International Women's Day in Sweden."
+        Send AssertSAreEqual "" Holiday.sFunction "A fixed date in the package: no library function."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_HolidayDetails_Of_UK_Bank_Holidays
+        tHoliday Holiday
+        Date dDate
+        Get DateSetDate of ghoCalendarHolidays 2026 12 25 to dDate
+        Get HolidayDetails of ghoCalendarHolidays dDate "GB" to Holiday
+        Send AssertSAreEqual "Christmas Day (UK)" Holiday.sHolidayName "2026: Christmas Day is the bank holiday."
+        Send AssertIAreEqual 8 Holiday.iRegions "A bank holiday of the whole UK."
+        Send AssertIAreEqual 1 (If(Holiday.bNationalHoliday, 1, 0)) "A bank holiday is an official holiday."
+        Get DateSetDate of ghoCalendarHolidays 2027 12 25 to dDate
+        Get HolidayDetails of ghoCalendarHolidays dDate "GB" to Holiday
+        Send AssertSAreEqual "Christmas Day" Holiday.sHolidayName "2027: Christmas Day is a Saturday."
+        Send AssertIAreEqual 0 Holiday.iRegions "Not the bank holiday that year."
+        Get DateSetDate of ghoCalendarHolidays 2027 12 27 to dDate
+        Get HolidayDetails of ghoCalendarHolidays dDate "GB" to Holiday
+        Send AssertSAreEqual "Christmas Day Holiday (UK)" Holiday.sHolidayName "2027: the bank holiday is Monday the 27th."
+        Send AssertSAreEqual "ChristmasDayBH" Holiday.sFunction "The function that gives it."
+        Send AssertIAreEqual 8 Holiday.iRegions "The whole UK."
+        Get DateSetDate of ghoCalendarHolidays 2026 2 17 to dDate
+        Get HolidayDetails of ghoCalendarHolidays dDate "GB" to Holiday
+        Send AssertSAreEqual "Shrove Tuesday (Pancake Day)" Holiday.sHolidayName "The day before Ash Wednesday."
+        Send AssertSAreEqual "AshWednesday - 1 day" Holiday.sFunction "A day before the function's date."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_IsDateAHoliday_Asks_The_Country
+        Boolean bFound bIsHoliday
+        String sName sFunction
+        Date dDate
+        Get DateSetDate of ghoCalendarHolidays 2026 11 26 to dDate
+        Get IsDateAHoliday of ghoCalendarHolidays dDate "US" (&bIsHoliday) (&sName) (&sFunction) to bFound
+        Send AssertIAreEqual 1 (If(bFound, 1, 0)) "Thanksgiving 2026 is a US holiday."
+        Send AssertSAreEqual "Thanksgiving Day" sName "Its name."
+        Send AssertSAreEqual "Thanksgiving" sFunction "The function that gives it."
+        Get IsDateAHoliday of ghoCalendarHolidays dDate "SE" (&bIsHoliday) (&sName) (&sFunction) to bFound
+        Send AssertFalse bFound "Thanksgiving is not a Swedish day."
+        Send AssertSAreEqual "" sName "No name."
+        Send AssertSAreEqual "" sFunction "No function."
+        Get DateSetDate of ghoCalendarHolidays 2026 12 25 to dDate
+        Get IsDateAHoliday of ghoCalendarHolidays dDate "ZZ" (&bIsHoliday) (&sName) (&sFunction) to bFound
+        Send AssertFalse bFound "A country with no holiday package: False."
+        Get IsDateAHoliday of ghoCalendarHolidays dDate "SE" (&bIsHoliday) (&sName) (&sFunction) to bFound
+        Send AssertIAreEqual 1 (If(bFound, 1, 0)) "Christmas Day in Sweden."
+        Send AssertIAreEqual 1 (If(bIsHoliday, 1, 0)) "An official holiday."
+        Send AssertSAreEqual "ChristmasDay" sFunction "The function that gives it."
+    End_Procedure
+
 End_Object

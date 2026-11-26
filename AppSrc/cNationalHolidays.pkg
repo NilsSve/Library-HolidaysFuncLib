@@ -1,10 +1,36 @@
 ﻿// This is the class to use when creating National Holidays packages,
 // such as BrittishHolidays.pkg, SwedishHolidays.pkg, NorwegianHolidays.pkg etc.
-// Note: Each country holiday package based on this class should be added 
+// Note: Each country holiday package based on this class should be added
 //       to the "CountryPackages.pkg." That package is Included by the oCalendarHolidays.pkg file.
 // The class registers itself with the ghoCalendarHolidays object.
+//
+// THE COUNTRY'S DAYS ARE A LIST (2026-11-26). A package lists its holidays and special days with AddDay (a day one of
+// the library's date functions gives) and AddFixedDay (the same month and day every year), each with its name in the
+// country's language and whether it is an official holiday. The days are looked up in the order they were added, and
+// the first that falls on a date names it - so when two fall on the same date, the one listed first wins (Christmas
+// Eve before the 4th Advent Sunday, Whit Sunday before Mother's Day). HolidayName and cCalendarHolidays'
+// IsDateAHoliday and HolidayDetails all read the same list, so they can tell which function gives the day.
+// A day that needs more than that takes one of the Set...Day messages right after it is added: SetDayYears (only in
+// some years), SetDayOffset (some days before or after the function's date, or only when that date is a given
+// weekday) and SetDayAlsoOn (only when the date is also another function's date).
 
 Use cCalendarHolidays.pkg
+
+// One holiday or special day of a country.
+Struct tCountryDay
+    String  sFunction       // the library's date function that gives the day ("EasterDay"); "" for a fixed date
+    Integer iFunctionID     // its get_ message, found when the day is added
+    Integer iMonth          // a fixed date's month and day - when sFunction is ""
+    Integer iDay
+    Integer iOffset         // days after (+) or before (-) the function's or fixed date: Shrove Tuesday = Ash Wednesday - 1
+    Integer iWeekday        // only when the function's or fixed date is this ISO weekday (1 Monday ... 7 Sunday); 0 any
+    String  sAlsoFunction   // only when the date is also this function's date ("" none): a UK bank holiday on the day
+    Integer iAlsoID
+    Integer iFromYear       // only from this year (0 no limit)
+    Integer iToYear         // only up to this year (0 no limit)
+    String  sName           // the day's name in the country's language
+    Integer iOfficial       // 1 an official holiday, 0 not; the UK package gives its region bits here (CI_UKRegion...)
+End_Struct
 
 Class cNationalHolidays is a cObject
     Procedure Construct_Object
@@ -12,7 +38,7 @@ Class cNationalHolidays is a cObject
         Move Self to ghoNationalHolidayObject
 
         { Visibility = Private }
-        
+
         Property String private_psISO_Short
         { Visibility = Public }
         Property String psOfficial_Short
@@ -20,20 +46,28 @@ Class cNationalHolidays is a cObject
         // day names in that language (MonthNameOfCountry, DayNameOfCountry). "" = the computer's own language.
         { Visibility = Public }
         Property String psLocaleName ""
-        
+
+        // The country's holidays and special days, in the order they are looked up (AddDay, AddFixedDay).
+        { Visibility = Public }
+        Property tCountryDay[] paDays
+        // True when the official value of the days (AddDay's last argument) is region bits rather than True or False:
+        // the UK package's bank holiday regions. HolidayDetails gives them in iRegions.
+        { Visibility = Public }
+        Property Boolean pbRegionBits False
+
     End_Procedure
-    
-    { MethodType = Property }    
+
+    { MethodType = Property }
     Procedure Set psISO_Short String sISO_Short
         String sOfficial_Short
 
         Set private_psISO_Short to sISO_Short
         If (ghoCalendarHolidays <> 0) Begin
-            Get ISO_ShortToOfficial_Short of ghoCalendarHolidays sISO_Short to sOfficial_Short     
+            Get ISO_ShortToOfficial_Short of ghoCalendarHolidays sISO_Short to sOfficial_Short
             Set psOfficial_Short to sOfficial_Short
         End
-    End_Procedure  
-    
+    End_Procedure
+
     Function psISO_Short Returns String
         Function_Return (private_psISO_Short(Self))
     End_Function
@@ -44,7 +78,177 @@ Class cNationalHolidays is a cObject
             Send RegisterNationalHolidays of ghoCalendarHolidays Self
         End
     End_Procedure
-    
+
+    // *** The list of days ***
+
+    // The get_ message of a library date function ("EasterDay"); an error when there is none, so that a misspelt name
+    // is found when the program starts rather than never matching.
+    { Visibility = Private }
+    Function DayFunctionID String sFunction Returns Integer
+        Integer iID
+        Move (Eval("get_" - sFunction)) to iID
+        If (iID = 0) Begin
+            Error DFERR_PROGRAM ("Holiday package" * psISO_Short(Self) + ": no date function named" * sFunction)
+        End
+        Function_Return iID
+    End_Function
+
+    // A day one of the library's date functions gives: AddDay "EasterDay" "Påskdagen" True.
+    { Visibility = Public }
+    Procedure AddDay String sFunction String sName Integer iOfficial
+        tCountryDay[] aDays
+        tCountryDay Day
+        Move sFunction to Day.sFunction
+        Get DayFunctionID sFunction to Day.iFunctionID
+        Move sName to Day.sName
+        Move iOfficial to Day.iOfficial
+        Get paDays to aDays
+        Move Day to aDays[SizeOfArray(aDays)]
+        Set paDays to aDays
+    End_Procedure
+
+    // A day on the same month and day every year: AddFixedDay 3 8 "Internationella Kvinnodagen" False.
+    { Visibility = Public }
+    Procedure AddFixedDay Integer iMonth Integer iDay String sName Integer iOfficial
+        tCountryDay[] aDays
+        tCountryDay Day
+        Move iMonth to Day.iMonth
+        Move iDay to Day.iDay
+        Move sName to Day.sName
+        Move iOfficial to Day.iOfficial
+        Get paDays to aDays
+        Move Day to aDays[SizeOfArray(aDays)]
+        Set paDays to aDays
+    End_Procedure
+
+    // The day added last applies only from iFromYear up to iToYear (0: no limit).
+    { Visibility = Public }
+    Procedure SetDayYears Integer iFromYear Integer iToYear
+        tCountryDay[] aDays
+        Integer iLast
+        Get paDays to aDays
+        Move (SizeOfArray(aDays) - 1) to iLast
+        If (iLast < 0) ;
+            Procedure_Return
+        Move iFromYear to aDays[iLast].iFromYear
+        Move iToYear   to aDays[iLast].iToYear
+        Set paDays to aDays
+    End_Procedure
+
+    // The day added last is iOffset days after (+) or before (-) its function's or fixed date - and, when iWeekday is
+    // not 0, only when that date is that ISO weekday (6 Saturday, 7 Sunday).
+    { Visibility = Public }
+    Procedure SetDayOffset Integer iOffset Integer iWeekday
+        tCountryDay[] aDays
+        Integer iLast
+        Get paDays to aDays
+        Move (SizeOfArray(aDays) - 1) to iLast
+        If (iLast < 0) ;
+            Procedure_Return
+        Move iOffset  to aDays[iLast].iOffset
+        Move iWeekday to aDays[iLast].iWeekday
+        Set paDays to aDays
+    End_Procedure
+
+    // The day added last counts only when the date is also sFunction's date: the UK's "Christmas Day (UK)" is Christmas
+    // Day when the Christmas Day bank holiday falls on it.
+    { Visibility = Public }
+    Procedure SetDayAlsoOn String sFunction
+        tCountryDay[] aDays
+        Integer iLast
+        Get paDays to aDays
+        Move (SizeOfArray(aDays) - 1) to iLast
+        If (iLast < 0) ;
+            Procedure_Return
+        Move sFunction to aDays[iLast].sAlsoFunction
+        Get DayFunctionID sFunction to aDays[iLast].iAlsoID
+        Set paDays to aDays
+    End_Procedure
+
+    // The first day of the list that falls on dDate, ByRef in Day; False when none does.
+    { Visibility = Public }
+    Function DayOn Date dDate tCountryDay ByRef Day Returns Boolean
+        tCountryDay[] aDays
+        Integer i iLast iYear iID
+        Date dBase dAlso
+        String sISO_Short
+
+        If (dDate < 1) ;
+            Function_Return False
+        Move (DateGetYear(dDate)) to iYear
+        Get psISO_Short to sISO_Short
+        Get paDays to aDays
+        Move (SizeOfArray(aDays) - 1) to iLast
+        For i from 0 to iLast
+            If (((aDays[i].iFromYear = 0) or (iYear >= aDays[i].iFromYear)) and ;
+                ((aDays[i].iToYear = 0) or (iYear <= aDays[i].iToYear))) Begin
+                If (aDays[i].iFunctionID <> 0) Begin
+                    Move aDays[i].iFunctionID to iID
+                    Get iID of ghoCalendarHolidays iYear sISO_Short to dBase
+                End
+                Else Begin
+                    Get DateSetDate of ghoCalendarHolidays iYear aDays[i].iMonth aDays[i].iDay to dBase
+                End
+                If ((dBase > 0) and (dDate = (dBase + aDays[i].iOffset))) Begin
+                    If ((aDays[i].iWeekday = 0) or (DateGetISODayOfWeek(ghoCalendarHolidays, dBase) = aDays[i].iWeekday)) Begin
+                        If (aDays[i].iAlsoID = 0) Begin
+                            Move aDays[i] to Day
+                            Function_Return True
+                        End
+                        Move aDays[i].iAlsoID to iID
+                        Get iID of ghoCalendarHolidays iYear sISO_Short to dAlso
+                        If (dAlso = dDate) Begin
+                            Move aDays[i] to Day
+                            Function_Return True
+                        End
+                    End
+                End
+            End
+        Loop
+        Function_Return False
+    End_Function
+
+    // The name of the holiday or special day on dInDate in the country's language, or "". bOfficialHoliday is True
+    // for an official holiday - a day off by law (in the UK, a bank holiday in any of its regions).
+    { Visibility = Public }
+    Function HolidayName Date dInDate Boolean ByRef bOfficialHoliday Returns String
+        tCountryDay Day
+        Boolean bFound
+        Move False to bOfficialHoliday
+        Get DayOn dInDate (&Day) to bFound
+        If (bFound = False) ;
+            Function_Return ""
+        Move (Day.iOfficial <> 0) to bOfficialHoliday
+        Function_Return Day.sName
+    End_Function
+
+    // Everything about the holiday or special day on dInDate (cCalendarHolidays.h.pkg's tHoliday): its name, whether it is
+    // an official holiday, the library function that gives it ("AshWednesday - 1 day" for a day before or after the
+    // function's date, "" for a fixed date) and, in the UK, the bank holiday's regions. The name is "" when no day of
+    // the list falls on dInDate.
+    { Visibility = Public }
+    Function HolidayDetails Date dInDate Returns tHoliday
+        tHoliday Holiday
+        tCountryDay Day
+        Boolean bFound
+        String sFunction
+
+        Move dInDate to Holiday.dDate
+        Move (psISO_Short(Self)) to Holiday.sISO_Short
+        Get DayOn dInDate (&Day) to bFound
+        If (bFound = False) ;
+            Function_Return Holiday
+        Move Day.sName to Holiday.sHolidayName
+        Move (Day.iOfficial <> 0) to Holiday.bNationalHoliday
+        If (pbRegionBits(Self)) ;
+            Move Day.iOfficial to Holiday.iRegions
+        Move Day.sFunction to sFunction
+        If ((sFunction <> "") and (Day.iOffset <> 0)) ;
+            Move (sFunction * If(Day.iOffset > 0, "+", "-") * String(Abs(Day.iOffset)) * If(Abs(Day.iOffset) = 1, "day", "days")) to sFunction
+        Move sFunction to Holiday.sFunction
+        Function_Return Holiday
+    End_Function
+
     // Is the date an official holiday - a day off by law - in this country? Asked by the working-day functions of
     // cCalendarHolidays (IsWorkingDay) with its piHolidayRegion. A country whose holidays differ by region answers
     // it itself (the British package, for the UK's regions); any other ignores the region and answers from
