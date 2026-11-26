@@ -29,7 +29,7 @@ Object oCalendarHolidays is a cCalendarHolidays
 
     { Published = True } 
     { Description = """
-      1:st Sunday after FeastChristKing. Falls Between november 27 and december 3. Four Sundays before ChristmasDay.
+      The first Sunday after FeastOfChristTheKing. Falls between November 27 and December 3. Four Sundays before ChristmasDay.
       """ }
     Function Advent1 Integer iYear Returns Date
         Date dReturn
@@ -39,7 +39,7 @@ Object oCalendarHolidays is a cCalendarHolidays
     End_Function
 
     { Published = True } 
-    { Description = "Falls one week after 1:st Advent" }
+    { Description = "Falls one week after the first Sunday of Advent (Advent1)" }
     Function Advent2 Integer iYear Returns Date
         Date dReturn
         Get FeastOfChristTheKing iYear to dReturn
@@ -48,7 +48,7 @@ Object oCalendarHolidays is a cCalendarHolidays
     End_Function
 
     { Published = True } 
-    { Description = "Falls two weeks after 1:st Advent" }
+    { Description = "Falls two weeks after the first Sunday of Advent (Advent1)" }
     Function Advent3 Integer iYear Returns Date
         Date dReturn
         Get FeastOfChristTheKing iYear to dReturn
@@ -57,7 +57,7 @@ Object oCalendarHolidays is a cCalendarHolidays
     End_Function
 
     { Published = True } 
-    { Description = "Falls three weeks after 1:st Advent (last Sunday before ChristmasDay, can ultimately fall on Christmas Eve)" }
+    { Description = "Falls three weeks after the first Sunday of Advent (Advent1) (last Sunday before ChristmasDay, can ultimately fall on Christmas Eve)" }
     Function Advent4 Integer iYear Returns Date
         Date dReturn
         Get FeastOfChristTheKing iYear to dReturn
@@ -70,7 +70,7 @@ Object oCalendarHolidays is a cCalendarHolidays
       All Saints Day is a feast celebrated on November 1 in Western Christianity, and on the first Sunday
       after Pentecost in Eastern Christianity in honour of All the saints, known and unknown.
       
-      In Sweden it is a moving holiday and is the Saturday that falls Between 31st of October and 6th of November.
+      In Sweden it is a moving holiday and is the Saturday that falls between 31st of October and 6th of November.
       See also the Halloween Function.
       Returns: The Date of All Saints Day, according to the Gregorian calendar.
       """ }
@@ -264,7 +264,7 @@ Object oCalendarHolidays is a cCalendarHolidays
     { Published = True } 
     { Description  = """
       Maundy Thursday, also known as Holy Thursday, Great and Holy Thursday, and Thursday of Mysteries.
-      HoMaundyly Thursday is a holiday in Denmark and Norway.
+      Maundy Thursday is a holiday in Denmark and Norway.
       
       Returns: The Maundy Thursday, according to the Gregorian calendar (for years after 1752)
       or the Julian calendar (for years before 1753) as a Date variable.
@@ -280,7 +280,7 @@ Object oCalendarHolidays is a cCalendarHolidays
       Good Friday, also called Holy Friday, Black Friday, or Great Friday.
       In most Christian countries it's a national holiday.
       
-      In the US it is not a govermental holiday at federal level; individual states and municipalities may observe the holiday.
+      In the US it is not a governmental holiday at federal level; individual states and municipalities may observe the holiday.
       
       Returns: The Good Friday, according to the Gregorian calendar (for years after 1752)
       or the Julian calendar (for years before 1753) as a Date variable.
@@ -322,15 +322,15 @@ Object oCalendarHolidays is a cCalendarHolidays
     { Published = True } 
     { Description  = """
       Whit Sunday or Pentecost is one of the prominent feasts in the Christian liturgical year.
-      It is celebrated 7 weeks (49 days) after Easter Sunday - hence its name.;
+      It is celebrated 7 weeks (49 days) after Easter Sunday - hence its name.
       Pentecost is a public holiday in many European countries including Austria, Belgium, Cyprus,
       Denmark, Estonia, France, Spain, Germany, Hungary, Luxemburg, The Netherlands, Norway, Poland,
       Romania, and (most parts of) Switzerland.
       
       In Sweden it is no longer (as of 2005) a holiday,
-      While Italy is discussing whether to re-establish it.
+      while Italy is discussing whether to re-establish it.
       
-      Returns: The date of Whit Sunday, according to the Gregorian calendar (for years:
+      Returns: The date of Whit Sunday, according to the Gregorian calendar (for years
       after 1752) or the Julian calendar (for years before 1753) as a Date variable.
       """ }
     Function WhitSunday Integer iYear Returns Date
@@ -417,7 +417,7 @@ Object oCalendarHolidays is a cCalendarHolidays
     { Published = True } 
     { Description  = """
       May Day Bank Holiday.
-      Brittish holiday on the first Monday in May.
+      British holiday on the first Monday in May.
       In 2012 it stayed on May 7: the Spring bank holiday (MemorialDay, GB) moved to June 4 to mark
       the Queen's diamond jubilee, and an extra bank holiday was added on June 5 (GB).
       In 2020 it moved to Friday May 8, the 75th anniversary of VE Day.
@@ -473,7 +473,7 @@ Object oCalendarHolidays is a cCalendarHolidays
     { Published = True } 
     { Description  = """
       Late Summer Bank Holiday.
-      Brittish holiday on the last Monday in August (GB).
+      British holiday on the last Monday in August (GB).
       """ }
     Function LateSummerBankDay Integer iYear String sISO_Short Returns Date
         Date dReturn
@@ -520,12 +520,12 @@ Object oCalendarHolidays is a cCalendarHolidays
     { Published = True } 
     { Description  = """
       Father's Day falls mostly on the second Sunday in June, but it differs for many countries.
-      In Sweden it falls on the second Sunday of November
+      In Sweden it falls on the second Sunday of November.
       In Denmark it is fixed and always falls on the fifth of June.
-      In Australia and New Zealand it falls on the first Sunday of September
-      In Germany it is celebrated on Ascension Day (forty days after Easter)
-      In Brazil it falls on the second Sunday of August
-      In Argentina,United Kingdom, Netherlands and United States it falls on the third Sunday in June.
+      In Australia and New Zealand it falls on the first Sunday of September.
+      In Germany it is celebrated on Ascension Day (forty days after Easter).
+      In Brazil it falls on the second Sunday of August.
+      In Argentina, United Kingdom, Netherlands and United States it falls on the third Sunday in June.
       
       Else: The most common day is the second Sunday of June.
       It is however, not a holiday.
@@ -609,7 +609,7 @@ Object oCalendarHolidays is a cCalendarHolidays
     End_Function
 
     { Published = True } 
-    { Description = "Feast of Christ the King the last holy Sunday in the western liturgical calendar. Falls on a Sunday 20-26 November." }
+    { Description = "Feast of Christ the King is the last Sunday in the western liturgical calendar. Falls on a Sunday 20-26 November." }
     Function FeastOfChristTheKing Integer iYear Returns Date
         Date dReturn
         Integer iDayNumber
@@ -770,8 +770,8 @@ Object oCalendarHolidays is a cCalendarHolidays
     { Description = """
       Black Friday falls on the day after Thanksgiving Day and traditionally is the beginning
       of the Christmas shopping season. Especially popular in the United States, the event is spreading to
-      other nations such as Canada and Australia. Black Friday is not actually a holiday, but many employers give their;
-      employees the day off, increasing the Number of potential shoppers.
+      other nations such as Canada and Australia. Black Friday is not actually a holiday, but many employers give their
+      employees the day off, increasing the number of potential shoppers.
       Returns: The date of Thanksgiving + one day = 'Black Friday'
       """ }
     Function BlackFriday Integer iYear Returns Date
@@ -838,7 +838,7 @@ Object oCalendarHolidays is a cCalendarHolidays
     End_Function
 
     { Published = True } 
-    { Description = "FlagDay always falls on the June 14. Commemorates the adoption of the flag of the United States, in 1777." }
+    { Description = "FlagDay always falls on June 14. Commemorates the adoption of the flag of the United States, in 1777." }
     Function FlagDay Integer iYear String sISO_Short Returns Date
         Date dReturn
         If (sISO_Short = "US") Begin
@@ -848,7 +848,7 @@ Object oCalendarHolidays is a cCalendarHolidays
     End_Function
 
     { Published = True } 
-    { Description = "PatriotsDay falls on the September 11. (US)" }
+    { Description = "PatriotsDay falls on September 11. (US)" }
     Function PatriotsDay Integer iYear String sISO_Short Returns Date
         Date dReturn
         If (sISO_Short = "US") Begin            
@@ -878,7 +878,7 @@ Object oCalendarHolidays is a cCalendarHolidays
     End_Function
 
     { Published = True } 
-    { Description = "ValborgsEve is the last day of April. Big festive day in Sweden" }
+    { Description = "ValborgsEve is the last day of April. Big festive day in Sweden." }
     Function ValborgsEve Integer iYear Returns Date
         Date dReturn
         Get DateSetDate iYear 4 30 to dReturn
@@ -888,10 +888,10 @@ Object oCalendarHolidays is a cCalendarHolidays
     { Published = True } 
     { Description = """
       Halloween is not to be confused with All Saints Day. Halloween always falls on October 31.
-      Halloween is originally the Celtic New Years Eve, and
+      Halloween is originally the Celtic New Year's Eve, and
       All Saints Day is a Christian holiday in honour of all Saints.
       Public Holiday in the USA (not national holiday).
-      Returns: The date of All Saints Day, according to the Gregorian calendar.
+      Returns: The date of Halloween.
       """ }
     Function Halloween Integer iYear Returns Date
         Date dReturn
@@ -1197,7 +1197,7 @@ Object oCalendarHolidays is a cCalendarHolidays
 
     { Published = True }
     { Description = """
-      St.Patrick' Day bank holiday - the Monday after St.Patrick's Day if the latter
+      St. Patrick's Day bank holiday - the Monday after St. Patrick's Day if the latter
       falls at a weekend (GB)
       """ }
     Function StPatricksDayBH Integer iYear String sISO_Short Returns Date
@@ -1399,8 +1399,8 @@ Object oCalendarHolidays is a cCalendarHolidays
 
     { Published = True }
     { Description = """
-      Spring Equinox
-      Equinox is the two moments in the year when the sun is exactly above
+      Spring equinox.
+      An equinox is one of the two moments in the year when the sun is exactly above
       the Equator and day and night are of equal length.
       """ }
     Function VernalEquinox Integer iYear String sISO_Short Returns Date
@@ -1443,8 +1443,8 @@ Object oCalendarHolidays is a cCalendarHolidays
     
     { Published = True }
     { Description = """
-      Autumn Equinox
-      Equinox is the two moments in the year when the sun is exactly above
+      Autumn equinox.
+      An equinox is one of the two moments in the year when the sun is exactly above
       the Equator and day and night are of equal length.
       """ }
     Function AutumnalEquinox Integer iYear String sISO_Short Returns Date
