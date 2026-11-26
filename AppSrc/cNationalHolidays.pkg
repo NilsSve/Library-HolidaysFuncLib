@@ -50,6 +50,29 @@ Class cNationalHolidays is a cObject
         // The country's holidays and special days, in the order they are looked up (AddDay, AddFixedDay).
         { Visibility = Public }
         Property tCountryDay[] paDays
+        // THE CALENDAR'S WORDS in the country's language (cCalendarHolidays' CountryWords): set the ones the language
+        // needs; an empty one is English.
+        { Visibility = Public }
+        Property String psTextWeek ""     // the heading of a calendar's week numbers: "Wk"
+        { Visibility = Public }
+        Property String psTextWorkingDaysNote ""     // a month's working days (%1 = how many): "%1 working days"
+        { Visibility = Public }
+        Property String psTextHoliday ""     // an official holiday on a working weekday: "Holiday, day off"
+        { Visibility = Public }
+        Property String psTextHolidayWeekend ""     // an official holiday on a weekend day: "Holiday on a weekend"
+        { Visibility = Public }
+        Property String psTextSpecial ""     // a named day that is worked: "Special day, worked"
+        { Visibility = Public }
+        Property String psTextSpecialWeekend ""     // a named day on a weekend day: "Special day, weekend"
+        { Visibility = Public }
+        Property String psTextWeekend ""     // a day off every week (psWeekendMask): "Off every week"
+        { Visibility = Public }
+        Property String psTextClosed ""     // a closure day (padClosedDays): "Closed"
+        { Visibility = Public }
+        Property String psTextClosedDay ""     // a closure day's name, when it has none of its own: "Closure day"
+        { Visibility = Public }
+        Property String psTextWorkingDay ""     // a working day: "Working day"
+
         // True when the official value of the days (AddDay's last argument) is region bits rather than True or False:
         // the UK package's bank holiday regions. HolidayDetails gives them in iRegions.
         { Visibility = Public }

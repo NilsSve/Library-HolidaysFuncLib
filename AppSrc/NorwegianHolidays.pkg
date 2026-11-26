@@ -30,6 +30,18 @@ Object oNorwegianHolidays is a cNationalHolidays
     Set psISO_Short to "NO"
     Set psLocaleName to "nb-NO"    // the month and day names in the country's language
 
+    // The calendar's words in the country's language (cCalendarHolidays' CountryWords; English where not set).
+    Set psTextWeek             to "Uke"
+    Set psTextWorkingDaysNote  to "%1 arbeidsdager"
+    Set psTextHoliday          to "Helligdag, fri"
+    Set psTextHolidayWeekend   to "Helligdag i helgen"
+    Set psTextSpecial          to "Merkedag, arbeidsdag"
+    Set psTextSpecialWeekend   to "Merkedag, helg"
+    Set psTextWeekend          to "Fri hver uke"
+    Set psTextClosed           to "Stengt"
+    Set psTextClosedDay        to "Stengt dag"
+    Set psTextWorkingDay       to "Arbeidsdag"
+
     // THE DAYS (2026-11-26): looked up in this order - the first that falls on a date names it, so when two fall on
     // the same date the one listed first wins. AddDay gives a day by one of the library's date functions
     // (oCalendarHolidays.pkg), AddFixedDay by its month and day; the last argument is True for an official holiday -

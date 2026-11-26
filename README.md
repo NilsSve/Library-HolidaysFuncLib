@@ -87,6 +87,8 @@ End_Object
 
 and `Send Refresh` when the country, the month or the settings have changed. After a Refresh it tells what it counted: `piWorkingDays`, `piHolidays`, `piSpecial` and `paNamedDays`. Twelve of them make a year - the demo's Year Overview.
 
+The calendar's words come in the country's language too: the heading of the week numbers, the note of the month's working days ("%1 arbetsdagar") and what a day is ("Helgdag, ledig"). Each country package sets them (`psTextWeek`, `psTextWorkingDaysNote`, `psTextHoliday` ...), and `CountryWords` returns them as one `tCountryWords` struct - English where a package sets none. A program that sets one of the calendar's own `psText...` properties gets its own word instead.
+
 ## Unit tests
 
 `AppSrc\UnitTests.src` is the unit-test program of the library, built on

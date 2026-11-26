@@ -247,4 +247,19 @@ Object oCalendarHolidays_Tests is a cTestFixture
         Send AssertSAreEqual "ChristmasDay" sFunction "The function that gives it."
     End_Procedure
 
+
+    { Published=True }
+    Procedure Test_CountryWords_In_The_Countrys_Language
+        tCountryWords Words
+        Get CountryWords of ghoCalendarHolidays "SE" to Words
+        Send AssertSAreEqual "V"              Words.sWeek            "The Swedish heading of the week numbers."
+        Send AssertSAreEqual "%1 arbetsdagar" Words.sWorkingDaysNote "A Swedish month's working days."
+        Send AssertSAreEqual "Arbetsdag"      Words.sWorkingDay      "A Swedish working day."
+        Get CountryWords of ghoCalendarHolidays "US" to Words
+        Send AssertSAreEqual "Wk"               Words.sWeek    "The US package sets no words: English."
+        Send AssertSAreEqual "Holiday, day off" Words.sHoliday "English."
+        Get CountryWords of ghoCalendarHolidays "ZZ" to Words
+        Send AssertSAreEqual "%1 working days" Words.sWorkingDaysNote "No package for the country: English."
+    End_Procedure
+
 End_Object

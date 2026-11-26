@@ -26,6 +26,18 @@ Object oSpanishHolidays is a cNationalHolidays
     Set psISO_Short to "ES"
     Set psLocaleName to "es-ES"    // the month and day names in the country's language
 
+    // The calendar's words in the country's language (cCalendarHolidays' CountryWords; English where not set).
+    Set psTextWeek             to "Sem"
+    Set psTextWorkingDaysNote  to "%1 días laborables"
+    Set psTextHoliday          to "Festivo, no laborable"
+    Set psTextHolidayWeekend   to "Festivo en fin de semana"
+    Set psTextSpecial          to "Día especial, laborable"
+    Set psTextSpecialWeekend   to "Día especial, fin de semana"
+    Set psTextWeekend          to "Libre cada semana"
+    Set psTextClosed           to "Cerrado"
+    Set psTextClosedDay        to "Día de cierre"
+    Set psTextWorkingDay       to "Día laborable"
+
     // THE DAYS (2026-11-26): looked up in this order - the first that falls on a date names it, so when two fall on
     // the same date the one listed first wins. AddDay gives a day by one of the library's date functions
     // (oCalendarHolidays.pkg), AddFixedDay by its month and day; the last argument is True for an official holiday -

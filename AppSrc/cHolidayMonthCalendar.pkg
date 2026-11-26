@@ -37,8 +37,9 @@
      ftcal-wkd            a day off every week (psWeekendMask)
      ftcal-cls            a closure day (padClosedDays)
    The working days follow the library's settings - psWeekendMask, padClosedDays, piHolidayRegion - as IsWorkingDay
-   does. The month and day names come in the country's language (CountryLocaleName); the words of the tooltips are
-   properties (psTextHoliday ...), English unless a program sets its own.
+   does. The month and day names come in the country's language (CountryLocaleName), and so do the words - the
+   week numbers' heading, the note of the working days and what a day is (CountryWords, from the country's package;
+   English where it has none). A program that sets one of the psText... properties gets its own word instead.
 
    WHAT IT COUNTS, for a page that sums a year: after Refresh, piWorkingDays, piHolidays (official holidays on
    working weekdays) and piSpecial (named days that are worked), and paNamedDays - the month's named days and
@@ -69,26 +70,55 @@ Class cHolidayMonthCalendar is a cFTMonthCalendar
         Property Integer piHolidays 0
         Property Integer piSpecial 0
         Property tHolidayCalendarDay[] paNamedDays
-        // The words: the note in the heading (%1 = the working days), and what a day is.
-        Property String psTextWorkingDaysNote "%1 working days"
-        Property String psTextHoliday "Holiday, day off"
-        Property String psTextHolidayWeekend "Holiday on a weekend"
-        Property String psTextSpecial "Special day, worked"
-        Property String psTextSpecialWeekend "Special day, weekend"
-        Property String psTextWeekend "Off every week"
-        Property String psTextClosed "Closed"
-        Property String psTextClosedDay "Closure day"
-        Property String psTextWorkingDay "Working day"
+        // The words: the week numbers' heading, the note in the heading (%1 = the working days), and what a day is.
+        // "" = the country's word (CountryWords, from its package; English where it has none) - set one for your own.
+        Property String psTextWeek ""
+        Property String psTextWorkingDaysNote ""
+        Property String psTextHoliday ""
+        Property String psTextHolidayWeekend ""
+        Property String psTextSpecial ""
+        Property String psTextSpecialWeekend ""
+        Property String psTextWeekend ""
+        Property String psTextClosed ""
+        Property String psTextClosedDay ""
+        Property String psTextWorkingDay ""
+        // The words this drawing uses: the country's, with the program's own over them (Refresh).
+        { Visibility=Private }
+        Property tCountryWords private.pWords
     End_Procedure
 
-    // Draw the month: the counts start again, and the names take the country's language.
+    // Draw the month: the counts start again, and the names and the words take the country's language.
     Procedure Refresh
         tHolidayCalendarDay[] aNone
+        tCountryWords Words
         Set piWorkingDays to 0
         Set piHolidays to 0
         Set piSpecial to 0
         Set paNamedDays to aNone
         Set psLocaleName to (CountryLocaleName(ghoCalendarHolidays, psISO_Short(Self)))
+        Get CountryWords of ghoCalendarHolidays (psISO_Short(Self)) to Words
+        If (psTextWeek(Self) <> "") ;
+            Move (psTextWeek(Self)) to Words.sWeek
+        If (psTextWorkingDaysNote(Self) <> "") ;
+            Move (psTextWorkingDaysNote(Self)) to Words.sWorkingDaysNote
+        If (psTextHoliday(Self) <> "") ;
+            Move (psTextHoliday(Self)) to Words.sHoliday
+        If (psTextHolidayWeekend(Self) <> "") ;
+            Move (psTextHolidayWeekend(Self)) to Words.sHolidayWeekend
+        If (psTextSpecial(Self) <> "") ;
+            Move (psTextSpecial(Self)) to Words.sSpecial
+        If (psTextSpecialWeekend(Self) <> "") ;
+            Move (psTextSpecialWeekend(Self)) to Words.sSpecialWeekend
+        If (psTextWeekend(Self) <> "") ;
+            Move (psTextWeekend(Self)) to Words.sWeekend
+        If (psTextClosed(Self) <> "") ;
+            Move (psTextClosed(Self)) to Words.sClosed
+        If (psTextClosedDay(Self) <> "") ;
+            Move (psTextClosedDay(Self)) to Words.sClosedDay
+        If (psTextWorkingDay(Self) <> "") ;
+            Move (psTextWorkingDay(Self)) to Words.sWorkingDay
+        Set private.pWords to Words
+        Set psWeekCaption to Words.sWeek
         Forward Send Refresh
     End_Procedure
 
@@ -101,8 +131,10 @@ Class cHolidayMonthCalendar is a cFTMonthCalendar
         Integer iIsoDay iWorking
         tHolidayCalendarDay[] aNamed
         tHolidayCalendarDay Named
+        tCountryWords Words
 
         Get psISO_Short to sISO_Short
+        Get private.pWords to Words
         Move False to bOfficial
         Get HolidayName of ghoCalendarHolidays dDate sISO_Short (&bOfficial) to sName
         Move (Trim(sName)) to sName
@@ -121,31 +153,31 @@ Class cHolidayMonthCalendar is a cFTMonthCalendar
         Case Begin
             Case (bClosed)
                 Move "ftcal-cls" to sClass
-                Get psTextClosed to sWhat
+                Move Words.sClosed to sWhat
                 Case Break
             Case ((bWorking = False) and (bWeekend = False))
                 Move "ftcal-off" to sClass
-                Get psTextHoliday to sWhat
+                Move Words.sHoliday to sWhat
                 Case Break
             Case (bWeekend and (sName <> "") and bOfficial)
                 Move "ftcal-off ftcal-wkd" to sClass
-                Get psTextHolidayWeekend to sWhat
+                Move Words.sHolidayWeekend to sWhat
                 Case Break
             Case (bWeekend and (sName <> ""))
                 Move "ftcal-spc ftcal-wkd" to sClass
-                Get psTextSpecialWeekend to sWhat
+                Move Words.sSpecialWeekend to sWhat
                 Case Break
             Case (bWeekend)
                 Move "ftcal-wkd" to sClass
-                Get psTextWeekend to sWhat
+                Move Words.sWeekend to sWhat
                 Case Break
             Case (sName <> "")
                 Move "ftcal-spc" to sClass
-                Get psTextSpecial to sWhat
+                Move Words.sSpecial to sWhat
                 Case Break
             Case Else
                 Move "" to sClass
-                Get psTextWorkingDay to sWhat
+                Move Words.sWorkingDay to sWhat
         Case End
 
         // The counts.
@@ -162,7 +194,7 @@ Class cHolidayMonthCalendar is a cFTMonthCalendar
         // A named day, or a closure day, for the page's list.
         If ((sName <> "") or bClosed) Begin
             Move dDate to Named.dDate
-            Move (If(sName = "", psTextClosedDay(Self), sName)) to Named.sName
+            Move (If(sName = "", Words.sClosedDay, sName)) to Named.sName
             Move sClass to Named.sClass
             Move sWhat to Named.sWhat
             Move bWorking to Named.bWorking
@@ -185,7 +217,9 @@ Class cHolidayMonthCalendar is a cFTMonthCalendar
 
     // The heading's note: the month's working days.
     Function MonthNote Returns String
-        Function_Return (Replace("%1", psTextWorkingDaysNote(Self), String(piWorkingDays(Self))))
+        tCountryWords Words
+        Get private.pWords to Words
+        Function_Return (Replace("%1", Words.sWorkingDaysNote, String(piWorkingDays(Self))))
     End_Function
 
 End_Class

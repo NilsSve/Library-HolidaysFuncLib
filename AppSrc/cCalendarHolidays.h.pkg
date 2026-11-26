@@ -32,6 +32,21 @@ Struct tHoliday
     Integer iRegions           // the UK: the bank holiday's regions, the CI_UKRegion... bits (8: the whole UK); 0 elsewhere
 End_Struct  
 
+// A calendar's words in a country's language (CountryWords): what a day is, and the week numbers' heading. The
+// country packages give them (cNationalHolidays' psText... properties); English where a package gives none.
+Struct tCountryWords
+    String sWeek                 // the heading of a calendar's week numbers
+    String sWorkingDaysNote      // a month's working days (%1 = how many)
+    String sHoliday              // an official holiday on a working weekday
+    String sHolidayWeekend       // an official holiday on a weekend day
+    String sSpecial              // a named day that is worked
+    String sSpecialWeekend       // a named day on a weekend day
+    String sWeekend              // a day off every week (psWeekendMask)
+    String sClosed               // a closure day (padClosedDays)
+    String sClosedDay            // a closure day's name, when it has none of its own
+    String sWorkingDay           // a working day
+End_Struct
+
 Struct tHolidayFuncVar
     String sType
     String sVarName

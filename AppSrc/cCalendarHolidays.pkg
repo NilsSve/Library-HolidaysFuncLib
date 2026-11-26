@@ -30,6 +30,17 @@ Use cCalendarHolidays.h.pkg
 Register_Function IsOfficialDayOff Date dDate Integer iRegion Returns Boolean
 // The language of a country package (cNationalHolidays), which MonthNameOfCountry and DayNameOfCountry ask.
 Register_Function psLocaleName Returns String
+// A country package's words (CountryWords).
+Register_Function psTextWeek Returns String
+Register_Function psTextWorkingDaysNote Returns String
+Register_Function psTextHoliday Returns String
+Register_Function psTextHolidayWeekend Returns String
+Register_Function psTextSpecial Returns String
+Register_Function psTextSpecialWeekend Returns String
+Register_Function psTextWeekend Returns String
+Register_Function psTextClosed Returns String
+Register_Function psTextClosedDay Returns String
+Register_Function psTextWorkingDay Returns String
 
 /*   What is the function library for "Holidays and other special dates"?
      
@@ -650,6 +661,65 @@ Class cCalendarHolidays is a cObject
             Function_Return ""
         Get psLocaleName of hoCountry to sLocaleName
         Function_Return sLocaleName
+    End_Function
+
+    // A CALENDAR'S WORDS IN THE COUNTRY'S LANGUAGE (2026-11-26): what a day is - "Holiday, day off" - the note of a
+    // month's working days and the heading of the week numbers. The country's package gives them (its psText...
+    // properties); a word it leaves empty, or a country without a package, gets the English one here.
+    { Visibility = Public }
+    { Description  = "A calendar's words in a country's language, as a tCountryWords struct: the heading of the" }
+    { Description += "week numbers, the note of a month's working days and what a day is (a holiday, a special" }
+    { Description += "day ...). The country's holiday package gives them; English where it gives none." }
+    Function CountryWords String sISO_Short Returns tCountryWords
+        tCountryWords Words
+        Handle hoCountry
+        String sWord
+
+        Move "Wk" to Words.sWeek
+        Move "%1 working days" to Words.sWorkingDaysNote
+        Move "Holiday, day off" to Words.sHoliday
+        Move "Holiday on a weekend" to Words.sHolidayWeekend
+        Move "Special day, worked" to Words.sSpecial
+        Move "Special day, weekend" to Words.sSpecialWeekend
+        Move "Off every week" to Words.sWeekend
+        Move "Closed" to Words.sClosed
+        Move "Closure day" to Words.sClosedDay
+        Move "Working day" to Words.sWorkingDay
+
+        Get NationalHolidaysObject sISO_Short to hoCountry
+        If (hoCountry = 0) ;
+            Function_Return Words
+        Get psTextWeek of hoCountry to sWord
+        If (sWord <> "") ;
+            Move sWord to Words.sWeek
+        Get psTextWorkingDaysNote of hoCountry to sWord
+        If (sWord <> "") ;
+            Move sWord to Words.sWorkingDaysNote
+        Get psTextHoliday of hoCountry to sWord
+        If (sWord <> "") ;
+            Move sWord to Words.sHoliday
+        Get psTextHolidayWeekend of hoCountry to sWord
+        If (sWord <> "") ;
+            Move sWord to Words.sHolidayWeekend
+        Get psTextSpecial of hoCountry to sWord
+        If (sWord <> "") ;
+            Move sWord to Words.sSpecial
+        Get psTextSpecialWeekend of hoCountry to sWord
+        If (sWord <> "") ;
+            Move sWord to Words.sSpecialWeekend
+        Get psTextWeekend of hoCountry to sWord
+        If (sWord <> "") ;
+            Move sWord to Words.sWeekend
+        Get psTextClosed of hoCountry to sWord
+        If (sWord <> "") ;
+            Move sWord to Words.sClosed
+        Get psTextClosedDay of hoCountry to sWord
+        If (sWord <> "") ;
+            Move sWord to Words.sClosedDay
+        Get psTextWorkingDay of hoCountry to sWord
+        If (sWord <> "") ;
+            Move sWord to Words.sWorkingDay
+        Function_Return Words
     End_Function
 
     // One value of a named locale (GetLocaleInfoEx) - of the computer's own locale when sLocaleName is "".
